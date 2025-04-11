@@ -1,0 +1,9 @@
+syntax = "proto3";
+
+option java_package = "bob.colbaskin.datastore";
+option java_multiple_files = true;
+
+enum AuthStatus {
+  NOT_AUTHENTICATED = 0;
+  AUTHENTICATED = 1;
+}
