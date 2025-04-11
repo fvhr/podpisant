@@ -12,6 +12,14 @@
     font-weight: bold;
   }
 
+  &__toggle {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 10px;
+    margin-right: 10px;
+  }
+
   &__icon {
     font-size: 1.5rem;
     cursor: pointer;
