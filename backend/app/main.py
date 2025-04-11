@@ -30,14 +30,12 @@ app.add_middleware(
 
 logger = logging.getLogger(__name__)
 
-if os.getenv("DEBUG", "false").lower() in ("false", "0"):
+def main():
+    logger.info("Starting application")
+    from gunicorn_application import Application
+    gunicorn_config: GunicornConfig = GunicornConfig()
+    gunicorn_app = Application(application=app, options=asdict(gunicorn_config))
+    gunicorn_app.run()
 
-    def main():
-        logger.info("Starting application")
-        from gunicorn_application import Application
-        gunicorn_config: GunicornConfig = GunicornConfig()
-        gunicorn_app = Application(application=app, options=asdict(gunicorn_config))
-        gunicorn_app.run()
-
-    if __name__ == "__main__":
-        main()
+if __name__ == "__main__":
+    main()
