@@ -8,7 +8,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from api.router import api_router
 from config import GunicornConfig
 
-app = FastAPI(title="Podpdisant Api")
+app = FastAPI(title="Podpdisant Api", root_path="/api")
 
 app.include_router(api_router)
 
