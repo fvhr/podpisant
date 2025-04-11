@@ -1,4 +1,3 @@
 #!/bin/sh
-
-cd app && \
-python3 -m main
+cd /podpisant.api/app || { echo "ERROR: Cannot cd to /podpisant.api"; exit 1; }
+python3 main.py
