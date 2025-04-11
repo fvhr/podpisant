@@ -1,0 +1,24 @@
+.header {
+  height: 7vh;
+  background: linear-gradient(135deg, #262858, #403C88);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 24px;
+  color: #F0F0FF;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+
+  &__logo {
+    font-weight: bold;
+  }
+
+  &__icon {
+    font-size: 1.5rem;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+
+    &:hover {
+      transform: scale(1.1);
+    }
+  }
+}
