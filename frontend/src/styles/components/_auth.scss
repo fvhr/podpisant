@@ -1,0 +1,115 @@
+@import '../lib/variables';
+
+.auth-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background-color: $color-bg;
+  padding: 20px;
+}
+
+.auth-form {
+  background-color: $color-card;
+  border-radius: 12px;
+  padding: 40px;
+  width: 100%;
+  max-width: 400px;
+  color: #fff;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+
+  h2 {
+    text-align: center;
+    margin-bottom: 20px;
+    font-size: 24px;
+  }
+}
+
+.email-notice {
+  text-align: center;
+  margin-bottom: 30px;
+  color: $color-text-muted;
+  font-size: 14px;
+}
+
+.form-group {
+  margin-bottom: 25px;
+
+  label {
+    display: block;
+    margin-bottom: 8px;
+    font-size: 16px;
+    color: $color-text;
+  }
+
+  input {
+    width: 100%;
+    padding: 14px;
+    background-color: $color-input;
+    border: 1px solid $color-input-border;
+    border-radius: 6px;
+    color: #fff;
+    font-size: 16px;
+
+    &:focus {
+      outline: none;
+      border-color: #4d48ab;
+    }
+
+    &.error {
+      border-color: $color-error;
+    }
+  }
+}
+
+.code-inputs {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 30px;
+
+  .code-input {
+    width: 60px;
+    height: 60px;
+    text-align: center;
+    font-size: 24px;
+    border: 2px solid $color-input-border;
+    border-radius: 8px;
+    background-color: $color-input;
+    color: #fff;
+
+    &:focus {
+      border-color: #4d48ab;
+      outline: none;
+    }
+  }
+}
+
+.error-message {
+  color: #ff5a5f;
+  font-size: 13px;
+  margin-top: 5px;
+  display: block;
+}
+
+.submit-btn {
+  width: 100%;
+  background-color: $color-button;
+  color: white;
+  border: none;
+  padding: 16px;
+  border-radius: 6px;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s;
+
+  &:hover:not(:disabled) {
+    background-color: #5d54d6;
+  }
+
+  &:disabled {
+    background-color: #575395;
+    cursor: not-allowed;
+    opacity: 0.7;
+  }
+}
