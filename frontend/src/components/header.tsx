@@ -1,8 +1,13 @@
 import React from 'react';
-import '../styles/app.scss';
 import { FiLogOut } from 'react-icons/fi';
+import '../styles/app.scss';
 
-export const Header: React.FC = () => {
+interface HeaderProps {
+    isSidebarOpen: boolean;
+    toggleSidebar: () => void;
+}
+
+export const Header: React.FC<HeaderProps> = () => {
     return (
         <header className="header">
             <div className="header__logo">НуСервисКрутой</div>
