@@ -1,20 +1,56 @@
 package bob.colbaskin.iubip_spring2025.auth.presentation
 
+import android.util.Log
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import bob.colbaskin.iubip_spring2025.auth.presentation.otp.AuthAction
 import bob.colbaskin.iubip_spring2025.auth.presentation.otp.OtpAction
 import bob.colbaskin.iubip_spring2025.auth.presentation.otp.OtpState
+import bob.colbaskin.iubip_spring2025.common.models.AuthConfig
+import bob.colbaskin.iubip_spring2025.onboarding.domain.UserPreferencesRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
+import java.util.regex.Pattern
 
 private const val VALID_OTP_CODE = "1414"
 
 @HiltViewModel
-class AuthViewModel @Inject constructor(): ViewModel() {
+class AuthViewModel @Inject constructor(
+    private val preferencesRepository: UserPreferencesRepository
+): ViewModel() {
+    var email by mutableStateOf("")
+        private set
+    var isValid by mutableStateOf(false)
+        private set
+
     private val _state = MutableStateFlow(OtpState())
     val state = _state.asStateFlow()
+
+    private val EMAIL_REGEX = Pattern.compile(
+        "[a-zA-Z0-9\\+\\.\\_\\%\\-\\+]{1,256}" +
+                "\\@" +
+                "[a-zA-Z0-9][a-zA-Z0-9\\-]{0,64}" +
+                "(" +
+                "\\." +
+                "[a-zA-Z0-9][a-zA-Z0-9\\-]{0,25}" +
+                ")+"
+    )
+
+    fun updateEmail(newEmail: String) {
+        email = newEmail
+        isValid = validateEmail(newEmail)
+    }
+
+    private fun validateEmail(email: String): Boolean {
+        return EMAIL_REGEX.matcher(email).matches()
+    }
 
     fun onAction(action: OtpAction) {
         when(action) {
@@ -38,6 +74,23 @@ class AuthViewModel @Inject constructor(): ViewModel() {
                     },
                     focusedIndex = previousIndex
                 ) }
+            }
+        }
+    }
+
+    fun action(action: AuthAction) {
+        when(action) {
+            AuthAction.Authenticated -> {
+                viewModelScope.launch {
+                    Log.d("Logging", "Authenticated status from VM")
+                    preferencesRepository.saveUserAuthStatus(AuthConfig.AUTHENTICATED)
+                }
+            }
+            AuthAction.NotAuthenticated -> {
+                viewModelScope.launch {
+                    Log.d("Logging", "NotAuthenticated status from VM")
+                    preferencesRepository.saveUserAuthStatus(AuthConfig.NOT_AUTHENTICATED)
+                }
             }
         }
     }

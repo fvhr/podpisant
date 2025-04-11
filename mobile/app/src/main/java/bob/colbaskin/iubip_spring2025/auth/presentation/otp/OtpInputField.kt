@@ -35,6 +35,8 @@ import androidx.compose.ui.unit.sp
 import androidx.core.text.isDigitsOnly
 import bob.colbaskin.iubip_spring2025.ui.theme.IUBIPSPRING2025Theme
 import bob.colbaskin.iubip_spring2025.ui.theme.ButtonColor
+import bob.colbaskin.iubip_spring2025.ui.theme.CardColor
+import bob.colbaskin.iubip_spring2025.ui.theme.TextColor
 
 @Composable
 fun OtpInputField(
@@ -63,7 +65,7 @@ fun OtpInputField(
         modifier = modifier
             .border(
                 width = 1.dp,
-                color = ButtonColor
+                color = CardColor
             )
             .background(ButtonColor),
         contentAlignment = Alignment.Center
@@ -82,7 +84,7 @@ fun OtpInputField(
                 textAlign = TextAlign.Center,
                 fontWeight = FontWeight.Light,
                 fontSize = 36.sp,
-                color = ButtonColor
+                color = TextColor
             ),
             keyboardOptions = KeyboardOptions(
                 keyboardType = KeyboardType.NumberPassword
@@ -107,7 +109,7 @@ fun OtpInputField(
                     Text(
                         text = "-",
                         textAlign = TextAlign.Center,
-                        color = ButtonColor,
+                        color = TextColor,
                         fontSize = 36.sp,
                         fontWeight = FontWeight.Light,
                         modifier = Modifier
