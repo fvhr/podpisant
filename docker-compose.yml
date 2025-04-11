@@ -40,16 +40,10 @@ services:
     build:
       context: backend
       dockerfile: Dockerfile
-#    image: menoitami/podpisant.api
+#    image: menoitami/podpisant.api:latest
     command: [ "sh", "/podpisant.api/docker/serve.sh" ]
     expose:
       - 8000
-    healthcheck:
-      test: [ "CMD-SHELL", "curl -fsSL http://localhost:8000/healthcheck" ]
-      interval: 10s
-      timeout: 60s
-      retries: 5
-      start_period: 10s
     depends_on:
       db:
         condition: service_healthy
@@ -143,6 +137,7 @@ services:
       - ./certbot/www:/var/www/certbot:rw
       - ./static:/usr/share/nginx/html
       - ./certs:/etc/nginx/certs
+      - ./app/options-ssl-nginx.conf:/etc/letsencrypt/options-ssl-nginx.conf
     depends_on:
       - api
       - db
