@@ -1,7 +1,7 @@
 import os
 from dataclasses import dataclass
 
-DEBUG = os.getenv("DEBUG", "true").lower() not in ("false", "0")
+DEBUG = not os.getenv("DEBUG", "false").lower() in ("false", "0")
 
 if DEBUG:
     from dotenv import load_dotenv

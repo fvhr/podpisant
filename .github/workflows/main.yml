@@ -7,27 +7,27 @@ on:
   workflow_dispatch:
 
 jobs:
-  build:
-   runs-on: ubuntu-latest
-
-   steps:
-     - name: Checkout repository
-       uses: actions/checkout@v2
-
-     - name: Log in to Docker Hub
-       uses: docker/login-action@v2
-       with:
-         username: ${{ secrets.DOCKERHUB_USERNAME }}
-         password: ${{ secrets.DOCKERHUB_PASSWORD }}
-
-     - name: Build Docker image
-       run: |
-         cd ./backend && docker build -t menoitami/api_podpisant:latest .
-
-     - name: Push Docker image to Docker Hub
-       run: |
-         docker tag  backend_service.api:latest menoitami/backend_service.api:latest
-         docker push menoitami/api_podpisant:latest
+#  build:
+#   runs-on: ubuntu-latest
+#
+#   steps:
+#     - name: Checkout repository
+#       uses: actions/checkout@v2
+#
+#     - name: Log in to Docker Hub
+#       uses: docker/login-action@v2
+#       with:
+#         username: ${{ secrets.DOCKERHUB_USERNAME }}
+#         password: ${{ secrets.DOCKERHUB_PASSWORD }}
+#
+#     - name: Build Docker image
+#       run: |
+#         cd ./backend && docker build -t menoitami/api_podpisant:latest .
+#
+#     - name: Push Docker image to Docker Hub
+#       run: |
+#         docker tag  backend_service.api:latest menoitami/backend_service.api:latest
+#         docker push menoitami/api_podpisant:latest
 
   deploy:
     runs-on: ubuntu-latest
