@@ -1,7 +1,4 @@
-import os
 from dataclasses import dataclass
-
-DEBUG = not os.getenv("DEBUG", "false").lower() in ("false", "0")
 
 @dataclass
 class GunicornConfig:
