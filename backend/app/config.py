@@ -3,11 +3,6 @@ from dataclasses import dataclass
 
 DEBUG = not os.getenv("DEBUG", "false").lower() in ("false", "0")
 
-if DEBUG:
-    from dotenv import load_dotenv
-
-    load_dotenv()
-
 @dataclass
 class GunicornConfig:
     bind: str = "0.0.0.0:8000"
