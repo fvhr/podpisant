@@ -1,3 +1,4 @@
+import logging
 import os
 from dataclasses import asdict
 
@@ -27,13 +28,14 @@ app.add_middleware(
     ],
 )
 
-def main():
-    if not os.getenv("DEBUG"):
-        from gunicorn_application import Application
-        gunicorn_config: GunicornConfig = GunicornConfig()
-        gunicorn_app = Application(application=app, options=asdict(gunicorn_config))
-        gunicorn_app.run()
+logger = logging.getLogger(__name__)
 
+def main():
+    logger.info("Starting application")
+    from gunicorn_application import Application
+    gunicorn_config: GunicornConfig = GunicornConfig()
+    gunicorn_app = Application(application=app, options=asdict(gunicorn_config))
+    gunicorn_app.run()
 
 if __name__ == "__main__":
     main()

@@ -1,0 +1,12 @@
+syntax = "proto3";
+
+import "bob/colbaskin/datastore/auth_status.proto";
+import "bob/colbaskin/datastore/onboarding_status.proto";
+
+option java_package = "bob.colbaskin.datastore";
+option java_multiple_files = true;
+
+message UserPreferences {
+  OnboardingStatus onboardingStatus = 1;
+  AuthStatus authStatus = 2;
+}
