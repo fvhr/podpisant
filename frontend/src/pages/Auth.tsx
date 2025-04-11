@@ -1,5 +1,5 @@
+import { AuthContainer } from '../components/auth';
+
 export const Auth = () => {
-	return (
-		<div>Auth</div>
-	)
-}
+  return <AuthContainer />;
+};
