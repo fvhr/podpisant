@@ -1,4 +1,6 @@
 import { axiosInstance } from './instance';
+import {ProfileProps} from "../types/profile.ts";
+import axios from "axios";
 
 export const userEmailLogin = async (email: string) => {
   try {
@@ -52,6 +54,16 @@ export const userRefreshToken = async () => {
 export const userInfo = async () => {
   try {
     const response = await axiosInstance.get('auth/user/info/');
+    return response.data;
+  } catch (error) {
+    console.error('User info error:', error);
+    throw error;
+  }
+};
+
+export const fetchProfile = async (): Promise<ProfileProps> => {
+  try {
+    const response = await axiosInstance.get<ProfileProps>('/me');
     return response.data;
   } catch (error) {
     console.error('User info error:', error);
