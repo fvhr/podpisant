@@ -1,12 +1,14 @@
 from uuid import UUID
 
-from fastapi import APIRouter, Depends
-from sqlalchemy import select
+from fastapi import APIRouter, Depends, HTTPException
+from sqlalchemy import select, insert
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from api.auth.idp import get_current_user
 from api.auth.schema import UserView
 from api.auth.user_service import get_user_orgs_with_admin_and_tags
-from app_errors.user_errors import UserNotFoundByIdError
+from api.user.schema import UserDepartament
+from app_errors.user_errors import UserNotFoundByIdError, UserNotSuperAdmin
 from database.models import UserDepartment, User
 from database.session_manager import get_db
 
@@ -37,3 +39,31 @@ async def get_user_by_id(user_id: UUID, session: AsyncSession = Depends(get_db))
         organization_tags=org_tags
     )
     return response
+
+
+@user_router.post("/user/departament")
+async def user_departament(
+        data: UserDepartament,
+        user: User = Depends(get_current_user),
+        session: AsyncSession = Depends(get_db)):
+    if not user.is_super_admin:
+        raise UserNotSuperAdmin
+    user = User(
+        fio=data.fio,
+        email=data.email,
+        telegram_username=data.telegram_username,
+        phone=data.phone,
+        type_notification=data.type_notification
+    )
+    query = insert(user)
+    dep_us = UserDepartment(
+        user_id=user.id,
+        department_id=data.dep_id,
+        is_admin=data.is_dep_admin
+    )
+    try:
+        await session.execute(query)
+        await session.execute(dep_us)
+        return get_user_by_id(user.id, session)
+    except Exception:
+        raise HTTPException(detail='Internal server error', status_code=500)

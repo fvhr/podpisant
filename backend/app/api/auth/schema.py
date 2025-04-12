@@ -9,6 +9,7 @@ from database.models.user import TypeNotificationEnum
 class AuthSchema(BaseModel):
     email: str
 
+
 class AuthWithCodeSchema(BaseModel):
     code: str
     device_id: str
