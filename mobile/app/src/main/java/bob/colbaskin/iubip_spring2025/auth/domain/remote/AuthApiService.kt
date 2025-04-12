@@ -14,4 +14,7 @@ interface AuthApiService {
 
     @POST("login-with-code")
     suspend fun loginWithCode(@Body request: LoginWithCodeDTO): CodeValidationResponseDTO
+
+    @POST("refresh")
+    suspend fun refreshToken(): CodeValidationResponseDTO
 }

@@ -1,6 +1,5 @@
 package bob.colbaskin.iubip_spring2025.navigation
 
-import bob.colbaskin.iubip_spring2025.organizations.domain.models.Organization
 import kotlinx.serialization.Serializable
 
 sealed interface Screens {
@@ -8,7 +7,13 @@ sealed interface Screens {
     data object Organizations: Screens
 
     @Serializable
+    data class OrganizationDetailed(val organizationId: String): Screens
+
+    @Serializable
     data object Documents: Screens
+
+    @Serializable
+    data class DocumentDetailed(val documentId: String): Screens
 
     @Serializable
     data class Profile(val id: String): Screens
@@ -24,7 +29,4 @@ sealed interface Screens {
 
     @Serializable
     data object OTPScreen: Screens
-
-    @Serializable
-    data class OrganizationDetailed(val organizationId: String): Screens
 }

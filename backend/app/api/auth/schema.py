@@ -1,3 +1,4 @@
+from typing import Dict
 from uuid import UUID
 
 from pydantic import BaseModel
@@ -24,6 +25,7 @@ class UserView(BaseModel):
     phone: str | None
     is_super_admin: bool
     type_notification: TypeNotificationEnum | None
-    admin_in_organizations: list[int] | None
+    admin_in_organization: int | None
     user_organizations: list[int] | None
     user_departments_ids: list[int]
+    organization_tags: Dict[int, dict]

@@ -25,11 +25,12 @@ async def get_user_by_id(session: AsyncSession, user_id: UUID) -> User:
     return user
 
 
-async def get_user_orgs_with_admin(session, user_id: UUID):
-    # Запрос для получения всех организаций пользователя
+async def get_user_orgs_with_admin_and_tags(session, user_id: UUID):
+    # Запрос для получения всех организаций пользователя с тегами
     orgs_query = select(
         Organization.id,
-        (Organization.admin_id == user_id).label("is_admin")
+        (Organization.admin_id == user_id).label("is_admin"),
+        UserOrganization.tags  # Добавляем теги
     ).join(
         UserOrganization,
         UserOrganization.organization_id == Organization.id
@@ -42,11 +43,13 @@ async def get_user_orgs_with_admin(session, user_id: UUID):
 
     all_org_ids = []
     admin_org_ids = []
+    org_tags = {}  # Словарь для хранения тегов по organization_id
 
-    for org_id, is_admin in rows:
+    for org_id, is_admin, tags in rows:
         all_org_ids.append(org_id)
         if is_admin:
             admin_org_ids.append(org_id)
+        if tags:  # Добавляем теги, если они есть
+            org_tags[org_id] = tags
 
-    return all_org_ids, admin_org_ids
-
+    return all_org_ids, admin_org_ids, org_tags

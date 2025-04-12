@@ -7,6 +7,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from api.auth.router import auth_router
+from api.documents.router import documents_router
 from api.main_router import api_router
 from config import GunicornConfig, get_logging_config, logging_path
 from exceptions import setup_exception_handlers
@@ -16,6 +17,7 @@ app = FastAPI(title="Podpdisant Api", root_path="/api")
 
 app.include_router(api_router)
 app.include_router(auth_router)
+app.include_router(documents_router)
 
 origins = ["*"]
 

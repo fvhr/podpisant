@@ -1,7 +1,6 @@
 @use '../lib/variables';
 
 .employees-container {
-  padding: 2rem;
   background-color: variables.$color-bg;
   min-height: 100vh;
 }
@@ -18,8 +17,8 @@
 
 .employees-title {
   color: variables.$color-text;
-  font-size: 1.8rem;
   font-weight: 500;
+  font-size: 2rem;
   margin: 0;
 }
 

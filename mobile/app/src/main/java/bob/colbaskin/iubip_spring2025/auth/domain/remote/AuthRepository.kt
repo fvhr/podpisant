@@ -7,4 +7,6 @@ interface AuthRepository {
     suspend fun loginByEmail(email: String): LoginResponse
 
     suspend fun loginWithCode(code: String, deviceId: String): Boolean
+
+    suspend fun refreshToken(): String
 }

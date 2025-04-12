@@ -13,7 +13,6 @@ class UserDepartment(Base):
 
     user_id: Mapped[UUID] = mapped_column(ForeignKey('user.id'), primary_key=True)
     department_id: Mapped[int] = mapped_column(ForeignKey('department.id'), primary_key=True)
-    tags: Mapped[dict] = mapped_column(JSONB, nullable=True)
 
     user = relationship("User", back_populates="user_departments")
     department = relationship("Department", back_populates="users")
@@ -38,6 +37,7 @@ class UserOrganization(Base):
 
     user_id: Mapped[UUID] = mapped_column(ForeignKey("user.id"), primary_key=True)
     organization_id: Mapped[int] = mapped_column(ForeignKey("organization.id"), primary_key=True)
+    tags: Mapped[dict] = mapped_column(JSONB, nullable=True)
 
     user = relationship("User", back_populates="organizations")
     organization = relationship("Organization", back_populates="users")
