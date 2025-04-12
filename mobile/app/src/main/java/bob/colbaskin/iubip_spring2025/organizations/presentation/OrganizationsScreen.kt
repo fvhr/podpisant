@@ -1,6 +1,5 @@
 package bob.colbaskin.iubip_spring2025.organizations.presentation
 
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -16,7 +15,6 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
@@ -38,19 +36,19 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.graphics.Color
 import bob.colbaskin.iubip_spring2025.ui.theme.ButtonColor
 import bob.colbaskin.iubip_spring2025.ui.theme.CardColor
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.TextFieldDefaults
-import androidx.compose.ui.tooling.preview.Preview
+import bob.colbaskin.iubip_spring2025.designsystem.ErrorScreen
+import bob.colbaskin.iubip_spring2025.designsystem.LoadingScreen
 import bob.colbaskin.iubip_spring2025.ui.theme.BackgroundColor
-import bob.colbaskin.iubip_spring2025.ui.theme.IUBIPSPRING2025Theme
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun OrganizationsScreen(
-    viewModel: OrganizationsViewModel = hiltViewModel()
+    viewModel: OrganizationsViewModel = hiltViewModel(),
+    onNavigateToOrganizationDetails: (String) -> Unit,
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val showCreateDialog by viewModel.showCreateDialog.collectAsStateWithLifecycle()
@@ -73,12 +71,16 @@ fun OrganizationsScreen(
         containerColor = BackgroundColor
     ) { padding ->
         when {
-            state.isLoading -> CenterProgress()
-            state.error != null -> ErrorMessage(state.error!!)
+            state.isLoading -> LoadingScreen(onError = viewModel::loadOrganizations)
+            state.error != null -> ErrorScreen(
+                message = state.error!!,
+                onError = viewModel::loadOrganizations
+            )
             else -> OrganizationsList(
                 organizations = state.organizations,
                 isAdmin = state.isAdmin,
-                modifier = Modifier.padding(padding)
+                modifier = Modifier.padding(padding),
+                onOrganizationSettings = onNavigateToOrganizationDetails
             )
         }
     }
@@ -95,7 +97,8 @@ fun OrganizationsScreen(
 private fun OrganizationsList(
     organizations: List<Organization>,
     isAdmin: Boolean,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onOrganizationSettings: (String) -> Unit
 ) {
     LazyColumn(modifier = modifier.fillMaxSize()) {
         items(organizations) { org ->
@@ -104,7 +107,8 @@ private fun OrganizationsList(
                 isAdmin = isAdmin,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(16.dp)
+                    .padding(16.dp),
+                onSettingsClick = onOrganizationSettings
             )
         }
     }
@@ -114,7 +118,8 @@ private fun OrganizationsList(
 private fun OrganizationCard(
     organization: Organization,
     isAdmin: Boolean,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onSettingsClick: (String) -> Unit
 ) {
     Card(
         modifier = modifier,
@@ -140,7 +145,7 @@ private fun OrganizationCard(
                     modifier = Modifier.weight(1f)
                 )
                 if (isAdmin) {
-                    IconButton(onClick = { }) {
+                    IconButton(onClick = { onSettingsClick(organization.id.toString()) }) {
                         Icon(
                             imageVector = Icons.Default.Settings,
                             contentDescription = "Настройки"
@@ -225,21 +230,4 @@ private fun CreateOrganizationDialog(
         },
         containerColor = BackgroundColor,
     )
-}
-
-@Composable
-private fun CenterProgress() {
-    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-        CircularProgressIndicator()
-    }
-}
-
-@Composable
-private fun ErrorMessage(message: String) {
-    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-        Text(
-            text = "Ошибка: $message",
-            color = Color.Red
-        )
-    }
 }
