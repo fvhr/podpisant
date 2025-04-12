@@ -1,6 +1,6 @@
 import { FiDownload } from 'react-icons/fi';
 interface DocumentButtonsProps {
-  onCreateStage: () => void; // Добавляем пропс для открытия модалки
+  onCreateStage: () => void; 
 }
 export const DocumentButtons = ({ onCreateStage }: DocumentButtonsProps) => {
   return (

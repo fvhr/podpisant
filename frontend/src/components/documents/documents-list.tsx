@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { FiClock } from 'react-icons/fi';
-import { useNavigate } from 'react-router-dom';
-import { getAllDocuments } from '../../api/documents';
+import { useNavigate, useParams } from 'react-router-dom'; // Добавляем useParams
+import { getDocumentsCurrentOrganizations } from '../../api/documents';
 import { Document } from '../../types';
 
 interface DocumentsListProps {
@@ -13,6 +13,7 @@ export const DocumentsList = ({ activeTab, refreshTrigger = 0 }: DocumentsListPr
   const [documents, setDocuments] = useState<Document[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
+  const { orgId } = useParams();
 
   const getStatusLabel = (status: string): string => {
     switch (status) {
@@ -26,12 +27,13 @@ export const DocumentsList = ({ activeTab, refreshTrigger = 0 }: DocumentsListPr
         return '';
     }
   };
+  const orgIdNumber = Number(orgId);
 
   useEffect(() => {
     const fetchDocuments = async () => {
       setIsLoading(true);
       try {
-        const res = await getAllDocuments();
+        const res = await getDocumentsCurrentOrganizations(orgIdNumber);
         setDocuments(res);
       } catch (error) {
         console.error('Ошибка загрузки документов:', error);
@@ -41,7 +43,7 @@ export const DocumentsList = ({ activeTab, refreshTrigger = 0 }: DocumentsListPr
     };
 
     fetchDocuments();
-  }, [refreshTrigger]);
+  }, [refreshTrigger, orgId]);
 
   const filteredDocuments = useMemo(() => {
     return activeTab === 'all' ? documents : documents.filter((doc) => doc.status === activeTab);
@@ -63,7 +65,7 @@ export const DocumentsList = ({ activeTab, refreshTrigger = 0 }: DocumentsListPr
     <div className="documents-grid">
       {filteredDocuments.map((document) => (
         <div
-          onClick={() => navigate('/document')}
+          onClick={() => navigate(`/document/${document.id}`, { state: { orgId } })}
           key={document.id}
           className={`document-card ${document.status}`}>
           <div className="document-info">
