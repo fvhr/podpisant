@@ -1,5 +1,6 @@
 package bob.colbaskin.iubip_spring2025.navigation.graphs
 
+import android.util.Log
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Text
@@ -16,6 +17,8 @@ import bob.colbaskin.iubip_spring2025.navigation.Screens
 import bob.colbaskin.iubip_spring2025.navigation.animatedTransition
 import bob.colbaskin.iubip_spring2025.onboarding.presentation.IntroductionScreen
 import bob.colbaskin.iubip_spring2025.onboarding.presentation.WelcomeScreen
+import bob.colbaskin.iubip_spring2025.organizations.presentation.OrganizationDetailedScreen
+import bob.colbaskin.iubip_spring2025.organizations.presentation.OrganizationsScreen
 
 fun NavGraphBuilder.onBoardingGraph(
     navController: NavHostController,
@@ -45,7 +48,7 @@ fun NavGraphBuilder.onBoardingGraph(
         }
         animatedTransition<Screens.OTPScreen> {
             OtpScreen(
-                onNextScreen = { navController.navigate(Screens.Home) {
+                onNextScreen = { navController.navigate(Screens.Organizations) {
                     popUpTo(Screens.OTPScreen) { inclusive = true }
                     popUpTo(Screens.EmailInput) { inclusive = true }
                 }}
@@ -56,17 +59,16 @@ fun NavGraphBuilder.onBoardingGraph(
 
 fun NavGraphBuilder.mainGraph(navController: NavHostController) {
     navigation<Graphs.Main>(
-        startDestination = Screens.Home
+        startDestination = Screens.Organizations
     ) {
-        animatedTransition<Screens.Home> {
-            Box(
-                modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center
-            ) {
-                Text("Home Screen")
-            }
+        animatedTransition<Screens.Organizations> {
+            OrganizationsScreen(
+                onNavigateToOrganizationDetails = { orgId ->
+                    navController.navigate(Screens.OrganizationDetailed(orgId))
+                }
+            )
         }
-        animatedTransition<Screens.SomeScreen> {
+        animatedTransition<Screens.Documents> {
             Box(
                 modifier = Modifier.fillMaxSize(),
                 contentAlignment = Alignment.Center
@@ -76,12 +78,23 @@ fun NavGraphBuilder.mainGraph(navController: NavHostController) {
         }
         animatedTransition<Screens.Profile> { backStackEntry ->
             val profile: Screens.Profile = backStackEntry.toRoute()
+            Log.d("Logging", "profile id: ${profile.id}")
+            Log.d("Logging", "profile: $profile")
             Box(
                 modifier = Modifier.fillMaxSize(),
                 contentAlignment = Alignment.Center
             ) {
                 Text(profile.id)
             }
+        }
+        animatedTransition<Screens.OrganizationDetailed> { backStackEntry ->
+            val detailedOrganization: Screens.OrganizationDetailed = backStackEntry.toRoute()
+            Log.d("Logging", "detailed id: ${detailedOrganization.organizationId}")
+            Log.d("Logging", "detailed org: $detailedOrganization")
+            OrganizationDetailedScreen(
+                organizationId = detailedOrganization.organizationId,
+                onBack = { navController.navigateUp() }
+            )
         }
     }
 }

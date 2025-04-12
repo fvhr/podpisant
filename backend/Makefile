@@ -59,7 +59,7 @@ create_venv:
 	@.\venv\Scripts\activate.bat
 
 install_requirements:
-	@pip install -r requirements/prod.txt
+	@pip install -r app_requirements/prod.txt
 
 make_migrations:
 	@cd app && alembic revision --autogenerate
@@ -72,10 +72,8 @@ server-prod:
 	cd app && \
 	uvicorn main:app --reload
 
-nfy:
-	cd notification/ && \
-	python app.py
+migrate:
+	alembic upgrade head
 
-clean:
-	poetry env remove python
-	find . -type d -name "__pycache__" -exec rm -rf {} +
+migration:
+	alembic revision --autogenerate

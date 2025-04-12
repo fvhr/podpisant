@@ -1,6 +1,6 @@
-
 @use './auth';
-
 @import 'main';
-@import "header";
+@import 'header';
+@import './org-modal';
 @import "sidebar";
+@import "header";

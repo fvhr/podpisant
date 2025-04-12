@@ -1,6 +1,7 @@
 package bob.colbaskin.iubip_spring2025.onboarding.presentation
 
 import androidx.annotation.RawRes
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -10,17 +11,21 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material3.Button
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import bob.colbaskin.iubip_spring2025.R
 import bob.colbaskin.iubip_spring2025.designsystem.Lottie
 import bob.colbaskin.iubip_spring2025.designsystem.PagerWithIndicator
+import bob.colbaskin.iubip_spring2025.ui.theme.TextColor
 import kotlinx.coroutines.launch
 
 @Composable
@@ -57,12 +62,44 @@ private fun OnBoarding(
                 .padding(bottom = 24.dp),
             pagerState = pagerState
         ) { position ->
-            Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(
+                        top = 16.dp,
+                        bottom = 32.dp,
+                        start = 16.dp,
+                        end = 16.dp
+                    ),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
+            ) {
+                Spacer(modifier = Modifier.height(16.dp))
+                Text(
+                    OnBoardingPage.allPages[position].title,
+                    color = TextColor,
+                    style = TextStyle(
+                        textAlign = TextAlign.Center,
+                        fontSize = MaterialTheme.typography.headlineSmall.fontSize
+                    )
+                )
+                Spacer(modifier = Modifier.weight(1f))
                 Lottie(
                     lottieJson = OnBoardingPage.allPages[position].lottieJson,
-                    modifier = Modifier.size(150.dp)
+                    modifier = Modifier.size(500.dp)
                 )
+                Spacer(modifier = Modifier.weight(1f))
+                Text(
+                    OnBoardingPage.allPages[position].label,
+                    color = TextColor,
+                    style = TextStyle(
+                        textAlign = TextAlign.Center,
+                        fontSize = MaterialTheme.typography.labelLarge.fontSize
+                    )
+                )
+                Spacer(modifier = Modifier.weight(1f))
             }
+
         }
         Button(
             onClick = {
@@ -93,11 +130,25 @@ private fun OnBoarding(
 }
 
 private sealed class OnBoardingPage(
-    @RawRes val lottieJson: Int
+    val title: String,
+    @RawRes val lottieJson: Int,
+    val label: String
 ) {
-    data object First: OnBoardingPage(lottieJson = R.raw.one)
-    data object Second: OnBoardingPage(lottieJson = R.raw.two)
-    data object Third: OnBoardingPage(lottieJson = R.raw.three)
+    data object First: OnBoardingPage(
+        title = "Структура компании",
+        lottieJson = R.raw.first,
+        label = "Создавайте отделы, назначайте роли и контролируйте процессы за пару кликов"
+    )
+    data object Second: OnBoardingPage(
+        title = "Подпись за секунды",
+        lottieJson = R.raw.second,
+        label = "Никакой бумаги — подписывайте документы через электронную почту"
+    )
+    data object Third: OnBoardingPage(
+        title = "Всё готово!",
+        lottieJson = R.raw.third,
+        label = "Начните работать с документами быстрее и удобнее уже сегодня"
+    )
 
     companion object {
         val allPages = listOf(First, Second, Third)

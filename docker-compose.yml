@@ -3,11 +3,13 @@ services:
     image: postgres:17
     container_name: podpisant.db
     command: -p 5432
+    ports:
+      - "5432:5432"
     expose:
       - 5432
     restart: always
     env_file:
-      - .env
+      - .env-prod
     volumes:
       - db-data:/var/lib/postgresql/data
     healthcheck:
@@ -36,7 +38,7 @@ services:
 
   api:
     env_file:
-      - .env
+      - .env-prod
     build:
       context: backend
       dockerfile: Dockerfile
@@ -52,38 +54,41 @@ services:
     ports:
       - "8000:8000"
     volumes:
-      - ./certs:/backend-service.auth_service/certs
+      - ./certs:/podpisant.api/certs
 
-#  nats:
-#    image: nats
-#    ports:
-#      - "8222:8222"
-#      - "6222:6222"
-#      - "4222:4222"
-#    command: "--cluster_name NATS --cluster nats://0.0.0.0:6222 --http_port 8222 --port 4222"
+  nats:
+    image: nats
+    ports:
+      - "8222:8222"
+      - "6222:6222"
+      - "4222:4222"
+    command: "--cluster_name NATS --cluster nats://0.0.0.0:6222 --http_port 8222 --port 4222"
 
-#  notification_app:
-#    env_file:
-#      - notification/.env
-#      - .env # для удобства в этом файле первостепенно в проде скорее всего лучше по 1 файлу указывать
+  notification_app:
+    env_file:
+      - backend/notification/.env
+      - .env-prod # для удобства в этом файле первостепенно в проде скорее всего лучше по 1 файлу указывать
 #    image: menoitami/podpisant.notification_app
-##    build:
-##      context: notification/
-#    command: [ "sh", "/notification_app/docker/app.sh" ]
-#    depends_on:
-#      - nats
+    build:
+      context: backend/notification/
+    command: [ "sh", "/notification_app/docker/app.sh" ]
+    depends_on:
+      - nats
 
   db_migration:
     profiles: [ "setup", "migration" ]
     container_name: podpisant.db_migration
-    image: menoitami/podpisant.api
+    build:
+      context: backend
+      dockerfile: Dockerfile
+#    image: menoitami/podpisant.api
     restart: on-failure
     depends_on:
       db:
         condition: service_healthy
     env_file:
-      - .env
-    command: [ "sh", "/backend-service.auth_service/docker/migrate.sh" ]
+      - .env-prod
+    command: [ "sh", "/podpisant.api/docker/migrate.sh" ]
 
 #  minio:
 #    image: minio/minio

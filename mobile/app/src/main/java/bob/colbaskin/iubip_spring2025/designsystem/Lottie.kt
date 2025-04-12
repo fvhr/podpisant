@@ -14,6 +14,7 @@ import com.airbnb.lottie.compose.rememberLottieComposition
 fun Lottie(
     @RawRes lottieJson: Int,
     modifier: Modifier = Modifier,
+    speed: Float = 1f
 ) {
 
     val composition by rememberLottieComposition(
@@ -23,6 +24,7 @@ fun Lottie(
     val compositionProgress by animateLottieCompositionAsState(
         composition = composition,
         iterations = LottieConstants.IterateForever,
+        speed = speed,
         isPlaying = true
     )
 

@@ -1,9 +1,9 @@
 package bob.colbaskin.iubip_spring2025.navigation
 
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Business
+import androidx.compose.material.icons.filled.Folder
 import androidx.compose.material.icons.filled.Person
-import androidx.compose.material.icons.filled.Screenshot
 import androidx.compose.ui.graphics.vector.ImageVector
 import java.util.UUID
 
@@ -12,19 +12,19 @@ enum class Destinations(
     val label: String,
     val screen: Screens
 ) {
-    HOME(
-        icon = Icons.Default.Home,
-        label = "Home",
-        screen = Screens.Home
+    ORGANIZATIONS(
+        icon = Icons.Default.Business,
+        label = "Организации",
+        screen = Screens.Organizations
     ),
-    SOMESCREEN(
-        icon = Icons.Default.Screenshot,
-        label = "SomeScreen",
-        screen = Screens.SomeScreen
+    DOCUMENTS(
+        icon = Icons.Default.Folder,
+        label = "Документы",
+        screen = Screens.Documents
     ),
     PROFILE(
         icon = Icons.Default.Person,
-        label = "Profile",
+        label = "Профиль",
         screen = Screens.Profile(id = UUID.randomUUID().toString())
     )
 }

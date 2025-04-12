@@ -1,6 +1,0 @@
-fastapi==0.115.0
-websockets==13.1
-SQLAlchemy==2.0.35
-alembic==1.13.3
-uvicorn==0.31.0
-gunicorn==23.0.0

@@ -1,4 +1,5 @@
-import {useForm, useWatch} from 'react-hook-form';
+import { useForm, useWatch } from 'react-hook-form';
+import { useNavigate } from 'react-router-dom';
 
 type CodeFormProps = {
     email: string,
@@ -29,11 +30,12 @@ export const CodeForm = ({email, onCodeSubmit, device_id}: CodeFormProps) => {
         onCodeSubmit(fullCode, device_id);
     };
 
-    const handleCodeChange = (e: React.ChangeEvent<HTMLInputElement>, index: number) => {
-        const value = e.target.value;
-
+  const handleCodeChange = (e: React.ChangeEvent<HTMLInputElement>, index: number) => {
+    const value = e.target.value.replace(/\D/g, ''); // Удаляем все не-цифры
+    const digit = value.slice(0, 1); // Берем только первую цифру
+    
+    setValue(`code.${index}`, digit);
         if (!/^\d*$/.test(value)) return;
-
         const digit = value.slice(0, 1);
         setValue(`code.${index}`, digit);
 
@@ -54,8 +56,22 @@ export const CodeForm = ({email, onCodeSubmit, device_id}: CodeFormProps) => {
         }
     };
 
-    return (
-        <div className="auth-form">
+  const handlePaste = (e: React.ClipboardEvent<HTMLInputElement>) => {
+    e.preventDefault();
+    const pasteData = e.clipboardData.getData('text').replace(/\D/g, '');
+    if (pasteData.length === 4) {
+      const digits = pasteData.split('');
+      digits.forEach((digit, i) => {
+        if (i < 4) {
+          setValue(`code.${i}`, digit);
+        }
+      });
+      document.getElementById(`code-3`)?.focus();
+    }
+  };
+
+  return (
+            <div className="auth-form">
             <h2>Введите код из письма</h2>
             <p className="email-notice">Код отправлен на {email}</p>
 

@@ -1,0 +1,17 @@
+[tool.poetry]
+name = "notification"
+version = "0.1.0"
+description = ""
+authors = ["CoSm1C AvEnGeR <zhora.zhilin.06@mail.ru>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.12"
+aiosmtplib = "^3.0.2"
+dishka = "^1.4.2"
+faststream = {extras = ["nats", "cli"], version = "^0.5.33"}
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
