@@ -39,8 +39,8 @@ async def get_connected_clients(
 ) -> ORJSONResponse:
     user_id = await email_code_sender.get_user_id_by_code(data.code, data.device_id)
     user = await get_user_by_id(session, user_id)
-    await email_code_sender.delete_code(data.code, data.device_id)
     access_token, refresh_token = await auth_service.create_and_save_tokens(user)
+    await email_code_sender.delete_code(data.code, data.device_id)
     response = ORJSONResponse({"status": "success"})
     set_tokens(response, access_token, refresh_token)
     return response

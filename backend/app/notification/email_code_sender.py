@@ -5,6 +5,7 @@ import redis.asyncio as aioredis
 from fastapi import Depends
 from nats.aio.client import Client
 
+from app_errors.user_errors import UserNotFoundErrorByCode
 from notification.nats_utils import get_nats_client, NatsConfig, send_via_nats
 from myredis.connection import get_redis
 
@@ -53,12 +54,16 @@ class EmailCodeSender:
     async def get_user_id_by_code(
         self, email_code: str, device_id: str
     ) -> UUID | None:
-        user_id = await self._redis.get(
+        user_id_bytes = await self._redis.get(
             f"login_code:{email_code}:{device_id}"
         )
-        if user_id is None:
-            raise UserNotFoundErrorByCode("User not found")
-        return UUID(user_id)
+
+        if user_id_bytes is None:
+            raise UserNotFoundErrorByCode(email_code)
+
+        user_id_str = user_id_bytes.decode('utf-8')
+
+        return UUID(user_id_str)
 
     async def delete_code(
         self, email_code: str, device_id: str
