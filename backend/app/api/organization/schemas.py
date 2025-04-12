@@ -11,7 +11,7 @@ class OrganizationView(BaseModel):
     name: str
     description: str
 
-class OrganizationCreateSchema(BaseModel):
+class CreateOrganizationSchema(BaseModel):
     name: str
     description: str
     admin_id: UUID

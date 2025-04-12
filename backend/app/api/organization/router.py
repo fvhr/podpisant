@@ -10,4 +10,6 @@ organization_router = APIRouter(prefix="/organizations", tags=["organizations"])
 @organization_router.post("")
 async def create_organization(organization_data: CreateOrganizationSchema, session: AsyncSession = Depends(get_db)):
     organization = Organization(**organization_data.model_dump())
-    organiz
+    organization = await session.merge(organization)
+    await session.commit()
+    return {"oraganization_id": organization.id}
