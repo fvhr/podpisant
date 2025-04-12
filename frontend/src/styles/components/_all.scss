@@ -1,7 +1,12 @@
-@use './auth';
+@use './login';
 @import 'main';
 @import 'header';
 @import './org-modal';
-@import "sidebar";
-@import "header";
+@import 'sidebar';
+@import 'header';
 @import './documents';
+@import './documentsdetails';
+@import './employes';
+@import './documents-modal';
+@import './departments';
+

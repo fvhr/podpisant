@@ -1,18 +1,16 @@
 import axios from 'axios';
 
-export const axiosInstanсe = axios.create({
-    baseURL: 'https://menoitami.ru/api',
+export const axiosInstance = axios.create({
+  baseURL: 'https://menoitami.ru/api',
+  withCredentials: true,
 });
 
-axiosInstanсe.interceptors.request.use(
-    (config) => {
-        const accessToken = localStorage.getItem('access');
-        if (accessToken) {
-            config.headers.Authorization = `Bearer ${accessToken}`;
-        }
-        return config;
-    },
-    (error) => {
-        return Promise.reject(error);
-    },
+axiosInstance.interceptors.response.use(
+  response => response,
+  async error => {
+    if (error.response?.status === 500) {
+      window.location.href = '/login';
+    }
+    return Promise.reject(error);
+  }
 );

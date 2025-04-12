@@ -43,7 +43,6 @@ class OrganizationsRepositoryImpl @Inject constructor(
     }
 
     override suspend fun getOrganizationById(id: String): Organization {
-        // Имитация задержки сети
         delay(1500)
 
         return mockOrganizations.find { it.id == id }

@@ -13,6 +13,8 @@ import androidx.navigation.toRoute
 import bob.colbaskin.iubip_spring2025.auth.presentation.EmailInputScreen
 import bob.colbaskin.iubip_spring2025.auth.presentation.otp.OtpScreen
 import bob.colbaskin.iubip_spring2025.common.models.OnBoardingConfig
+import bob.colbaskin.iubip_spring2025.documents.presentation.DocumentDetailedScreen
+import bob.colbaskin.iubip_spring2025.documents.presentation.DocumentsScreen
 import bob.colbaskin.iubip_spring2025.navigation.Screens
 import bob.colbaskin.iubip_spring2025.navigation.animatedTransition
 import bob.colbaskin.iubip_spring2025.onboarding.presentation.IntroductionScreen
@@ -43,7 +45,10 @@ fun NavGraphBuilder.onBoardingGraph(
         }
         animatedTransition<Screens.EmailInput> {
             EmailInputScreen(
-                onNextScreen = { navController.navigate(Screens.OTPScreen)}
+                onNextScreen = { navController.navigate(Screens.OTPScreen) },
+                onError = { navController.navigate(Screens.EmailInput) {
+                    popUpTo(Screens.EmailInput) { inclusive = true}
+                }}
             )
         }
         animatedTransition<Screens.OTPScreen> {
@@ -68,33 +73,35 @@ fun NavGraphBuilder.mainGraph(navController: NavHostController) {
                 }
             )
         }
+        animatedTransition<Screens.OrganizationDetailed> { backStackEntry ->
+            val detailedOrganization: Screens.OrganizationDetailed = backStackEntry.toRoute()
+            OrganizationDetailedScreen(
+                organizationId = detailedOrganization.organizationId,
+                onBack = { navController.navigateUp() }
+            )
+        }
         animatedTransition<Screens.Documents> {
-            Box(
-                modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center
-            ) {
-                Text("Some Screen")
-            }
+            DocumentsScreen(
+                onDocumentClick = {documentId ->
+                    navController.navigate(Screens.DocumentDetailed(documentId))
+                }
+            )
+        }
+        animatedTransition<Screens.DocumentDetailed> { backStackEntry ->
+            val documentDetailed: Screens.DocumentDetailed = backStackEntry.toRoute()
+            DocumentDetailedScreen(
+                documentId = documentDetailed.documentId,
+                onBack = { navController.navigateUp() }
+            )
         }
         animatedTransition<Screens.Profile> { backStackEntry ->
             val profile: Screens.Profile = backStackEntry.toRoute()
-            Log.d("Logging", "profile id: ${profile.id}")
-            Log.d("Logging", "profile: $profile")
             Box(
                 modifier = Modifier.fillMaxSize(),
                 contentAlignment = Alignment.Center
             ) {
                 Text(profile.id)
             }
-        }
-        animatedTransition<Screens.OrganizationDetailed> { backStackEntry ->
-            val detailedOrganization: Screens.OrganizationDetailed = backStackEntry.toRoute()
-            Log.d("Logging", "detailed id: ${detailedOrganization.organizationId}")
-            Log.d("Logging", "detailed org: $detailedOrganization")
-            OrganizationDetailedScreen(
-                organizationId = detailedOrganization.organizationId,
-                onBack = { navController.navigateUp() }
-            )
         }
     }
 }

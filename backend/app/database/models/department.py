@@ -13,8 +13,7 @@ class Department(Base):
     name: Mapped[str] = mapped_column(String(255), unique=True)
     desc: Mapped[str] = mapped_column(String(1024))
     organization_id: Mapped[int] = mapped_column(ForeignKey('organization.id'))
-    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False) # datetime.now(UTC)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
 
-    employees = relationship("UserDepartment", back_populates="departments", uselist=True)
-    dep_documents = relationship("Document", back_populates="department_document", uselist=True)
-    organization = relationship("Organization", back_populates="departments", uselist=False)
+    users = relationship("UserDepartment", back_populates="department")
+    organization = relationship("Organization", back_populates="departments")

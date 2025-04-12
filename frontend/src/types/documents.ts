@@ -1,7 +1,7 @@
 export interface Document {
   id: number;
-  title: string;
+  name: string;
   status: string;
-  date: string;
-  fileUrl: string;
+  created_at: string;
+  file_url: string;
 }

@@ -1,11 +1,11 @@
 import React from 'react';
-import { Header, Organizations } from '../components';
+import { MainHeader, MainOrganizations } from '../components';
 
 export const Main: React.FC = () => {
   return (
     <div className="wrapper">
-      <Header />
-      <Organizations />
+      <MainHeader />
+      <MainOrganizations />
     </div>
   );
 };
