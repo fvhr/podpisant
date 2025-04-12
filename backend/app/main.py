@@ -19,7 +19,7 @@ app.include_router(api_router)
 app.include_router(auth_router)
 app.include_router(documents_router)
 
-origins = ["*"]
+origins = ["http://localhost:5173"]
 
 app.add_middleware(
     CORSMiddleware,
