@@ -16,5 +16,4 @@ class Department(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
 
     users = relationship("UserDepartment", back_populates="department")
-    documents = relationship("Document", back_populates="department")
     organization = relationship("Organization", back_populates="departments")

@@ -24,17 +24,16 @@ class Document(Base):
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
     name: Mapped[str] = mapped_column(String(255), nullable=False)
-    department_id: Mapped[int] = mapped_column(ForeignKey('department.id'))
-    organization_id: Mapped[int] = mapped_column(ForeignKey('organization.id'))  # Добавлено
+    organization_id: Mapped[int] = mapped_column(ForeignKey('organization.id'))
     creator_id: Mapped[int] = mapped_column(ForeignKey('user.id'))
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
     status: Mapped[DocSignStatus] = mapped_column(PgEnum(DocSignStatus), default=DocSignStatus.IN_PROGRESS)
     type: Mapped[DocumentTypeEnum | None] = mapped_column(
         PgEnum(DocumentTypeEnum),
-        default=DocumentTypeEnum.STRICT
+        default=None,
+        nullable=True
     )
 
     stages = relationship("DocSignStage", back_populates="document", order_by="DocSignStage.stage_number")
     creator = relationship("User", back_populates="documents_created", uselist=False)
     organization = relationship("Organization", back_populates="org_documents")
-    department = relationship("Department", back_populates="documents")
