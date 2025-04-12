@@ -149,15 +149,15 @@ services:
       - redis
 #      - certbot
 
-  certbot:
-    image: certbot/certbot
-    container_name: certbot_temp
-    volumes:
-      - ./certbot/conf:/etc/letsencrypt
-      - ./certbot/www:/var/www/certbot
-    depends_on:
-      - nginx
-    command: certonly --webroot -w /var/www/certbot -d menoitami.ru --email your@email.com --agree-tos --non-interactive
+#  certbot:
+#    image: certbot/certbot
+#    container_name: certbot_temp
+#    volumes:
+#      - ./certbot/conf:/etc/letsencrypt
+#      - ./certbot/www:/var/www/certbot
+#    depends_on:
+#      - nginx
+#    command: certonly --webroot -w /var/www/certbot -d menoitami.ru --email your@email.com --agree-tos --non-interactive
 
 volumes:
   db-data:
