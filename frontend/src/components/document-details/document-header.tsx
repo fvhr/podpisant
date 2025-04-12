@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 
 export const DocumentHeader: React.FC = () => {
-  const [documentStatus, setDocumentStatus] = useState<'in-progress' | 'signed' | 'canceled'>(
+  const [documentStatus] = useState<'in-progress' | 'signed' | 'canceled'>(
     'in-progress',
   );
 
