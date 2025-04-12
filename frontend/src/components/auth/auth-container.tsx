@@ -9,7 +9,7 @@ export const AuthContainer = () => {
   const navigate = useNavigate();
   const [step, setStep] = useState<'email' | 'code'>('email');
   const [userEmail, setUserEmail] = useState('');
-  const [emailError, setEmailError] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null); 
   const [deviceId, setDeviceId] = useState<string | null>(null);
 
   const handleEmailSubmit = async (email: string) => {
@@ -17,66 +17,63 @@ export const AuthContainer = () => {
       const response = await userEmailLogin(email);
 
       if (response.status === 404) {
-        setEmailError(response.error?.data || 'Пользователь с таким email не найден');
-        throw new Error('User not found');
+        setError(response.error?.data || 'Пользователь с таким email не найден');
       }
 
       if (response.status === 'success') {
-        setEmailError(null);
+        setError(null);
         setUserEmail(email);
         setDeviceId(response.device_id);
         setStep('code');
       } else {
-        setEmailError(response.error?.data || 'Ошибка сервера');
+        setError(response.error?.data || 'Ошибка сервера');
       }
-    } catch (err) {
-      console.error(err);
-      setEmailError('Пользователя с таким email не найдено');
+    } catch  {
+      setError('Пользователя с таким email не найдено');
     }
   };
 
   const handleCodeSubmit = async (code: string) => {
     if (!deviceId) {
       console.error('device_id отсутствует');
+      setError('Ошибка устройства');
       return;
     }
 
     try {
       const response = await userCodeLogin(code, deviceId);
-      if (!response) {
-        setEmailError('Ответ от сервера не получен');
-        return;
-      }
 
-      console.log(response);
-
-      if (response.status === 200) {
-        console.log('Авторизация прошла успешно');
+      if (response?.status === 200) {
         navigate('/main');
+      } else if (response?.status === 400 || response?.status === 404) {
+        setError('Неверный код');
       } else {
-        setEmailError('Ошибка при авторизации с кодом');
+        setError('Ошибка при авторизации');
       }
     } catch (err) {
-      console.error('Ошибка при авторизации', err);
-      setEmailError('Ошибка при авторизации');
+      console.log('Код неверный', err);
+      setError('Неверный код');
     }
   };
 
   return (
-      <div className="auth-container">
-        {step === 'email' ? (
-            <EmailForm
-                onEmailSubmit={handleEmailSubmit}
-                serverError={emailError}
-                onErrorClear={() => setEmailError(null)}
-            />
-        ) : (
-            <CodeForm
-                email={userEmail}
-                device_id={deviceId}
-                onCodeSubmit={handleCodeSubmit}
-            />
-        )}
-      </div>
+    <div className="auth-container">
+      {step === 'email' ? (
+        <EmailForm
+          onEmailSubmit={handleEmailSubmit}
+          serverError={error}
+          onErrorClear={() => setError(null)}
+        />
+      ) : (
+        <>
+          <CodeForm
+            email={userEmail}
+            device_id={deviceId}
+            onCodeSubmit={handleCodeSubmit}
+						error={error}
+          />
+        </>
+      )}
+    </div>
   );
 };
