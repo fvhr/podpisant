@@ -8,10 +8,11 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
 
 WORKDIR /podpisant.api
 
-COPY requirements .
+COPY pyproject.toml ./
 
 RUN pip install --no-cache-dir --upgrade pip && \
-    pip install --no-cache-dir -r prod.txt
+    pip install --no-cache-dir uv && \
+    uv pip install -e . --system
 
 COPY . .
 

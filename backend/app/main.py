@@ -1,16 +1,20 @@
 import logging
 import os
+from contextlib import asynccontextmanager
 from dataclasses import asdict
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from api.router import api_router
+from api.auth.router import auth_router
+from api.main_router import api_router
 from config import GunicornConfig
+from exceptions import setup_exception_handlers
 
 app = FastAPI(title="Podpdisant Api", root_path="/api")
 
 app.include_router(api_router)
+app.include_router(auth_router)
 
 origins = ["*"]
 
@@ -27,6 +31,8 @@ app.add_middleware(
         "Authorization",
     ],
 )
+
+setup_exception_handlers(app)
 
 logger = logging.getLogger(__name__)
 
