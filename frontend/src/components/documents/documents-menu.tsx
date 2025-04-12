@@ -1,8 +1,8 @@
 import { FiPlus } from 'react-icons/fi';
 
 interface MenuProps {
-  setActiveTab: (tab: 'all' | 'signed' | 'canceled' | 'in-progress') => void;
-  activeTab: 'all' | 'signed' | 'canceled' | 'in-progress';
+  setActiveTab: (tab: 'all' | 'signed' | 'rejected' | 'in_progress') => void;
+  activeTab: 'all' | 'signed' | 'rejected' | 'in_progress';
   onOpenModal: () => void;
 }
 
@@ -23,13 +23,13 @@ export const DocumentsMenu = ({ activeTab, setActiveTab, onOpenModal }: MenuProp
             Подписанные
           </button>
           <button
-            className={`tab ${activeTab === 'canceled' ? 'active' : ''}`}
-            onClick={() => setActiveTab('canceled')}>
+            className={`tab ${activeTab === 'rejected' ? 'active' : ''}`}
+            onClick={() => setActiveTab('rejected')}>
             Отмененные
           </button>
           <button
-            className={`tab ${activeTab === 'in-progress' ? 'active' : ''}`}
-            onClick={() => setActiveTab('in-progress')}>
+            className={`tab ${activeTab === 'in_progress' ? 'active' : ''}`}
+            onClick={() => setActiveTab('in_progress')}>
             В процессе
           </button>
         </div>

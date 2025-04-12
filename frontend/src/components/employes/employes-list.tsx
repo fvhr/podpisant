@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { AiFillDelete, AiOutlinePlus } from 'react-icons/ai';
-import { useNavigate } from 'react-router-dom';
+import { AddEmployeeModal } from './employes-modal';
 
 interface Employee {
   id: number;
@@ -10,8 +10,17 @@ interface Employee {
   department: string;
 }
 
+const departments = [
+  'Отдел продаж',
+  'Маркетинг',
+  'ИТ отдел',
+  'Финансовый отдел',
+  'HR',
+  'Логистика',
+  'Производство',
+];
+
 export const EmployeesList: React.FC = () => {
-  const navigate = useNavigate();
   const [employees, setEmployees] = useState<Employee[]>([
     {
       id: 1,
@@ -20,50 +29,27 @@ export const EmployeesList: React.FC = () => {
       email: 'ivanov@example.com',
       department: 'Отдел продаж',
     },
-    {
-      id: 2,
-      fullName: 'Мария Петрова',
-      phone: '+7 987 654 32 10',
-      email: 'petrova@example.com',
-      department: 'Маркетинг',
-    },
-    {
-      id: 3,
-      fullName: 'Алексей Сидоров',
-      phone: '+7 555 123 45 67',
-      email: 'sidorov@example.com',
-      department: 'ИТ отдел',
-    },
-    {
-      id: 4,
-      fullName: 'Елена Кузнецова',
-      phone: '+7 888 765 43 21',
-      email: 'kuznetsova@example.com',
-      department: 'Финансовый отдел',
-    },
-    {
-      id: 5,
-      fullName: 'Дмитрий Смирнов',
-      phone: '+7 234 567 89 01',
-      email: 'smirnov@example.com',
-      department: 'HR',
-    },
   ]);
-
-  const handleEmployeeClick = (id: number) => {
-    navigate(`/employee/${id}`);
-  };
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const handleDeleteClick = (id: number, e: React.MouseEvent) => {
     e.stopPropagation();
     setEmployees((emps) => emps.filter((emp) => emp.id !== id));
   };
 
+  const handleAddEmployee = (newEmployee: Omit<Employee, 'id'>) => {
+    const employee: Employee = {
+      id: employees.length + 1,
+      ...newEmployee,
+    };
+    setEmployees([...employees, employee]);
+  };
+
   return (
     <main className="employees-container">
       <div className="employees-header">
         <h1 className="employees-title">Все сотрудники</h1>
-        <button className="add-employee-btn">
+        <button className="add-employee-btn" onClick={() => setIsModalOpen(true)}>
           <AiOutlinePlus className="icon" />
           Добавить сотрудника
         </button>
@@ -72,7 +58,7 @@ export const EmployeesList: React.FC = () => {
       <div className="employees-grid">
         {employees.map((emp) => (
           <div key={emp.id} className="employee-card">
-            <div className="employee-content" onClick={() => handleEmployeeClick(emp.id)}>
+            <div className="employee-content">
               <h3 className="employee-name">{emp.fullName}</h3>
               <p className="employee-department">{emp.department}</p>
               <div className="employee-contacts">
@@ -87,6 +73,14 @@ export const EmployeesList: React.FC = () => {
           </div>
         ))}
       </div>
+
+      {isModalOpen && (
+        <AddEmployeeModal
+          onClose={() => setIsModalOpen(false)}
+          onAdd={handleAddEmployee}
+          departments={departments}
+        />
+      )}
     </main>
   );
 };

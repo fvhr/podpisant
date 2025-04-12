@@ -40,8 +40,8 @@ export const MainOrganizations: React.FC = () => {
     },
   ]);
 
-  const handleOrganizationClick = (id: number) => {
-    navigate(`/organization/${id}`);
+  const handleOrganizationClick = () => {
+    navigate(`/documents`);
   };
 
   const handleDeleteClick = (id: number, e: React.MouseEvent) => {
@@ -70,7 +70,7 @@ export const MainOrganizations: React.FC = () => {
       <div className="organizations-list">
         {organizations.map((org) => (
           <div key={org.id} className="organization-card">
-            <div className="organization-content" onClick={() => handleOrganizationClick(org.id)}>
+            <div className="organization-content" onClick={() => handleOrganizationClick()}>
               <h3 className="organization-name">{org.name}</h3>
               <p className="organization-description">{org.description}</p>
             </div>
