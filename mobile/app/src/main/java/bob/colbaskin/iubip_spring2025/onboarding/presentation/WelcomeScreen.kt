@@ -50,7 +50,7 @@ fun Welcome(
     ) {
         Spacer(modifier = Modifier.height(16.dp))
         Text(
-            "DocFlow: Документы в цифре",
+            "Podpisant: Документы в цифре",
             color = TextColor,
             style = TextStyle(
                 textAlign = TextAlign.Center,
