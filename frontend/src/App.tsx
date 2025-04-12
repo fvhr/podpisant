@@ -1,5 +1,4 @@
-
-import { Navigate, Route, Routes } from 'react-router-dom';
+import { Navigate } from 'react-router-dom';
 import { Auth } from './pages';
 import {Route, Routes} from "react-router-dom";
 import './styles/app.scss';
