@@ -1,6 +1,6 @@
 from pydantic.dataclasses import dataclass
 
-from app_errors.application_errors import DomainError
+from app_errors.application_errors import DomainError, ApplicationError
 
 
 @dataclass(eq=False)
@@ -35,3 +35,12 @@ class UnauthenticatedUserError(DomainError):
     @property
     def title(self) -> str:
         return "Unauthenticated user."
+
+
+@dataclass(eq=False)
+class UserNotFoundErrorByCode(ApplicationError):
+    code: str
+
+    @property
+    def title(self) -> str:
+        return f"User not found by code {self.code}"

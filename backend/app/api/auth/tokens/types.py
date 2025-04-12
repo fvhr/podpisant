@@ -30,13 +30,11 @@ class RefreshTokenPayload(TypedDict):
     jti: UUID
 
 
-# types.py
 @dataclass
 class RefreshTokenData:
     user_id: UUID
     jti: str
     created_at: datetime
-    device_id: str  # Убедиться, что есть это поле
 
 @dataclass
 class RefreshTokenWithData(RefreshTokenData):

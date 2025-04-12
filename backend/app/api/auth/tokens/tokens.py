@@ -67,32 +67,25 @@ class AuthServerTokenCreationService:
         self.jwt_service = jwt_service
         self.jwt_settings = jwt_settings
 
-    def create_auth_server_access_token(
-        self, user_id: UUID, is_admin
-    ) -> AccessToken:
-        jwt_payload = {
+    def create_auth_server_access_token(self, user_id: UUID, is_admin: bool) -> AccessToken:
+        payload = {
             "sub": str(user_id),
             "jti": str(uuid4()),
-            "is_admin": is_admin,
+            "is_admin": is_admin
         }
-        encoded_token = self.jwt_service.encode(
-            payload=jwt_payload,
-            expire_minutes=self.jwt_settings.access_token_expire_minutes,
-        )
-        return AccessToken(encoded_token["token"])
+        encoded = self.jwt_service.encode(payload)
+        return AccessToken(encoded["token"])
 
-    async def create_auth_server_refresh_token(
-        self, user_id: UUID, device_id: str  # Изменить параметр с fingerprint на device_id
-    ) -> RefreshTokenWithData:
+    async def create_auth_server_refresh_token(self, user_id: UUID) -> RefreshTokenWithData:
         jti = str(uuid4())
-        jwt_payload = {"sub": str(user_id), "jti": jti}
-        encoded_token = self.jwt_service.encode(payload=jwt_payload)
+        payload = {"sub": str(user_id), "jti": jti}
+        encoded = self.jwt_service.encode(payload)
+
         return RefreshTokenWithData(
-            token=RefreshToken(encoded_token["token"]),
+            token=RefreshToken(encoded["token"]),
             user_id=user_id,
             jti=jti,
-            created_at=encoded_token["created_at"],
-            device_id=str(device_id)  # Добавить device_id
+            created_at=encoded["created_at"]
         )
 
 

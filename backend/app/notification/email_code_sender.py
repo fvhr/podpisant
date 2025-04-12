@@ -22,7 +22,7 @@ class EmailCodeSender:
         self._nats_config = nats_config
         self._redis = redis
 
-    async def email_login_notify(self, user_email: str, user_id: UUID, email_code: str) -> None:
+    async def email_login_notify(self, user_email: str, user_id: UUID, email_code: str, device_id: str) -> None:
         data = {
             "email": user_email, "email_code": email_code,
         }
@@ -37,34 +37,34 @@ class EmailCodeSender:
                 self._nats_config.email_confirmation_sub,
                 data=data,
             )
-            await self.save_code(email_code, user_id)
+            await self.save_code(email_code, user_id, device_id)
         except Exception as e:
-            await self.delete_code(email_code)
+            await self.delete_code(email_code, device_id)
 
     async def save_code(
-        self, email_code: str, user_id: UUID
+        self, email_code: str, user_id: UUID, device_id: str
     ) -> None:
         await self._redis.set(
-            f"login_code:{email_code}",
+            f"login_code:{email_code}:{device_id}",
             str(user_id),
             ex=1800,
         )
 
     async def get_user_id_by_code(
-        self, email_code: str
+        self, email_code: str, device_id: str
     ) -> UUID | None:
         user_id = await self._redis.get(
-            f"login_code:{email_code}"
+            f"login_code:{email_code}:{device_id}"
         )
         if user_id is None:
-            return None
+            raise UserNotFoundErrorByCode("User not found")
         return UUID(user_id)
 
     async def delete_code(
-        self, email_code: str
+        self, email_code: str, device_id: str
     ) -> None:
         await self._redis.delete(
-            f"login_code:{email_code}"
+            f"login_code:{email_code}:{device_id}"
         )
 
 def get_email_code_sender(

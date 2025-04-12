@@ -9,7 +9,8 @@ from starlette.requests import Request
 from starlette.status import HTTP_500_INTERNAL_SERVER_ERROR
 
 from app_errors.application_errors import AppError, DeviceMismatchException
-from app_errors.user_errors import UserNotFoundByIdError, UnauthenticatedUserError, UserNotFoundByEmailError
+from app_errors.user_errors import UserNotFoundByIdError, UnauthenticatedUserError, UserNotFoundByEmailError, \
+    UserNotFoundErrorByCode
 from responses import ErrorData, ErrorResponse
 
 logger = logging.getLogger(__name__)
@@ -33,7 +34,8 @@ def setup_exception_handlers(app: FastAPI):
     app.add_exception_handler(
         UnauthenticatedUserError, error_handler(status.HTTP_401_UNAUTHORIZED)
     )
-    app.add_exception_handler(DeviceMismatchException, error_handler(status.HTTP_409_CONFLICT))
+    app.add_exception_handler(DeviceMismatchException, error_handler(status.HTTP_404_NOT_FOUND))
+    app.add_exception_handler(UserNotFoundErrorByCode, error_handler(status.HTTP_404_NOT_FOUND))
     # app.add_exception_handler(
     #     InvalidCredentialsError, error_handler(status.HTTP_403_FORBIDDEN)
     # )
