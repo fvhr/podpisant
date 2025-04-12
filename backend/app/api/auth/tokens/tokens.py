@@ -97,7 +97,7 @@ def set_tokens(response: ORJSONResponse, access_token: str, refresh_token: str):
         secure=False,
         max_age=60 * 60 * 24 * 30,
         expires=60 * 60 * 24 * 30,
-        samesite="lax",
+        samesite="none",
         # samesite="none"
     )
     response.set_cookie(
@@ -107,5 +107,5 @@ def set_tokens(response: ORJSONResponse, access_token: str, refresh_token: str):
         secure=False,
         max_age=60 * 60 * 24 * 30,
         expires=60 * 60 * 24 * 30,
-        samesite="lax",
+        samesite="none",
     )

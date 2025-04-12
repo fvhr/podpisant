@@ -10,3 +10,6 @@ class CreateDocumentSchema(BaseModel):
 #
 # class StageSchema(BaseModel):
 
+
+class DocumentSchema(BaseModel):
+    name: str

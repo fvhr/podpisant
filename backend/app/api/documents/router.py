@@ -6,10 +6,12 @@ from zoneinfo import ZoneInfo
 
 from fastapi import APIRouter, UploadFile, File, Form, Depends, HTTPException, Response
 from minio import Minio
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from api.auth.idp import get_current_user
-from api.documents.shcemas import CreateDocumentSchema
+from api.auth.user_service import get_user_orgs_with_admin_and_tags
+from api.documents.schemas import CreateDocumentSchema
 from database.models import User, Document
 from database.session_manager import get_db
 from minio_client.client import get_minio_client, DOCUMENTS_BUCKET_NAME, MINIO_PUBLIC_URL
@@ -98,3 +100,9 @@ async def get_document_file(
         }
     )
 
+
+# @documents_router.get("")
+# async def get_document(user: User = Depends(get_current_user), session: AsyncSession = Depends(get_db)) -> UserDocumentsSchema:
+#     org_ids, _, _ = await get_user_orgs_with_admin_and_tags(session, user.id)
+#     documents = await session.execute(select(Document).where(Document.organization_id.in_(org_ids)))
+#     return
