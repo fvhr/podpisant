@@ -77,16 +77,6 @@ class TokenWhiteListService:
             created_at=datetime.fromisoformat(decoded_data['created_at'])
         )
 
-    async def remove_token_by_jti(self, jti: UUID):
-        """Удаляет токен по его идентификатору"""
-        token_data = await self.get_refresh_token_data(jti)
-        if not token_data:
-            logger.warning(f"Token with jti {jti} not found for deletion")
-            return
-
-        await self.redis.delete(f"refresh_token:{jti}")
-        await self.redis.zrem(f"refresh_tokens:{token_data.user_id}", str(jti))
-
     async def remove_all_tokens_except(self, user_id: UUID, exclude_jti: UUID):
         tokens = await self.redis.zrange(f"refresh_tokens:{user_id}", 0, -1)
         tokens_to_remove = [t for t in tokens if t != str(exclude_jti)]

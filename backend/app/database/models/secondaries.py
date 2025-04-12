@@ -1,4 +1,9 @@
-from sqlalchemy.orm import Mapped
+from uuid import UUID
+
+from sqlalchemy import ForeignKey, String
+from sqlalchemy.orm import Mapped, relationship, mapped_column
+
+from database.models import Base
 
 
 class UserDepartment(Base):

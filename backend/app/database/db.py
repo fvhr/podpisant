@@ -1,3 +1,4 @@
+import logging
 import re
 from typing import Type, Tuple, Dict, Any, Union, Sequence
 from datetime import datetime
@@ -11,8 +12,10 @@ from app.connections.pgsql.session_manager import (
     db_manager,
 )
 
-# Базовый класс для моделей SQLAlchemy
-Base = declarative_base()
+from database.models import Base
+
+
+logger = logging.getLogger(__name__)
 
 
 class DatabaseManager:
