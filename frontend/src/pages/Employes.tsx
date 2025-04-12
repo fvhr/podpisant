@@ -1,12 +1,19 @@
-import React from 'react';
-import { Header } from '../components';
-import { EmployeesComponent } from '../components/employes/employes-component.tsx';
+import React, { useState } from 'react';
+import { Sidebar } from '../components';
+import { EmployeesList } from '../components/employes/employes-list.tsx';
 
 export const Employes: React.FC = () => {
-    return (
-        <div className="wrapper">
-            <Header />
-            <EmployeesComponent />
-        </div>
-    );
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+
+  const toggleSidebar = () => {
+    setIsSidebarOpen(!isSidebarOpen);
+  };
+  return (
+    <div className="wrapper">
+      <Sidebar isOpen={isSidebarOpen} toggleSidebar={toggleSidebar} />
+      <main className={`content ${isSidebarOpen ? 'with-sidebar' : 'full-width'}`}>
+        <EmployeesList />
+      </main>
+    </div>
+  );
 };
