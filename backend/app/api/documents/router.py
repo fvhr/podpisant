@@ -108,6 +108,7 @@ async def get_document(user: User = Depends(get_current_user), session: AsyncSes
     documents = documents.scalars().all()
     data = [
         DocumentSchema(
+            id=document.id,
             name=document.name,
             organization_id=document.organization_id,
             creator_id=document.creator_id,

@@ -61,14 +61,13 @@ async def refresh_tokens(
     return response
 
 
-@auth_router.post("/me")
+@auth_router.get("/me")
 async def get_current_user(
     user: User = Depends(get_current_user),
     session: AsyncSession = Depends(get_db)
 ) -> UserView:
     user_organizations, admin_in_organizations, org_tags = await get_user_orgs_with_admin_and_tags(session, user.id)
 
-    # Получаем ID департаментов пользователя
     user_departments_ids_query = select(UserDepartment.department_id).where(UserDepartment.user_id == user.id)
     user_departments_ids = (await session.execute(user_departments_ids_query)).scalars().all()
 

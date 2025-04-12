@@ -16,6 +16,7 @@ class CreateDocumentSchema(BaseModel):
 
 
 class DocumentSchema(BaseModel):
+    id: int
     name: str
     organization_id: int
     file_url: str
