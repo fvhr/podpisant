@@ -1,13 +1,20 @@
 import React, { useState } from 'react';
 import { DocumentsList, DocumentsMenu } from '../components';
+import { DocumentModal } from '../components/documents/documents-modal';
 import { Sidebar } from '../components/sidebar';
 
 export const Documents: React.FC = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<'all' | 'signed' | 'canceled' | 'in-progress'>('all');
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const toggleSidebar = () => {
     setIsSidebarOpen(!isSidebarOpen);
+  };
+
+  const handleCreateDocument = (name: string, file: File) => {
+    // Здесь логика создания документа
+    console.log('Создаем документ:', name, file);
   };
 
   const documents = [
@@ -39,9 +46,12 @@ export const Documents: React.FC = () => {
       <Sidebar isOpen={isSidebarOpen} toggleSidebar={toggleSidebar} />
 
       <main className={`content ${isSidebarOpen ? 'with-sidebar' : 'full-width'}`}>
-        <DocumentsMenu setActiveTab={setActiveTab} activeTab={activeTab} />
+        <DocumentsMenu onOpenModal={() => setIsModalOpen(true)} setActiveTab={setActiveTab} activeTab={activeTab} />
         <DocumentsList documents={documents} activeTab={activeTab} />
       </main>
+      {isModalOpen && (
+        <DocumentModal onClose={() => setIsModalOpen(false)} onCreate={handleCreateDocument} />
+      )}
     </div>
   );
 };

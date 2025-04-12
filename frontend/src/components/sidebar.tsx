@@ -1,5 +1,5 @@
 import { AiOutlineFile, AiOutlineSolution, AiOutlineUser } from 'react-icons/ai';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import '../styles/app.scss';
 import { NavItem, SidebarProps } from '../types/navbar.ts';
 
@@ -12,6 +12,7 @@ export const navItems: NavItem[] = [
 export const Sidebar = ({ isOpen, toggleSidebar }: SidebarProps) => {
   const location = useLocation();
   const isActive = (path: string) => location.pathname === path;
+  const navigate = useNavigate();
 
   const handleSidebarClick = (e: React.MouseEvent) => {
     const target = e.target as HTMLElement;
@@ -21,6 +22,10 @@ export const Sidebar = ({ isOpen, toggleSidebar }: SidebarProps) => {
     }
 
     toggleSidebar?.();
+  };
+
+  const handleLogout = () => {
+    navigate('/main');
   };
 
   return (
@@ -73,6 +78,11 @@ export const Sidebar = ({ isOpen, toggleSidebar }: SidebarProps) => {
           ))}
         </ul>
       </div>
+      {isOpen && (
+        <button className="sidebar__logout" onClick={handleLogout}>
+          <span>Выйти</span>
+        </button>
+      )}
     </div>
   );
 };
