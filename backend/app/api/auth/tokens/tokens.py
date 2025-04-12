@@ -98,7 +98,6 @@ def set_tokens(response: ORJSONResponse, access_token: str, refresh_token: str):
         max_age=60 * 60 * 24 * 30,
         expires=60 * 60 * 24 * 30,
         samesite="none",
-        # samesite="none"
     )
     response.set_cookie(
         key="access_token",
