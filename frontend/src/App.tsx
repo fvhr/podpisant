@@ -4,6 +4,7 @@ import { Main } from './pages/Main.tsx';
 import './styles/app.scss';
 import {Employes} from "./pages/Employes.tsx";
 import {Departments} from "./pages/Departments.tsx";
+import {Profile} from "./pages/Profile.tsx";
 
 export const App = () => {
   return (
@@ -15,6 +16,7 @@ export const App = () => {
       <Route path="/departments" element={<Departments />} />
       <Route path="/documents" element={<Documents />} />
       <Route path="/document" element={<DocumentDetails />} />
+      <Route path="/profile" element={<Profile />} />
     </Routes>
   );
 };
