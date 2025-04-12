@@ -96,11 +96,14 @@ pool_class = (
 )
 engine = create_async_engine(DATABASE_URI, poolclass=pool_class)
 
-
 sessionmaker = async_sessionmaker(
     bind=engine, expire_on_commit=False, class_=AsyncSession
 )
 
+
 async def get_db() -> AsyncIterable[AsyncSession]:
     async with sessionmaker() as session:
         yield session
+
+
+db_manager = CustomSession()
