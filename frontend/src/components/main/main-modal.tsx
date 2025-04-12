@@ -2,7 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import { useForm } from 'react-hook-form';
 
-interface CreateOrganizationModalProps {
+interface MainModalProps {
   onClose: () => void;
   onCreate: (name: string, description: string) => void;
 }
@@ -12,10 +12,7 @@ interface OrganizationFormData {
   description: string;
 }
 
-export const CreateOrganizationModal: React.FC<CreateOrganizationModalProps> = ({
-  onClose,
-  onCreate,
-}) => {
+export const MainModal: React.FC<MainModalProps> = ({ onClose, onCreate }) => {
   const {
     register,
     handleSubmit,
@@ -28,7 +25,7 @@ export const CreateOrganizationModal: React.FC<CreateOrganizationModalProps> = (
   const onSubmit = (data: OrganizationFormData) => {
     onCreate(data.name, data.description);
     reset();
-		onClose();
+    onClose();
   };
 
   const handleClose = () => {

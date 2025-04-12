@@ -2,7 +2,7 @@
   padding: 0;
   margin: 0;
   border: 0;
-	font-family: 'Rubik', Roboto, system-ui, Tahoma, sans-serif;
+  font-family: 'Rubik', Roboto, system-ui, Tahoma, sans-serif;
 }
 *,
 *::before,
@@ -35,14 +35,13 @@ body {
   -ms-text-size-adjust: 100%;
   -moz-text-size-adjust: 100%;
   -webkit-text-size-adjust: 100%;
-	font-size: 16px;
+  font-size: 16px;
 }
 input,
 button,
 textarea {
   font-family: inherit;
 }
-
 
 input::-ms-clear {
   display: none;
@@ -77,18 +76,18 @@ h6 {
   font-size: inherit;
   font-weight: 400;
 }
-input[type="number"]::-webkit-outer-spin-button,
-input[type="number"]::-webkit-inner-spin-button {
-		-webkit-appearance: none;
-		margin: 0;
+input[type='number']::-webkit-outer-spin-button,
+input[type='number']::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
 }
 
 /* Скрытие спиннеров для Firefox */
-input[type="number"] {
-		-moz-appearance: textfield;
+input[type='number'] {
+  -moz-appearance: textfield;
 }
 body {
-	background-color: #fafafa;
-	font-family: 'Rubik';
-	font-size: 1rem;
+  background-color: #fafafa;
+  font-family: 'Rubik';
+  font-size: 1rem;
 }

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { AiFillDelete, AiFillPlusCircle } from 'react-icons/ai';
 import { useNavigate } from 'react-router-dom';
-import { CreateOrganizationModal } from './organizations-modal';
+import { MainModal } from './main-modal';
 
 interface Organization {
   id: number;
@@ -9,7 +9,7 @@ interface Organization {
   description: string;
 }
 
-export const Organizations: React.FC = () => {
+export const MainOrganizations: React.FC = () => {
   const navigate = useNavigate();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [organizations, setOrganizations] = useState<Organization[]>([
@@ -82,10 +82,7 @@ export const Organizations: React.FC = () => {
       </div>
 
       {isModalOpen && (
-        <CreateOrganizationModal
-          onClose={() => setIsModalOpen(false)}
-          onCreate={handleCreateOrganization}
-        />
+        <MainModal onClose={() => setIsModalOpen(false)} onCreate={handleCreateOrganization} />
       )}
     </main>
   );

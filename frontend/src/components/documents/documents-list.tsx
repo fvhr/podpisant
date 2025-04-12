@@ -1,6 +1,6 @@
 import { FiClock } from 'react-icons/fi';
-import { Document } from '../../types/documents';
 import { useNavigate } from 'react-router-dom';
+import { Document } from '../../types/documents';
 
 interface DocumentsListProps {
   documents: Document[];
@@ -9,7 +9,7 @@ interface DocumentsListProps {
 
 export const DocumentsList = ({ documents, activeTab }: DocumentsListProps) => {
   const navigate = useNavigate();
-	
+
   function getStatusLabel(status: string): string {
     switch (status) {
       case 'signed':
