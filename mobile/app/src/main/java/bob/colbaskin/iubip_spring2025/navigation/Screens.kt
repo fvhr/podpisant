@@ -4,10 +4,10 @@ import kotlinx.serialization.Serializable
 
 sealed interface Screens {
     @Serializable
-    data object Home: Screens
+    data object Organizations: Screens
 
     @Serializable
-    data object SomeScreen: Screens
+    data object Documents: Screens
 
     @Serializable
     data class Profile(val id: String): Screens

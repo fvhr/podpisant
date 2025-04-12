@@ -16,6 +16,7 @@ import bob.colbaskin.iubip_spring2025.navigation.Screens
 import bob.colbaskin.iubip_spring2025.navigation.animatedTransition
 import bob.colbaskin.iubip_spring2025.onboarding.presentation.IntroductionScreen
 import bob.colbaskin.iubip_spring2025.onboarding.presentation.WelcomeScreen
+import bob.colbaskin.iubip_spring2025.organizations.presentation.OrganizationsScreen
 
 fun NavGraphBuilder.onBoardingGraph(
     navController: NavHostController,
@@ -45,7 +46,7 @@ fun NavGraphBuilder.onBoardingGraph(
         }
         animatedTransition<Screens.OTPScreen> {
             OtpScreen(
-                onNextScreen = { navController.navigate(Screens.Home) {
+                onNextScreen = { navController.navigate(Screens.Organizations) {
                     popUpTo(Screens.OTPScreen) { inclusive = true }
                     popUpTo(Screens.EmailInput) { inclusive = true }
                 }}
@@ -56,17 +57,12 @@ fun NavGraphBuilder.onBoardingGraph(
 
 fun NavGraphBuilder.mainGraph(navController: NavHostController) {
     navigation<Graphs.Main>(
-        startDestination = Screens.Home
+        startDestination = Screens.Organizations
     ) {
-        animatedTransition<Screens.Home> {
-            Box(
-                modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center
-            ) {
-                Text("Home Screen")
-            }
+        animatedTransition<Screens.Organizations> {
+            OrganizationsScreen()
         }
-        animatedTransition<Screens.SomeScreen> {
+        animatedTransition<Screens.Documents> {
             Box(
                 modifier = Modifier.fillMaxSize(),
                 contentAlignment = Alignment.Center
