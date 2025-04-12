@@ -1,11 +1,12 @@
-import React from 'react';
+import React, { useState } from 'react';
 import ReactDOM from 'react-dom';
 import { useForm } from 'react-hook-form';
 import { FiUpload, FiX } from 'react-icons/fi';
+import { createDocument } from '../../api/documents';
 
 interface DocumentModalProps {
   onClose: () => void;
-  onCreate: (name: string, file: File) => void;
+  onSuccess: () => void;
 }
 
 interface DocumentFormData {
@@ -13,7 +14,7 @@ interface DocumentFormData {
   document: FileList;
 }
 
-export const DocumentModal: React.FC<DocumentModalProps> = ({ onClose, onCreate }) => {
+export const DocumentModal: React.FC<DocumentModalProps> = ({ onClose, onSuccess }) => {
   const {
     register,
     handleSubmit,
@@ -23,11 +24,26 @@ export const DocumentModal: React.FC<DocumentModalProps> = ({ onClose, onCreate 
   } = useForm<DocumentFormData>();
 
   const fileName = watch('document')?.[0]?.name;
+  const [isLoading, setIsLoading] = useState(false);
 
-  const onSubmit = (data: DocumentFormData) => {
-    onCreate(data.name, data.document[0]);
-    reset();
-    onClose();
+  const onSubmit = async (data: DocumentFormData) => {
+    setIsLoading(true);
+    try {
+      await createDocument({
+        name: data.name,
+        organization_id: 1,
+        file: data.document[0],
+      });
+
+      reset();
+      onSuccess();
+      onClose();
+    } catch (error) {
+      console.error('Ошибка:', error);
+      alert('Не удалось создать документ');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleClose = () => {
@@ -47,7 +63,9 @@ export const DocumentModal: React.FC<DocumentModalProps> = ({ onClose, onCreate 
 
         <form onSubmit={handleSubmit(onSubmit)}>
           <div className="document-modal-form-group">
-            <label className="document-modal-name" htmlFor="document-name">Название документа</label>
+            <label className="document-modal-name" htmlFor="document-name">
+              Название документа
+            </label>
             <input
               id="document-name"
               type="text"
@@ -87,7 +105,7 @@ export const DocumentModal: React.FC<DocumentModalProps> = ({ onClose, onCreate 
 
           <div className="document-modal-actions">
             <button type="submit" className="submit-button">
-              Создать документ
+              {isLoading ? 'Создание...' : 'Создать документ'}
             </button>
           </div>
         </form>

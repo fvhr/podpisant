@@ -1,10 +1,13 @@
-import React from 'react';
 import { FiDownload } from 'react-icons/fi';
-
-export const DocumentButtons: React.FC = () => {
+interface DocumentButtonsProps {
+  onCreateStage: () => void; // Добавляем пропс для открытия модалки
+}
+export const DocumentButtons = ({ onCreateStage }: DocumentButtonsProps) => {
   return (
     <div className="document-actions">
-      <button className="action-btn edit">Создать новый этап</button>
+      <button className="action-btn edit" onClick={onCreateStage}>
+        Создать новый этап
+      </button>
       <button className="action-btn download">
         <FiDownload /> Скачать документ
       </button>
