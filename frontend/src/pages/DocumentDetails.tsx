@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { FiArrowLeft } from 'react-icons/fi';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { CreateStageModal, DocumentButtons, DocumentHeader, DocumentStages } from '../components';
 import { Sidebar } from '../components/sidebar';
 
@@ -8,6 +8,9 @@ export const DocumentDetails: React.FC = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isStageModalOpen, setIsStageModalOpen] = useState(false);
   const navigate = useNavigate();
+	const location = useLocation();
+
+	const orgId = location.state?.orgId;
 
   const employees = [
     'Иванов Иван Иванович',
@@ -24,6 +27,14 @@ export const DocumentDetails: React.FC = () => {
     setIsStageModalOpen(false);
   };
 
+	const handleBack = () => {
+    if (orgId) {
+      navigate(`/documents/${orgId}`); 
+    } else {
+      navigate('/documents'); 
+    }
+  };
+
   return (
     <div className="documents-page">
       <Sidebar isOpen={isSidebarOpen} toggleSidebar={toggleSidebar} />
@@ -31,14 +42,16 @@ export const DocumentDetails: React.FC = () => {
       <main className={`content ${isSidebarOpen ? 'with-sidebar' : 'full-width'}`}>
         <div className="document-details-layout">
           <div className="document-content-section">
-            <div onClick={() => navigate('/documents')} className="document-back">
-              <FiArrowLeft /> Назад
+            <div style={{width: '70%'}}>
+              <div onClick={handleBack} className="document-back">
+                <FiArrowLeft /> Назад
+              </div>
+              <DocumentHeader />
+              <DocumentStages />
             </div>
-            <DocumentHeader />
-            <DocumentStages />
-          </div>
 
-          <DocumentButtons onCreateStage={() => setIsStageModalOpen(true)} />
+            <DocumentButtons onCreateStage={() => setIsStageModalOpen(true)} />
+          </div>
         </div>
       </main>
 

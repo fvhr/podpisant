@@ -32,7 +32,6 @@ export const LoginContainer = () => {
   const handleCodeSubmit = async (code: string) => {
     try {
       const result = await userCodeLogin(code, deviceId);
-      console.log('Login result:', result);
 
       if (result?.success) {
         navigate('/main');
