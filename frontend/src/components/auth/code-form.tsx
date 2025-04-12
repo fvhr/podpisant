@@ -33,6 +33,12 @@ export const CodeForm = ({ email, onCodeSubmit, device_id, error }: CodeFormProp
   const handleCodeChange = (e: React.ChangeEvent<HTMLInputElement>, index: number) => {
     const value = e.target.value.replace(/\D/g, '');
 
+    const digit = value.slice(0, 1);
+    
+    setValue(`code.${index}`, digit);
+        if (!/^\d*$/.test(value)) return;
+        setValue(`code.${index}`, digit);
+
     if (!value) {
       setValue(`code.${index}`, '');
       return;
