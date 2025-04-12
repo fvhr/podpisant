@@ -18,11 +18,10 @@
     gap: 8px;
     margin-top: 30px;
     background-color: $color-button-dark;
-    transition: 0.3 ease;
 
     &:hover {
       background-color: #413997;
-      transition: 0.3 ease;
+      transition: 0.3 ease-in;
     }
   }
 }
@@ -143,5 +142,3 @@
   font-size: 0.95rem;
   line-height: 1.4;
 }
-
-
