@@ -21,13 +21,13 @@ async def get_connected_clients(
     data: AuthSchema,
     session: AsyncSession = Depends(get_db),
     email_code_sender: EmailCodeSender = Depends(get_email_code_sender)
-) -> AuthCodeSchema:
+) -> ORJSONResponse:
     user = await get_user_by_email(session, data.email)
 
     code = f"{secrets.randbelow(10000):04d}"
     await email_code_sender.email_login_notify(user.email, user.id, code)
 
-    return AuthCodeSchema(code=code)
+    return ORJSONResponse({"status": "success"})
 
 
 @auth_router.post("/login-with-code")
