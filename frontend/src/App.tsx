@@ -1,5 +1,5 @@
 import { Navigate, Route, Routes } from 'react-router-dom';
-import { Auth, Documents } from './pages';
+import { Auth, DocumentDetails, Documents } from './pages';
 import { Main } from './pages/Main.tsx';
 import './styles/app.scss';
 
@@ -10,6 +10,7 @@ export const App = () => {
       <Route path="/login" element={<Auth />} />
       <Route path="/main" element={<Main />} />
       <Route path="/documents" element={<Documents />} />
+      <Route path="/document" element={<DocumentDetails />} />
     </Routes>
   );
 };
