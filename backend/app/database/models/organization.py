@@ -13,5 +13,5 @@ class Organization(Base):
     admin_id: Mapped[int] = mapped_column(ForeignKey('user.id'))
 
     users = relationship("UserOrganization", back_populates="organization")
-    org_documents = relationship("Document", back_populates="organization")
-    departments = relationship("Department", back_populates="organization")
+    org_documents = relationship("Document", back_populates="organization", cascade="all, delete-orphan")
+    departments = relationship("Department", back_populates="organization", cascade="all, delete-orphan")

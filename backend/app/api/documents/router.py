@@ -107,16 +107,7 @@ async def get_document(user: User = Depends(get_current_user), session: AsyncSes
     documents = await session.execute(select(Document).where(Document.organization_id.in_(org_ids)))
     documents = documents.scalars().all()
     data = [
-        DocumentSchema(
-            id=document.id,
-            name=document.name,
-            organization_id=document.organization_id,
-            creator_id=document.creator_id,
-            created_at=document.created_at.isoformat(),
-            file_url=f"https://menoitami/api/documents/{document.id}/file",
-            status=document.status,
-            type=document.type
-        ) for document in documents
+        DocumentSchema.from_db(document) for document in documents
     ]
     return data
 
@@ -126,19 +117,18 @@ async def get_documents_by_organization_id(organization_id: int, session: AsyncS
     documents = await session.execute(select(Document).where(Document.organization_id == organization_id))
     documents = documents.scalars().all()
     data = [
-        DocumentSchema(
-            id=document.id,
-            name=document.name,
-            organization_id=document.organization_id,
-            creator_id=document.creator_id,
-            created_at=document.created_at.isoformat(),
-            file_url=f"https://menoitami/api/documents/{document.id}/file",
-            status=document.status,
-            type=document.type
-        ) for document in documents
+        DocumentSchema.from_db(document) for document in documents
     ]
     return data
 
+
+@documents_router.get("/{document_id}")
+async def get_document_by_id(document_id: int, session: AsyncSession = Depends(get_db)) -> DocumentSchema:
+    document = await session.get(Document, document_id)
+    if not document:
+        raise HTTPException(status_code=404, detail="Document not found")
+    data = DocumentSchema.from_db(document)
+    return data
 
 # @documents_router.post("/stages")
 # async def add_stages_to_document(data: AddStagesToDocumentSchema):
