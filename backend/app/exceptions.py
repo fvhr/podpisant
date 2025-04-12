@@ -17,7 +17,7 @@ logger = logging.getLogger(__name__)
 
 
 def error_handler(
-    status_code: int,
+        status_code: int,
 ) -> Callable[..., Awaitable[ORJSONResponse]]:
     return partial(app_error_handler, status_code=status_code)
 
@@ -42,15 +42,14 @@ def setup_exception_handlers(app: FastAPI):
     app.add_exception_handler(Exception, unknown_exception_handler)
 
 
-
 def error_handler(
-    status_code: int,
+        status_code: int,
 ) -> Callable[..., Awaitable[ORJSONResponse]]:
     return partial(app_error_handler, status_code=status_code)
 
 
 async def app_error_handler(
-    request: Request, err: AppError, status_code: int
+        request: Request, err: AppError, status_code: int
 ) -> ORJSONResponse:
     method = request.method
     path = request.url.path
@@ -67,7 +66,7 @@ async def app_error_handler(
 
 
 async def unknown_exception_handler(
-    request: Request, err: Exception
+        request: Request, err: Exception
 ) -> ORJSONResponse:
     method = request.method
     path = request.url.path
@@ -88,11 +87,11 @@ async def unknown_exception_handler(
 
 
 async def handle_error(
-    request: Request,
-    err: Exception,
-    err_data: ErrorData,
-    status: int,
-    status_code: int,
+        request: Request,
+        err: Exception,
+        err_data: ErrorData,
+        status: int,
+        status_code: int,
 ) -> ORJSONResponse:
     return ORJSONResponse(
         ErrorResponse(error=err_data, status=status_code),

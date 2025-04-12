@@ -51,7 +51,7 @@ async def user_departament(
             select(UserDepartment).where(
                 UserDepartment.user_id == user.id,
                 UserDepartment.department_id == data.dep_id,
-                UserDepartment.is_admin == True
+                UserDepartment.is_admin is True
             )
         )
         user_dep = result.scalar_one_or_none()
