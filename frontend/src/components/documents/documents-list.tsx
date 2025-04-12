@@ -1,5 +1,6 @@
-import { FiClock, FiDownload } from 'react-icons/fi';
+import { FiClock } from 'react-icons/fi';
 import { Document } from '../../types/documents';
+import { useNavigate } from 'react-router-dom';
 
 interface DocumentsListProps {
   documents: Document[];
@@ -7,6 +8,8 @@ interface DocumentsListProps {
 }
 
 export const DocumentsList = ({ documents, activeTab }: DocumentsListProps) => {
+  const navigate = useNavigate();
+	
   function getStatusLabel(status: string): string {
     switch (status) {
       case 'signed':
@@ -25,7 +28,10 @@ export const DocumentsList = ({ documents, activeTab }: DocumentsListProps) => {
       {documents
         .filter((doc) => activeTab === 'all' || doc.status === activeTab)
         .map((document) => (
-          <div key={document.id} className={`document-card ${document.status}`}>
+          <div
+            onClick={() => navigate('/document')}
+            key={document.id}
+            className={`document-card ${document.status}`}>
             <div className="document-info">
               <h3>{document.title}</h3>
               <div className="document-meta">
@@ -36,11 +42,6 @@ export const DocumentsList = ({ documents, activeTab }: DocumentsListProps) => {
                   {getStatusLabel(document.status)}
                 </span>
               </div>
-            </div>
-            <div className="document-actions">
-              <a href={document.fileUrl} download className="download-btn">
-                <FiDownload className="icon" /> Скачать
-              </a>
             </div>
           </div>
         ))}
