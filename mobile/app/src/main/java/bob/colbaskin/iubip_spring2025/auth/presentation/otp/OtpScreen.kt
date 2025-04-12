@@ -29,18 +29,27 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextDecoration
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import bob.colbaskin.iubip_spring2025.auth.presentation.AuthViewModel
-import bob.colbaskin.iubip_spring2025.ui.theme.IUBIPSPRING2025Theme
 import bob.colbaskin.iubip_spring2025.ui.theme.TextColor
 
 @Composable
 fun OtpScreen(
     viewModel: AuthViewModel = hiltViewModel(),
+    onNextScreen: () -> Unit
+) {
+    OtpScreenFull(
+        viewModel = viewModel,
+        onNextScreen = onNextScreen
+    )
+}
+
+@Composable
+fun OtpScreenFull(
+    viewModel: AuthViewModel,
     onNextScreen: () -> Unit
 ) {
     val state = viewModel.state.collectAsStateWithLifecycle().value
@@ -182,18 +191,6 @@ fun OtpContent(
                     ),
                 )
             }
-
-            Spacer(modifier = Modifier.weight(0.2f))
         }
-    }
-}
-
-@Preview
-@Composable
-private fun OtpScreenPreview() {
-    IUBIPSPRING2025Theme {
-        OtpScreen(
-            onNextScreen = {}
-        )
     }
 }

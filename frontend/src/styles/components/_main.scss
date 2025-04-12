@@ -18,11 +18,10 @@
     gap: 8px;
     margin-top: 30px;
     background-color: $color-button-dark;
-    transition: 0.3 ease;
 
     &:hover {
       background-color: #413997;
-      transition: 0.3 ease;
+      transition: 0.3 ease-in;
     }
   }
 }
@@ -94,6 +93,10 @@
   flex: 1;
   padding: 20px;
   cursor: pointer;
+
+  @media (max-width: 768px) {
+    padding: 10px;
+  }
 }
 
 .organization-actions {
@@ -105,6 +108,10 @@
   cursor: pointer;
   transition: all 0.3s ease;
   border-left: 1px solid rgba($color-error, 0.1);
+  
+  @media (max-width: 768px) {
+    flex: 0 0 30px;
+  }
 
   &:hover {
     background-color: rgba($color-error, 0.2);
@@ -135,5 +142,3 @@
   font-size: 0.95rem;
   line-height: 1.4;
 }
-
-

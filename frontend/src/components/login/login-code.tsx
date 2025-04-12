@@ -1,40 +1,39 @@
 import { useForm, useWatch } from 'react-hook-form';
-import { useNavigate } from 'react-router-dom';
 
 type CodeFormProps = {
   email: string;
-  onCodeSubmit: (code: string) => void;
+  onCodeSubmit: (code: string, device_id: string | null) => void;
+  device_id: string | null;
+  error: string | null;
 };
 
 type CodeFormData = {
   code: string[];
 };
 
-export const CodeForm = ({ email, onCodeSubmit }: CodeFormProps) => {
+export const LoginCode = ({ email, onCodeSubmit, device_id, error }: CodeFormProps) => {
   const { register, handleSubmit, setValue, control } = useForm<CodeFormData>({
     defaultValues: {
-      code: ['', '', '', '']
-    }
+      code: ['', '', '', ''],
+    },
   });
-  const navigate = useNavigate();
 
   const codeValues = useWatch({
     control,
-    name: 'code'
+    name: 'code',
   });
 
-  const isCodeComplete = codeValues?.every(digit => digit?.length === 1);
+  const isCodeComplete = codeValues?.every((digit) => digit?.length === 1);
 
   const onSubmit = (data: CodeFormData) => {
     const fullCode = data.code.join('');
-    navigate('/main');
-    onCodeSubmit(fullCode);
+    onCodeSubmit(fullCode, device_id);
   };
 
   const handleCodeChange = (e: React.ChangeEvent<HTMLInputElement>, index: number) => {
-    const value = e.target.value.replace(/\D/g, ''); // Удаляем все не-цифры
-    const digit = value.slice(0, 1); // Берем только первую цифру
-    
+    const value = e.target.value.replace(/\D/g, '');
+    const digit = value.slice(0, 1);
+
     setValue(`code.${index}`, digit);
 
     if (digit && index < 3) {
@@ -44,18 +43,9 @@ export const CodeForm = ({ email, onCodeSubmit }: CodeFormProps) => {
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>, index: number) => {
-    if (!/[0-9]|Backspace|Delete|Tab|ArrowLeft|ArrowRight/.test(e.key)) {
-      e.preventDefault();
-      return;
-    }
-
-    if (e.key === 'Backspace' || e.key === 'Delete') {
-      if (e.key === 'Backspace' && index > 0 && !(e.target as HTMLInputElement).value) {
-        const prevInput = document.getElementById(`code-${index - 1}`);
-        prevInput?.focus();
-      }
-      
-      setValue(`code.${index}`, '');
+    if (e.key === 'Backspace' && !(e.target as HTMLInputElement).value && index > 0) {
+      const prevInput = document.getElementById(`code-${index - 1}`);
+      prevInput?.focus();
     }
   };
 
@@ -86,7 +76,6 @@ export const CodeForm = ({ email, onCodeSubmit }: CodeFormProps) => {
               id={`code-${index}`}
               type="text"
               inputMode="numeric"
-              pattern="[0-9]*"
               maxLength={1}
               {...register(`code.${index}`, {
                 required: true,
@@ -100,12 +89,13 @@ export const CodeForm = ({ email, onCodeSubmit }: CodeFormProps) => {
             />
           ))}
         </div>
+        {error && (
+          <div style={{ marginTop: '-20px', marginBottom: '10px' }} className="error-message">
+            {error}
+          </div>
+        )}
 
-        <button 
-          type="submit" 
-          className="submit-btn"
-          disabled={!isCodeComplete}
-        >
+        <button type="submit" className="submit-btn" disabled={!isCodeComplete}>
           Подтвердить
         </button>
       </form>

@@ -1,22 +1,24 @@
 package bob.colbaskin.iubip_spring2025.di
 
+import android.content.Context
 import android.util.Log
 import bob.colbaskin.iubip_spring2025.BuildConfig
 import bob.colbaskin.iubip_spring2025.auth.domain.local.AuthDataStoreRepository
+import com.franmontiel.persistentcookiejar.PersistentCookieJar
+import com.franmontiel.persistentcookiejar.cache.SetCookieCache
+import com.franmontiel.persistentcookiejar.persistence.SharedPrefsCookiePersistor
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.json.Json
-import okhttp3.Cookie
-import okhttp3.CookieJar
-import okhttp3.HttpUrl
-import okhttp3.Interceptor
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
+import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import javax.inject.Named
 import javax.inject.Singleton
@@ -44,29 +46,31 @@ object RemoteModule {
     @Provides
     @Singleton
     fun provideOkHttpClient(
-        authDataStoreRepository: AuthDataStoreRepository,
-        @Named("accessToken") token: String
+        @ApplicationContext context: Context
     ): OkHttpClient {
+        val cookieJar = PersistentCookieJar(
+            SetCookieCache(),
+            SharedPrefsCookiePersistor(context)
+        )
+
         return OkHttpClient.Builder()
-            .addInterceptor(Interceptor { chain ->
-                val token2 = runBlocking { authDataStoreRepository.getToken().first() } ?: token
-                Log.d("AuthViewModel", "token used in provideOkHttpClient: $token and $token2")
-
-                val cookie = Cookie.Builder()
-                    .domain(BuildConfig.DOMAIN)
-                    .name("access_token")
-                    .value(token2)
-                    .build()
-
-                val request = chain.request().newBuilder()
-                    .build()
-
-                val cookieJar = PersistentCookieJar()
-                cookieJar.saveFromResponse(chain.request().url, listOf(cookie))
-
-                chain.proceed(request)
+            .cookieJar(cookieJar)
+            .addInterceptor(HttpLoggingInterceptor().apply {
+                level = if (BuildConfig.DEBUG) {
+                    HttpLoggingInterceptor.Level.BODY
+                } else {
+                    HttpLoggingInterceptor.Level.NONE
+                }
             })
-            .cookieJar(PersistentCookieJar())
+            .addInterceptor { chain ->
+                val request = chain.request()
+                Log.d("Logging", "Sending cookies: ${request.headers["Cookie"]}")
+
+                val response = chain.proceed(request)
+
+                Log.d("Logging", "Received cookies: ${response.headers["Set-Cookie"]}")
+                response
+            }
             .build()
     }
 
@@ -77,22 +81,9 @@ object RemoteModule {
         okHttpClient: OkHttpClient
     ): Retrofit {
         return Retrofit.Builder()
-            .addConverterFactory(Json.asConverterFactory("application/json".toMediaType()))
             .baseUrl(apiUrl)
             .client(okHttpClient)
+            .addConverterFactory(Json.asConverterFactory("application/json".toMediaType()))
             .build()
-    }
-}
-
-class PersistentCookieJar : CookieJar {
-
-    private val cookies = mutableListOf<Cookie>()
-
-    override fun loadForRequest(url: HttpUrl): List<Cookie> {
-        return cookies.filter { it.matches(url) }
-    }
-
-    override fun saveFromResponse(url: HttpUrl, cookies: List<Cookie>) {
-        this.cookies.addAll(cookies)
     }
 }
