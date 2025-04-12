@@ -5,6 +5,8 @@ Revises:
 Create Date: 2025-04-12 07:22:16.751349
 
 """
+import random
+from datetime import datetime
 from typing import Sequence, Union
 import os
 from uuid import uuid4
@@ -28,7 +30,7 @@ def upgrade() -> None:
     sa.Column('fio', sa.String(length=128), nullable=False),
     sa.Column('email', sa.String(length=128), nullable=False),
     sa.Column('telegram_id', sa.Integer(), nullable=True),
-    sa.Column('phone', sa.String(length=20), nullable=True),
+    sa.Column('phone', sa.String(length=100), nullable=True),
     sa.Column('is_super_admin', sa.Boolean(), nullable=False),
     sa.Column('type_notification', postgresql.ENUM('TG', 'EMAIL', 'PHONE', name='notification_type_enum'), nullable=True),
     sa.PrimaryKeyConstraint('id'),
@@ -37,13 +39,16 @@ def upgrade() -> None:
     # ### end Alembic commands ###
     load_dotenv()
     admin_emails = os.getenv('API_ADMIN_EMAILS', '').split(',')
+    admins_ids = [str(uuid4()) for _ in range(len(admin_emails))]
     if admin_emails:
         users = []
-        for email in admin_emails:
+        for i in range(len(admin_emails)):
+            email = admin_emails[i]
+            admin_id = admins_ids[i]
             email = email.strip()
             if email:  # Пропускаем пустые email
                 users.append({
-                    'id': str(uuid4()),
+                    'id': admin_id,
                     'fio': 'Admin ' + email.split('@')[0].title(),
                     'email': email,
                     'is_super_admin': True,
@@ -64,9 +69,123 @@ def upgrade() -> None:
                 users
             )
 
+    op.create_table('organization',
+    sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
+    sa.Column('name', sa.String(length=255), nullable=False),
+    sa.Column('description', sa.String(length=1024), nullable=False),
+    sa.Column('admin_id', sa.Uuid(), nullable=False),
+    sa.PrimaryKeyConstraint('id')
+    )
+
+    op.create_table('department',
+    sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
+    sa.Column('name', sa.String(length=255), nullable=False),
+    sa.Column('desc', sa.String(length=1024), nullable=False),
+    sa.Column('organization_id', sa.Integer(), nullable=False),
+    sa.Column('created_at', sa.DateTime(timezone=True), nullable=False),
+    sa.PrimaryKeyConstraint('id'),
+    sa.UniqueConstraint('name')
+    )
+
+    op.create_table('document',
+    sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
+    sa.Column('name', sa.String(length=255), nullable=False),
+    sa.Column('department_id', sa.Integer(), nullable=False),
+    sa.Column('creator_id', sa.Uuid(), nullable=False),
+    sa.Column('created_at', sa.DateTime(timezone=True), nullable=False),
+    sa.Column('status', sa.String(length=20), nullable=False),
+    sa.Column('type', postgresql.ENUM('STRICT', 'GROUP', name='documenttypeenum'), nullable=True),
+    sa.PrimaryKeyConstraint('id')
+    )
+
+    # Теперь создаем таблицу этапов, которая зависит от document
+    op.create_table('doc_sign_stage',
+    sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
+    sa.Column('doc_id', sa.Integer(), nullable=False),
+    sa.Column('stage_number', sa.Integer(), nullable=False),
+    sa.Column('name', sa.String(length=100), nullable=False),
+    sa.Column('created_at', sa.DateTime(timezone=True), nullable=False),
+    sa.Column('deadline', sa.DateTime(timezone=True), nullable=True),
+    sa.ForeignKeyConstraint(['doc_id'], ['document.id'], ),
+    sa.PrimaryKeyConstraint('id')
+    )
+
+    # Добавляем внешний ключ current_stage_id в document
+    op.add_column('document', sa.Column('current_stage_id', sa.Integer(), nullable=True))
+    op.create_foreign_key('document_current_stage_id_fkey', 'document', 'doc_sign_stage', ['current_stage_id'], ['id'])
+
+    # Остальные таблицы
+    op.create_table('stage_signer',
+    sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
+    sa.Column('stage_id', sa.Integer(), nullable=False),
+    sa.Column('user_id', sa.Uuid(), nullable=False),
+    sa.Column('is_required', sa.Boolean(), nullable=False, server_default='true'),
+    sa.Column('signed_at', sa.DateTime(timezone=True), nullable=True),
+    sa.Column('status', sa.String(length=20), nullable=False, server_default='pending'),
+    sa.ForeignKeyConstraint(['stage_id'], ['doc_sign_stage.id'], ),
+    sa.ForeignKeyConstraint(['user_id'], ['user.id'], ),
+    sa.PrimaryKeyConstraint('id')
+    )
+
+    op.create_table('document_signature',
+    sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
+    sa.Column('stage_signer_id', sa.Integer(), nullable=False),
+    sa.Column('signature_type', sa.String(length=50), nullable=False),
+    sa.Column('signed_at', sa.DateTime(), nullable=False, server_default=sa.func.now()),
+    sa.Column('signature_data', sa.String(length=500), nullable=True),
+    sa.ForeignKeyConstraint(['stage_signer_id'], ['stage_signer.id'], ),
+    sa.PrimaryKeyConstraint('id')
+    )
+
+    op.create_table('user_department',
+    sa.Column('user_id', sa.Uuid(), nullable=False),
+    sa.Column('department_id', sa.Integer(), nullable=False),
+    sa.Column('role', sa.String(length=50), nullable=False, server_default='employee'),
+    sa.ForeignKeyConstraint(['department_id'], ['department.id'], ),
+    sa.ForeignKeyConstraint(['user_id'], ['user.id'], ),
+    sa.PrimaryKeyConstraint('user_id', 'department_id')
+    )
+
+    # Добавляем базовые данные
+    op.bulk_insert(
+        sa.table('organization',
+            sa.Column('id', sa.Integer),
+            sa.Column('name', sa.String),
+            sa.Column('description', sa.String),
+            sa.Column('admin_id', sa.Uuid)
+        ),
+        [
+            {'id': 1, 'name': 'Главная организация', 'description': 'Основная организация системы', 'admin_id': random.choice(admins_ids)},
+            {'id': 2, 'name': 'Филиал Восток', 'description': 'Восточный филиал компании', 'admin_id': random.choice(admins_ids)}
+        ]
+    )
+
+    op.bulk_insert(
+        sa.table('department',
+            sa.Column('id', sa.Integer),
+            sa.Column('name', sa.String),
+            sa.Column('desc', sa.String),
+            sa.Column('organization_id', sa.Integer),
+            sa.Column('created_at', sa.DateTime)
+        ),
+        [
+            {'id': 1, 'name': 'IT отдел', 'desc': 'Отдел информационных технологий', 'organization_id': 1, 'created_at': datetime.utcnow()},
+            {'id': 2, 'name': 'Бухгалтерия', 'desc': 'Финансовый отдел', 'organization_id': 1, 'created_at': datetime.utcnow()},
+            {'id': 3, 'name': 'Логистика', 'desc': 'Отдел логистики филиала', 'organization_id': 2, 'created_at': datetime.utcnow()}
+        ]
+    )
+
 
 def downgrade() -> None:
     # ### commands auto generated by Alembic - please adjust! ###
     op.drop_table('user')
     op.execute("DROP TYPE notification_type_enum")  # Удаляем ENUM тип
-    # ### end Alembic commands ###
+    op.drop_table('user_department')
+    op.drop_table('document_signature')
+    op.drop_table('stage_signer')
+    op.drop_column('document', 'current_stage_id')
+    op.drop_table('doc_sign_stage')
+    op.drop_table('document')
+    op.drop_table('department')
+    op.drop_table('organization')
+    op.execute("DROP TYPE documenttypeenum")

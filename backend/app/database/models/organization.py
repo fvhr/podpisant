@@ -12,5 +12,6 @@ class Organization(Base):
     description: Mapped[str] = mapped_column(String(1024), nullable=False)
     admin_id: Mapped[int] = mapped_column(ForeignKey('user.id'))
 
-    admin = relationship("User", back_populates="ad_department", uselist=False)
-    departments = relationship("Department", back_populates="department_organizations", uselist=True)
+    users = relationship("UserOrganization", back_populates="organization")
+    org_documents = relationship("Document", back_populates="organization")
+    departments = relationship("Department", back_populates="organization")

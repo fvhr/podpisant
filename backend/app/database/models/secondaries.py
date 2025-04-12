@@ -1,8 +1,10 @@
+from datetime import datetime
+from enum import StrEnum
 from uuid import UUID
 
-from sqlalchemy import ForeignKey, String
+from sqlalchemy import ForeignKey, String, DateTime, func, Enum
+from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import Mapped, relationship, mapped_column
-
 from database.models import Base
 
 
@@ -11,20 +13,31 @@ class UserDepartment(Base):
 
     user_id: Mapped[UUID] = mapped_column(ForeignKey('user.id'), primary_key=True)
     department_id: Mapped[int] = mapped_column(ForeignKey('department.id'), primary_key=True)
-    role: Mapped[str] = mapped_column(String(50))  # например, "employee", "manager"
+    tags: Mapped[dict] = mapped_column(JSONB, nullable=True)
 
-    user = relationship("User", back_populates="departments")
+    user = relationship("User", back_populates="user_departments")
     department = relationship("Department", back_populates="users")
 
 
-class DocumentSignature(Base):
-    __tablename__ = 'document_signature'
+class StageSigner(Base):
+    __tablename__ = "stage_signer"
 
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
-    document_id: Mapped[int] = mapped_column(ForeignKey('document.id'))
-    user_id: Mapped[UUID] = mapped_column(ForeignKey('user.id'))
-    signature_type: Mapped[str] = mapped_column(String(50))  # "digital", "handwritten", etc.
-    signed_at: Mapped[datetime] = mapped_column(default=datetime.utcnow)
+    stage_id: Mapped[int] = mapped_column(ForeignKey("doc_sign_stage.id"))
+    user_id: Mapped[UUID] = mapped_column(ForeignKey("user.id"))
 
-    document = relationship("Document", back_populates="signatures")
-    user = relationship("User")
+    signature_type: Mapped[str] = mapped_column(String(50), nullable=True)
+    signed_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=True)
+
+    stage = relationship("DocSignStage", back_populates="signers")
+    user = relationship("User", back_populates="signatures")
+
+
+class UserOrganization(Base):
+    __tablename__ = "user_organization"
+
+    user_id: Mapped[UUID] = mapped_column(ForeignKey("user.id"), primary_key=True)
+    organization_id: Mapped[int] = mapped_column(ForeignKey("organization.id"), primary_key=True)
+
+    user = relationship("User", back_populates="organizations")
+    organization = relationship("Organization", back_populates="users")
