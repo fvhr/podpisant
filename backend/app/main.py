@@ -8,8 +8,9 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from api.auth.router import auth_router
 from api.main_router import api_router
-from config import GunicornConfig
+from config import GunicornConfig, get_logging_config, logging_path
 from exceptions import setup_exception_handlers
+from log.main import configure_logging
 
 app = FastAPI(title="Podpdisant Api", root_path="/api")
 
@@ -33,6 +34,8 @@ app.add_middleware(
 )
 
 setup_exception_handlers(app)
+logging_config = get_logging_config(logging_path)
+configure_logging(logging_config)
 
 logger = logging.getLogger(__name__)
 

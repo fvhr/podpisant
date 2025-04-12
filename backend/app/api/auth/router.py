@@ -1,14 +1,16 @@
 from uuid import uuid4
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 import secrets
 
 from fastapi.responses import ORJSONResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from api.auth.idp import get_refresh_token, get_current_user
 from api.auth.tokens.auth_service import HttpAuthServerService, get_auth_service, DeviceId
 from api.auth.tokens.tokens import set_tokens
 from api.auth.user_service import get_user_by_email, get_user_by_id
+from database.models import User
 from notification.email_code_sender import EmailCodeSender, get_email_code_sender
 from api.auth.schema import AuthSchema, AuthWithCodeSchema, AuthCodeSchema
 from database.session_manager import get_db
@@ -41,6 +43,17 @@ async def get_connected_clients(
     user = await get_user_by_id(session, user_id)
     access_token, refresh_token = await auth_service.create_and_save_tokens(user)
     await email_code_sender.delete_code(data.code, data.device_id)
+    response = ORJSONResponse({"status": "success"})
+    set_tokens(response, access_token, refresh_token)
+    return response
+
+
+@auth_router.post("/refresh")
+async def refresh_tokens(
+    user: User = Depends(get_current_user),
+    auth_service: HttpAuthServerService = Depends(get_auth_service)
+):
+    access_token, refresh_token = await auth_service.create_and_save_tokens(user)
     response = ORJSONResponse({"status": "success"})
     set_tokens(response, access_token, refresh_token)
     return response

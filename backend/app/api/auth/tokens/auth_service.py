@@ -37,7 +37,6 @@ class HttpAuthServerService:
         self.jwt_settings = jwt_settings
 
     async def create_and_save_tokens(self, user: User) -> tuple[AccessToken, RefreshToken]:
-        # Создаем access токен
         access_token = self.token_creation_service.create_auth_server_access_token(
             user.id, user.is_super_admin
         )
@@ -64,16 +63,24 @@ class HttpAuthServerService:
             UUID(payload["jti"])
         )
 
-async def get_auth_service(
-    redis: Redis = Depends(get_redis),
+def get_jwt_settings() -> JWTSettings:
+    return JWTSettings()
+
+def get_whitelist_service(redis: Redis = Depends(get_redis)) -> TokenWhiteListService:
+    token_whitelist_service = TokenWhiteListService(redis)
+    return token_whitelist_service
+
+
+def get_jwt_service(jwt_settings: JWTSettings = Depends(get_jwt_settings)) -> JWTService:
+    jwt_service = JWTService(jwt_settings)
+    return jwt_service
+
+def get_auth_service(
+    token_whitelist_service: TokenWhiteListService = Depends(get_whitelist_service),
+    jwt_service: JWTService = Depends(get_jwt_service),
+    jwt_settings: JWTSettings = Depends(get_jwt_settings)
 ) -> HttpAuthServerService:
     """Фабрика для создания HttpAuthServerService с зависимостями."""
-
-    jwt_settings = JWTSettings()
-
-    jwt_service = JWTService(jwt_settings)
-
-    token_whitelist_service = TokenWhiteListService(redis)
 
     token_creation_service = AuthServerTokenCreationService(
         jwt_settings=jwt_settings,

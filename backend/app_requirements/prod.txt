@@ -10,3 +10,4 @@ pytz==2025.02
 asyncpg==0.30.0
 pyjwt==2.10.1
 cryptography==44.0.0
+colorlog>=6.9.0

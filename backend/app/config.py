@@ -1,7 +1,9 @@
 import logging
 import os
 from dataclasses import dataclass
+from pathlib import Path
 
+import yaml
 from dotenv import load_dotenv
 
 
@@ -32,3 +34,11 @@ REDIS_PORT = os.environ.get("REDIS_PORT")
 REDIS_URI = f"redis://{REDIS_HOST}:{REDIS_PORT}/0"
 
 NATS_URI = os.environ.get("NATS_URI")
+
+base_path = Path(__file__).parent
+logging_path = base_path / "log" / "logging.yaml"
+
+def get_logging_config(logging_path):
+    with open(logging_path) as f:
+        logging_config = yaml.safe_load(f)
+    return logging_config
