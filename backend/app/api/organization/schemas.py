@@ -1,15 +1,16 @@
 from pydantic import BaseModel
 from sqlalchemy import UUID
 
-
 class OrganizationBase(BaseModel):
     name: str
     description: str
 
-
-class OrganizationView(OrganizationBase):
+class OrganizationView(BaseModel):
     id: int
+    name: str
+    description: str
 
-
-class CreateOrganizationSchema(OrganizationBase):
+class OrganizationCreateSchema(BaseModel):
+    name: str
+    description: str
     admin_id: UUID
