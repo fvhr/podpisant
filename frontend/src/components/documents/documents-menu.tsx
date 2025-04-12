@@ -3,7 +3,7 @@ interface MenuProps {
   activeTab: 'all' | 'signed' | 'canceled' | 'in-progress';
 }
 
-export const Menu = ({ activeTab, setActiveTab }: MenuProps) => {
+export const DocumentsMenu = ({ activeTab, setActiveTab }: MenuProps) => {
   return (
     <div className="documents-header">
       <h1>Документы</h1>

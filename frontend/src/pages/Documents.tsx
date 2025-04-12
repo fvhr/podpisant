@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { DocumentsList, Menu } from '../components';
+import { DocumentsList, DocumentsMenu } from '../components';
 import { Sidebar } from '../components/sidebar';
 
 export const Documents: React.FC = () => {
@@ -39,7 +39,7 @@ export const Documents: React.FC = () => {
       <Sidebar isOpen={isSidebarOpen} toggleSidebar={toggleSidebar} />
 
       <main className={`content ${isSidebarOpen ? 'with-sidebar' : 'full-width'}`}>
-        <Menu setActiveTab={setActiveTab} activeTab={activeTab} />
+        <DocumentsMenu setActiveTab={setActiveTab} activeTab={activeTab} />
         <DocumentsList documents={documents} activeTab={activeTab} />
       </main>
     </div>

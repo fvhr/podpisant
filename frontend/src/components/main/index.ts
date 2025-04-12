@@ -1,3 +1,3 @@
-export * from './header';
-export * from './organizations';
-export * from './organizations-modal';
+export * from './main-header';
+export * from './main-modal';
+export * from './main-organizations';

@@ -2,7 +2,7 @@ import React from 'react';
 import { FiLogOut } from 'react-icons/fi';
 import { useNavigate } from 'react-router-dom';
 
-export const Header: React.FC = () => {
+export const MainHeader: React.FC = () => {
   const navigate = useNavigate();
   return (
     <header className="header">

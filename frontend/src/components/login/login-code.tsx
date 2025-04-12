@@ -11,7 +11,7 @@ type CodeFormData = {
   code: string[];
 };
 
-export const CodeForm = ({ email, onCodeSubmit, device_id, error }: CodeFormProps) => {
+export const LoginCode = ({ email, onCodeSubmit, device_id, error }: CodeFormProps) => {
   const { register, handleSubmit, setValue, control } = useForm<CodeFormData>({
     defaultValues: {
       code: ['', '', '', ''],
