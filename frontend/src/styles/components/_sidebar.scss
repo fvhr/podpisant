@@ -137,4 +137,27 @@
   &__menu--text {
     transition: opacity 0.2s ease;
   }
+  &__logout {
+    display: flex;
+    align-items: center;
+		justify-content: center;
+    gap: 10px;
+    padding: 0.75rem 1rem;
+    margin: 2rem;
+    border-radius: 6px;
+    background: rgba(variables.$color-error, 0.1);
+    color: variables.$color-error;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 0.9rem;
+
+    &:hover {
+      background: rgba(variables.$color-error, 0.2);
+    }
+
+    .logout-icon {
+      font-size: 1.2rem;
+    }
+  }
 }

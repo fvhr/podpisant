@@ -71,14 +71,38 @@
   }
 }
 
+.create-document-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.7rem 1.2rem;
+  background: variables.$color-button-dark;
+  color: variables.$color-text;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background 0.2s;
+  height: fit-content;
+
+  &:hover {
+    background: variables.$color-button;
+  }
+
+  .icon {
+    font-size: 1.1rem;
+  }
+}
+
 .documents-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  grid-template-columns: repeat(2, 1fr);
   gap: 1.5rem;
+  width: 100%;
 }
 
 .document-card {
-	cursor: pointer;
+  cursor: pointer;
   background: variables.$color-card;
   border-radius: 8px;
   padding: 1.5rem;
@@ -182,3 +206,4 @@
 .document-card.in-progress {
   border-left: 3px solid #c1e700fe;
 }
+
