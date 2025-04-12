@@ -31,7 +31,7 @@ export const DocumentModal: React.FC<DocumentModalProps> = ({ onClose, onSuccess
     try {
       await createDocument({
         name: data.name,
-        organization_id: 1,
+        organization_id: 10,
         file: data.document[0],
       });
 

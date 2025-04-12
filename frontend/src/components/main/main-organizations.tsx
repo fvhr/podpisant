@@ -17,7 +17,6 @@ export const MainOrganizations: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Запрос на получение организаций
   useEffect(() => {
     const fetchOrganizations = async () => {
       try {
@@ -36,8 +35,10 @@ export const MainOrganizations: React.FC = () => {
   }, []);
 
   const handleOrganizationClick = (orgId: number) => {
-    navigate(`/documents?orgId=${orgId}`);
+    navigate(`/documents/${orgId}`); 
   };
+
+  console.log(organizations);
 
   if (isLoading) {
     return <div className="loading-message">Загрузка организаций...</div>;

@@ -1,7 +1,6 @@
 @use '../lib/variables';
 
 .document-details-layout {
-  padding: 1rem;
   color: variables.$color-text;
   display: flex;
   justify-content: space-between;
@@ -68,18 +67,14 @@
     }
   }
 }
-.document-details-layout {
-  // Сохраняем все существующие стили
-  position: relative;
-  min-height: calc(100vh - 2rem); // Добавляем минимальную высоту
-}
+
 
 .document-content-section {
-  flex: 1;
-  width: calc(100% - 350px); // Оставляем место для кнопок
+  display: flex;
+	justify-content: space-between;
+	width: 100%;
 }
 
-// Стили для модалки (добавляем в конец файла)
 .modal-overlay {
   position: fixed;
   top: 0;
@@ -173,11 +168,8 @@
   flex-direction: column;
   gap: 1rem;
   padding-top: 1rem;
-  justify-content: flex-end;
-  margin-bottom: 1rem;
-  position: absolute;
-  bottom: 1rem;
-  right: 1rem;
+  margin-bottom: 0.8rem;
+	justify-content: flex-end;
 
   .action-btn {
     padding: 0.9rem 2.6rem;
