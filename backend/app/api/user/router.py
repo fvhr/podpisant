@@ -64,6 +64,7 @@ async def user_departament(
     try:
         await session.execute(query)
         await session.execute(dep_us)
+        await session.commit()
         return get_user_by_id(user.id, session)
     except Exception:
         raise HTTPException(detail='Internal server error', status_code=500)
