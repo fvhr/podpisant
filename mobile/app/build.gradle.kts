@@ -111,6 +111,7 @@ dependencies {
 
     implementation(libs.retrofit2.kotlinx.serialization.converter)
     implementation(libs.logging.interceptor)
+    implementation(libs.persistentcookiejar)
 
     implementation(libs.androidx.datastore.core)
     implementation(libs.androidx.datastore)

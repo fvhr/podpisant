@@ -18,6 +18,7 @@ hilt = "2.50"
 hiltWork = "1.2.0"
 # Network
 loggingInterceptor = "4.9.1"
+persistentcookiejar = "v1.0.1"
 retrofit = "2.10.0"
 kotlinReflect = "2.1.0"
 okhttp = "4.12.0"
@@ -67,6 +68,7 @@ hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "hiltA
 # Retrofit + OkHttp
 kotlin-reflect = { module = "org.jetbrains.kotlin:kotlin-reflect", version.ref = "kotlinReflect" }
 logging-interceptor = { module = "com.squareup.okhttp3:logging-interceptor", version.ref = "loggingInterceptor" }
+persistentcookiejar = { module = "com.github.franmontiel:PersistentCookieJar", version.ref = "persistentcookiejar" }
 retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit" }
 okhttp = { module = "com.squareup.okhttp3:okhttp", version.ref = "okhttp" }
 retrofit2-kotlinx-serialization-converter = { module = "com.jakewharton.retrofit:retrofit2-kotlinx-serialization-converter", version.ref = "retrofit2KotlinxSerializationConverter" }
