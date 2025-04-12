@@ -1,7 +1,7 @@
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException
-from sqlalchemy import select, insert
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from api.auth.idp import get_current_user
@@ -47,24 +47,35 @@ async def user_departament(
         user: User = Depends(get_current_user),
         session: AsyncSession = Depends(get_db)):
     if not user.is_super_admin:
-        raise UserNotSuperAdmin
-    user = User(
+        result = await session.execute(
+            select(UserDepartment).where(
+                UserDepartment.user_id == user.id,
+                UserDepartment.department_id == data.dep_id,
+                UserDepartment.is_admin == True
+            )
+        )
+        user_dep = result.scalar_one_or_none()
+        if not user_dep:
+            raise UserNotSuperAdmin
+        if data.is_dep_admin:
+            raise HTTPException(status_code=403, detail="Вы не можете назначать других пользователей администраторами")
+    new_user = User(
         fio=data.fio,
         email=data.email,
         telegram_username=data.telegram_username,
         phone=data.phone,
         type_notification=data.type_notification
     )
-    query = insert(user)
     dep_us = UserDepartment(
-        user_id=user.id,
+        user_id=new_user.id,
         department_id=data.dep_id,
         is_admin=data.is_dep_admin
     )
+
     try:
-        await session.execute(query)
-        await session.execute(dep_us)
+        session.add(new_user)
+        session.add(dep_us)
         await session.commit()
-        return get_user_by_id(user.id, session)
+        return await get_user_by_id(new_user.id, session)
     except Exception:
         raise HTTPException(detail='Internal server error', status_code=500)
