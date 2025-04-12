@@ -42,3 +42,5 @@ def get_logging_config(logging_path):
     with open(logging_path) as f:
         logging_config = yaml.safe_load(f)
     return logging_config
+
+CRYPT_KEY = os.environ.get("CRYPT_KEY")
