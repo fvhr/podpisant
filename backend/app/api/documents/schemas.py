@@ -27,6 +27,6 @@ class DocumentSchema(BaseModel):
     creator_id: UUID
 
 
-class AddStagesToDocumentSchema(BaseModel):
-    document_id: int
-    stages: list[AddStagesSchema]
+# class AddStagesToDocumentSchema(BaseModel):
+#     document_id: int
+#     stages: list[AddStagesSchema]

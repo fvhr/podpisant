@@ -71,7 +71,7 @@ async def get_current_user(
 
     user_departments_ids_query = select(UserDepartment.department_id).where(UserDepartment.user_id == user.id)
     user_departments_ids = (await session.execute(user_departments_ids_query)).scalars().all()
-    organizations = (await session.execute(select(Organization).where(Organization.id.in_(user_departments_ids)))).scalars().all()
+    organizations = (await session.execute(select(Organization).where(Organization.id.in_(user_organizations)))).scalars().all()
     organizations_data = [OrganizationView(id=org.id, name=org.name, description=org.description) for org in organizations]
     response = UserView(
         id=user.id,
