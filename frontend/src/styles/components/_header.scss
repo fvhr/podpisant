@@ -7,10 +7,17 @@
 	background-color: $color-card;
   color: #F0F0FF;
 
-  &__logo {
+	&__logo {
+		display: flex;
+		align-items: center;
+		gap: 10px;
+		cursor: pointer;
+	}
+
+  &__logo-text {
     font-weight: bold;
 		font-size: 1.5rem;
-		cursor: pointer;
+		
   }
 
   &__toggle {
