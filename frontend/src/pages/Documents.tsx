@@ -7,13 +7,14 @@ export const Documents: React.FC = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<'all' | 'signed' | 'rejected' | 'in_progress'>('all');
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
 
   const toggleSidebar = () => {
     setIsSidebarOpen(!isSidebarOpen);
   };
 
-  const handleCreateDocument = (name: string, file: File) => {
-    console.log('Создаем документ:', name, file);
+  const handleRefresh = () => {
+    setRefreshTrigger((prev) => prev + 1); // Увеличиваем триггер для обновления списка
   };
 
   return (
@@ -26,10 +27,14 @@ export const Documents: React.FC = () => {
           setActiveTab={setActiveTab}
           activeTab={activeTab}
         />
-        <DocumentsList activeTab={activeTab} />
+        <DocumentsList activeTab={activeTab} refreshTrigger={refreshTrigger} />
       </main>
+
       {isModalOpen && (
-        <DocumentModal onClose={() => setIsModalOpen(false)} onCreate={handleCreateDocument} />
+        <DocumentModal
+          onClose={() => setIsModalOpen(false)}
+          onSuccess={handleRefresh} 
+        />
       )}
     </div>
   );

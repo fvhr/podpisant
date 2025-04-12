@@ -4,7 +4,6 @@ import { useForm } from 'react-hook-form';
 
 interface MainModalProps {
   onClose: () => void;
-  onCreate: (name: string, description: string) => void;
 }
 
 interface OrganizationFormData {
@@ -12,7 +11,7 @@ interface OrganizationFormData {
   description: string;
 }
 
-export const MainModal: React.FC<MainModalProps> = ({ onClose, onCreate }) => {
+export const MainModal: React.FC<MainModalProps> = ({ onClose }) => {
   const {
     register,
     handleSubmit,
@@ -22,8 +21,7 @@ export const MainModal: React.FC<MainModalProps> = ({ onClose, onCreate }) => {
     mode: 'onChange',
   });
 
-  const onSubmit = (data: OrganizationFormData) => {
-    onCreate(data.name, data.description);
+  const onSubmit = () => {
     reset();
     onClose();
   };
