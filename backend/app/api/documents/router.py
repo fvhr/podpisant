@@ -13,7 +13,7 @@ from api.auth.idp import get_current_user
 from api.documents.shcemas import CreateDocumentSchema
 from database.models import User, Document
 from database.session_manager import get_db
-from minio_client.client import get_minio_client, DOCUMENTS_BUCKET_NAME, MINIO_ENDPOINT_URL
+from minio_client.client import get_minio_client, DOCUMENTS_BUCKET_NAME, MINIO_ENDPOINT_URL, MINIO_PUBLIC_URL
 
 documents_router = APIRouter(prefix="/documents", tags=["documents"])
 
@@ -46,6 +46,7 @@ async def upload_document(
 
     )
     document = await session.merge(document)
+    await session.flush()
     unique_filename = f"document_{document.id}"
     # Загружаем в MinIO
     minio_client.put_object(
@@ -57,7 +58,7 @@ async def upload_document(
     )
     await session.commit()
 
-    file_url = f"{MINIO_ENDPOINT_URL}/{DOCUMENTS_BUCKET_NAME}/{unique_filename}"
+    file_url = f"{MINIO_PUBLIC_URL}/{DOCUMENTS_BUCKET_NAME}/{unique_filename}"
 
     return {
         "document_id": document.id,
