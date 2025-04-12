@@ -23,6 +23,8 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextFieldColors
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -33,6 +35,7 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import bob.colbaskin.iubip_spring2025.ui.theme.ButtonColor
+import bob.colbaskin.iubip_spring2025.ui.theme.CardColor
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
@@ -82,7 +85,12 @@ fun EmailInputScreen(
                             tint = Color.Red
                         )
                     }
-                }
+                },
+                colors = TextFieldDefaults.colors(
+                    focusedContainerColor = ButtonColor,
+                    unfocusedContainerColor = CardColor,
+                    disabledContainerColor = CardColor
+                )
             )
         }
 

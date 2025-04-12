@@ -8,6 +8,9 @@ import bob.colbaskin.iubip_spring2025.auth.domain.remote.AuthApiService
 import bob.colbaskin.iubip_spring2025.auth.domain.remote.AuthRepository
 import bob.colbaskin.iubip_spring2025.onboarding.data.UserPreferencesRepositoryImpl
 import bob.colbaskin.iubip_spring2025.onboarding.domain.UserPreferencesRepository
+import bob.colbaskin.iubip_spring2025.organizations.data.OrganizationsRepositoryImpl
+import bob.colbaskin.iubip_spring2025.organizations.domain.remote.OrganizationApiService
+import bob.colbaskin.iubip_spring2025.organizations.domain.remote.OrganizationsRepository
 import bob.colbaskin.iubip_spring2025.utils.user.UserDataStore
 import dagger.Module
 import dagger.Provides
@@ -43,5 +46,17 @@ object RepositoryModule {
     @Singleton
     fun provideAuthRepository(authApiService: AuthApiService): AuthRepository {
         return AuthRepositoryImpl(authApiService)
+    }
+
+    @Provides
+    @Singleton
+    fun provideOrganizationApiService(retrofit: Retrofit): OrganizationApiService {
+        return retrofit.create(OrganizationApiService::class.java)
+    }
+
+    @Provides
+    @Singleton
+    fun provideOrganizationsRepository(organizationApiService: OrganizationApiService): OrganizationsRepository {
+        return OrganizationsRepositoryImpl(organizationApiService)
     }
 }
