@@ -1,33 +1,40 @@
-import axios from 'axios';
-import { axiosInstanсe } from './instance';
+import { axiosInstance } from './instance';
 
 export const userEmailLogin = async (email: string) => {
-  const data = { email };
   try {
-    const response = await axiosInstanсe.post('/login', data);
+    const response = await axiosInstance.post('/login', { email });
     return response.data;
   } catch (error) {
-    console.log('Ошибка', error);
+    console.error('Login error:', error);
     throw error;
   }
 };
 
 export const userCodeLogin = async (code: string, device_id: string) => {
-  const data = { code, device_id };
   try {
-    const response = await axiosInstanсe.post('/login-with-code', data);
-    return response;
+    const response = await axiosInstance.post('/login-with-code', { code, device_id });
+
+    if (response.status === 200) {
+      return {
+        success: true,
+        data: response.data,
+        cookiesReceived: document.cookie.includes('access_token'),
+      };
+    }
+
+    return response.data;
   } catch (error) {
-    console.log('Ошибка', error);
+    console.error('Code login error:', error);
+    throw error;
   }
 };
 
 export const userRefreshToken = async () => {
-  const refresh = localStorage.getItem('refresh');
   try {
-    const response = await axios.post(
-      'https://task_manager_api.cl.ru.net/auth/user/refresh/',
-      null,
+    const refresh = localStorage.getItem('refresh');
+    const response = await axiosInstance.post(
+      '/auth/user/refresh/',
+      {},
       {
         headers: {
           Authorization: `Bearer ${refresh}`,
@@ -35,17 +42,19 @@ export const userRefreshToken = async () => {
       },
     );
     localStorage.setItem('access', response.data.access_token);
-    return response;
+    return response.data;
   } catch (error) {
-    console.log('Ошибка', error);
+    console.error('Refresh error:', error);
+    throw error;
   }
 };
 
 export const userInfo = async () => {
   try {
-    const response = await axiosInstanсe.get('auth/user/info/');
+    const response = await axiosInstance.get('auth/user/info/');
     return response.data;
   } catch (error) {
-    console.log('Ошибка', error);
+    console.error('User info error:', error);
+    throw error;
   }
 };

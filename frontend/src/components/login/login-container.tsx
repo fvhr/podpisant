@@ -15,7 +15,8 @@ export const LoginContainer = () => {
     try {
       const response = await userEmailLogin(email);
 
-      if (response.status === 'success') {
+      // Предполагаем, что успешный ответ содержит device_id
+      if (response.device_id) {
         setError(null);
         setUserEmail(email);
         setDeviceId(response.device_id);
@@ -30,17 +31,17 @@ export const LoginContainer = () => {
 
   const handleCodeSubmit = async (code: string) => {
     try {
-      const response = await userCodeLogin(code, deviceId);
+      const result = await userCodeLogin(code, deviceId);
+      console.log('Login result:', result);
 
-      if (response?.status === 200) {
+      if (result?.success) {
         navigate('/main');
-      } else if (response?.status === 400 || response?.status === 404) {
-        setError('Неверный код');
       } else {
-        setError('Ошибка при авторизации');
+        setError('Неверный код');
       }
-    } catch {
-      setError('Неверный код');
+    } catch (error) {
+      console.error('Auth error:', error);
+      setError('Ошибка при авторизации');
     }
   };
 
