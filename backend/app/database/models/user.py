@@ -1,9 +1,10 @@
+import uuid
 from enum import StrEnum
 from uuid import UUID
 
-from sqlalchemy import String, Integer, Boolean
+from sqlalchemy import String, Boolean
+from sqlalchemy.dialects.postgresql import ENUM as PgEnum
 from sqlalchemy.orm import mapped_column, Mapped, relationship
-from sqlalchemy.dialects.postgresql import ENUM as PgEnum, JSONB
 
 from database.models.base import Base
 
@@ -17,7 +18,7 @@ class TypeNotificationEnum(StrEnum):
 class User(Base):
     __tablename__ = 'user'
 
-    id: Mapped[UUID] = mapped_column(primary_key=True)
+    id: Mapped[UUID] = mapped_column(primary_key=True, default=uuid.uuid4)
     fio: Mapped[str] = mapped_column(String(128), nullable=False)
     email: Mapped[str] = mapped_column(String(128), nullable=False, unique=True)
     telegram_username: Mapped[str] = mapped_column(String, nullable=True)

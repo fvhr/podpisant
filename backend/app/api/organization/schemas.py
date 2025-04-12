@@ -1,5 +1,6 @@
+from uuid import UUID
+
 from pydantic import BaseModel
-from sqlalchemy import UUID
 
 class OrganizationBase(BaseModel):
     name: str
@@ -10,7 +11,7 @@ class OrganizationView(BaseModel):
     name: str
     description: str
 
-class OrganizationCreateSchema(BaseModel):
+class CreateOrganizationSchema(BaseModel):
     name: str
     description: str
     admin_id: UUID

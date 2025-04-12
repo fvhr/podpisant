@@ -1,12 +1,13 @@
-import { AiOutlineFile, AiOutlineSolution, AiOutlineUser } from 'react-icons/ai';
+import {AiOutlineFile, AiOutlineSolution, AiOutlineTeam, AiOutlineUser} from 'react-icons/ai';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import '../styles/app.scss';
 import { NavItem, SidebarProps } from '../types/navbar.ts';
 
 export const navItems: NavItem[] = [
-  { label: 'Сотрудники', path: '/employees', icon: AiOutlineUser },
+  { label: 'Сотрудники', path: '/employees', icon: AiOutlineTeam },
   { label: 'Отделы', path: '/departments', icon: AiOutlineSolution },
   { label: 'Документы', path: '/documents', icon: AiOutlineFile },
+  { label: 'Профиль', path: '/profile', icon: AiOutlineUser },
 ];
 
 export const Sidebar = ({ isOpen, toggleSidebar }: SidebarProps) => {

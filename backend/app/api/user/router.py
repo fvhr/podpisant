@@ -1,16 +1,19 @@
 from uuid import UUID
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from api.auth.idp import get_current_user
 from api.auth.schema import UserView
 from api.auth.user_service import get_user_orgs_with_admin_and_tags
-from app_errors.user_errors import UserNotFoundByIdError
-from database.models import UserDepartment, user, User
+from api.user.schema import UserDepartament
+from app_errors.user_errors import UserNotFoundByIdError, UserNotSuperAdmin
+from database.models import UserDepartment, User
 from database.session_manager import get_db
 
 user_router = APIRouter(prefix="/users", tags=["users"])
+
 
 @user_router.get("/{user_id}")
 async def get_user_by_id(user_id: UUID, session: AsyncSession = Depends(get_db)) -> UserView:
@@ -38,3 +41,41 @@ async def get_user_by_id(user_id: UUID, session: AsyncSession = Depends(get_db))
     return response
 
 
+@user_router.post("/user/departament")
+async def user_departament(
+        data: UserDepartament,
+        user: User = Depends(get_current_user),
+        session: AsyncSession = Depends(get_db)):
+    if not user.is_super_admin:
+        result = await session.execute(
+            select(UserDepartment).where(
+                UserDepartment.user_id == user.id,
+                UserDepartment.department_id == data.dep_id,
+                UserDepartment.is_admin is True
+            )
+        )
+        user_dep = result.scalar_one_or_none()
+        if not user_dep:
+            raise UserNotSuperAdmin
+        if data.is_dep_admin:
+            raise HTTPException(status_code=403, detail="Вы не можете назначать других пользователей администраторами")
+    new_user = User(
+        fio=data.fio,
+        email=data.email,
+        telegram_username=data.telegram_username,
+        phone=data.phone,
+        type_notification=data.type_notification
+    )
+    dep_us = UserDepartment(
+        user_id=new_user.id,
+        department_id=data.dep_id,
+        is_admin=data.is_dep_admin
+    )
+
+    try:
+        session.add(new_user)
+        session.add(dep_us)
+        await session.commit()
+        return await get_user_by_id(new_user.id, session)
+    except Exception:
+        raise HTTPException(detail='Internal server error', status_code=500)
