@@ -6,8 +6,8 @@ from sqlalchemy import text, delete, update, select, RowMapping
 
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import declarative_base
-from app.connections.pgsql.utils import convert_to_moscow_time
-from app.connections.pgsql.session_manager import (
+from app.database.utils import convert_to_moscow_time
+from app.database.session_manager import (
     DatabaseSessionManager,
     db_manager,
 )
