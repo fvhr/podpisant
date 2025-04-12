@@ -20,7 +20,7 @@ class User(Base):
     id: Mapped[UUID] = mapped_column(primary_key=True)
     fio: Mapped[str] = mapped_column(String(128), nullable=False)
     email: Mapped[str] = mapped_column(String(128), nullable=False, unique=True)
-    telegram_id: Mapped[int] = mapped_column(Integer, nullable=True)
+    telegram_username: Mapped[int] = mapped_column(String(32), nullable=True)
     phone: Mapped[str] = mapped_column(String(100), nullable=True)
     is_super_admin: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
     type_notification: Mapped[TypeNotificationEnum | None] = mapped_column(

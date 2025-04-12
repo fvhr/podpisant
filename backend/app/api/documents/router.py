@@ -119,3 +119,7 @@ async def get_document(user: User = Depends(get_current_user), session: AsyncSes
         ) for document in documents
     ]
     return data
+
+
+# @documents_router.post("/stages")
+# async def add_stages_to_document(data: AddStagesToDocumentSchema):

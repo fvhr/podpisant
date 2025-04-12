@@ -12,7 +12,8 @@ class CreateDocumentSchema(BaseModel):
 
 #     stages: list[StageSchema]
 #
-# class StageSchema(BaseModel):
+# class AddStagesSchema(BaseModel):
+
 
 
 class DocumentSchema(BaseModel):
@@ -24,3 +25,8 @@ class DocumentSchema(BaseModel):
     status: DocSignStatus
     type: DocumentTypeEnum | None
     creator_id: UUID
+
+
+class AddStagesToDocumentSchema(BaseModel):
+    document_id: int
+    stages: list[AddStagesSchema]
