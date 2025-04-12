@@ -1,6 +1,4 @@
 import logging
-import os
-from contextlib import asynccontextmanager
 from dataclasses import asdict
 
 from fastapi import FastAPI
@@ -19,7 +17,11 @@ app.include_router(api_router)
 app.include_router(auth_router)
 app.include_router(documents_router)
 
-origins = ["http://localhost:5173"]
+origins = [
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
+    "https://menoitami.ru"
+]
 
 app.add_middleware(
     CORSMiddleware,
