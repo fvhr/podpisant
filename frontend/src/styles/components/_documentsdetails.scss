@@ -6,6 +6,7 @@
   display: flex;
   justify-content: space-between;
   gap: 50px;
+  position: relative;
 }
 
 .document-back {
@@ -66,6 +67,39 @@
       color: #c1e700fe;
     }
   }
+}
+.document-details-layout {
+  // Сохраняем все существующие стили
+  position: relative;
+  min-height: calc(100vh - 2rem); // Добавляем минимальную высоту
+}
+
+.document-content-section {
+  flex: 1;
+  width: calc(100% - 350px); // Оставляем место для кнопок
+}
+
+// Стили для модалки (добавляем в конец файла)
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal-container {
+  background: variables.$color-card;
+  border-radius: 8px;
+  width: 100%;
+  max-width: 500px;
+  padding: 2rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
 }
 
 .stage-card {
@@ -141,6 +175,9 @@
   padding-top: 1rem;
   justify-content: flex-end;
   margin-bottom: 1rem;
+  position: absolute;
+  bottom: 1rem;
+  right: 1rem;
 
   .action-btn {
     padding: 0.9rem 2.6rem;
