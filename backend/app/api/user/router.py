@@ -30,9 +30,9 @@ async def get_user_by_id(user_id: UUID, session: AsyncSession = Depends(get_db))
 
     response = UserView(
         id=user.id,
-        fio=user.fio,
+        fio=encryptor.decrypt(user.fio),
         email=user.email,
-        phone=user.phone if user.phone else "",
+        phone=encryptor.decrypt(user.phone) if user.phone else "",
         type_notification=user.type_notification,
         user_organizations=user_organizations,
         admin_in_organization=admin_in_organizations[0] if admin_in_organizations else None,
