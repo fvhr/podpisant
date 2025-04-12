@@ -7,10 +7,11 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from api.auth.schema import UserView
 from api.auth.user_service import get_user_orgs_with_admin_and_tags
 from app_errors.user_errors import UserNotFoundByIdError
-from database.models import UserDepartment, user, User
+from database.models import UserDepartment, User
 from database.session_manager import get_db
 
 user_router = APIRouter(prefix="/users", tags=["users"])
+
 
 @user_router.get("/{user_id}")
 async def get_user_by_id(user_id: UUID, session: AsyncSession = Depends(get_db)) -> UserView:
@@ -36,5 +37,3 @@ async def get_user_by_id(user_id: UUID, session: AsyncSession = Depends(get_db))
         organization_tags=org_tags
     )
     return response
-
-
