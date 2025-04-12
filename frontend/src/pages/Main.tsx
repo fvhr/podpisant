@@ -1,14 +1,11 @@
 import React from 'react';
-import '../styles/app.scss';
-import { AiFillPlusCircle } from "react-icons/ai";
+import { Header, Organizations } from '../components';
 
 export const Main: React.FC = () => {
-    return (
-        <main className="main">
-            <button className="main__button">
-                <AiFillPlusCircle />
-                Добавить организацию
-            </button>
-        </main>
-    );
+  return (
+    <div className="wrapper">
+      <Header />
+      <Organizations />
+    </div>
+  );
 };
