@@ -1,11 +1,11 @@
 import logging
 from datetime import datetime
 from uuid import UUID, uuid4
-from typing import Optional
+from typing import Optional, Union
 
 from redis.asyncio import Redis
 
-from api.auth.tokens.types import RefreshTokenWithData, RefreshTokenData
+from api.auth.tokens.types import RefreshTokenData, RefreshTokenWithData
 
 logger = logging.getLogger(__name__)
 
@@ -14,9 +14,13 @@ class TokenWhiteListService:
     def __init__(self, redis: Redis):
         self.redis = redis
 
+    def _ensure_str(self, value: Union[str, bytes]) -> str:
+        """Универсальное преобразование в строку"""
+        return value.decode('utf-8') if isinstance(value, bytes) else str(value)
+
     def _serialize_token_data(self, token_data: RefreshTokenWithData) -> dict[str, str]:
         return {
-            "jti": token_data.jti,
+            "jti": str(token_data.jti),
             "user_id": str(token_data.user_id),
             "created_at": token_data.created_at.isoformat()
         }
@@ -28,10 +32,11 @@ class TokenWhiteListService:
         if await self.redis.zcard(user_tokens_key) >= limit:
             oldest_tokens = await self.redis.zrange(user_tokens_key, 0, 0)
             if oldest_tokens:
-                oldest_token = oldest_tokens[0]
-                oldest_token_str = oldest_token.decode('utf-8') if isinstance(oldest_token, bytes) else str(
-                    oldest_token)
-                await self.remove_token_by_jti(UUID(oldest_token_str))
+                oldest_token = self._ensure_str(oldest_tokens[0])
+                try:
+                    await self.remove_token_by_jti(UUID(oldest_token))
+                except (ValueError, AttributeError) as e:
+                    logger.error(f"Failed to remove old token: {e}")
 
         await self.redis.hset(
             f"refresh_token:{token_data.jti}",
@@ -44,45 +49,59 @@ class TokenWhiteListService:
         )
 
     async def remove_token_by_jti(self, jti: UUID):
-        """Удаляет токен по его идентификатору"""
-        jti_str = str(jti)
-        jti_bytes = jti_str.encode('utf-8')
+        """Универсальное удаление токена"""
+        try:
+            jti_str = str(jti)
+            token_data = await self.get_refresh_token_data(jti)
+            if not token_data:
+                return
 
-        token_data = await self.get_refresh_token_data(jti)
-        if not token_data:
-            logger.warning(f"Token with jti {jti} not found for deletion")
-            return
-
-        # Удаляем из хэша
-        await self.redis.delete(f"refresh_token:{jti_str}")
-
-        # Удаляем из сортированного множества
-        user_tokens_key = f"refresh_tokens:{token_data.user_id}"
-        await self.redis.zrem(user_tokens_key, jti_bytes)
-
+            # Удаление из всех структур
+            await self.redis.delete(f"refresh_token:{jti_str}")
+            await self.redis.zrem(
+                f"refresh_tokens:{token_data.user_id}",
+                jti_str.encode('utf-8')  # Работает для обоих случаев
+            )
+        except Exception as e:
+            logger.error(f"Error removing token {jti}: {e}")
+            raise
 
     async def get_refresh_token_data(self, jti: UUID) -> Optional[RefreshTokenData]:
-        token_data = await self.redis.hgetall(f"refresh_token:{jti}")
-        if not token_data:
+        """Универсальное получение данных токена"""
+        try:
+            token_data = await self.redis.hgetall(f"refresh_token:{jti}")
+            if not token_data:
+                return None
+
+            decoded = {
+                self._ensure_str(k): self._ensure_str(v)
+                for k, v in token_data.items()
+            }
+
+            return RefreshTokenData(
+                jti=decoded['jti'],
+                user_id=UUID(decoded['user_id']),
+                created_at=datetime.fromisoformat(decoded['created_at'])
+            )
+        except Exception as e:
+            logger.error(f"Error getting token data: {e}")
             return None
 
-        decoded_data = {
-            key.decode('utf-8'): value.decode('utf-8')
-            for key, value in token_data.items()
-        }
-
-        return RefreshTokenData(
-            jti=decoded_data['jti'],
-            user_id=UUID(decoded_data['user_id']),
-            created_at=datetime.fromisoformat(decoded_data['created_at'])
-        )
-
     async def remove_all_tokens_except(self, user_id: UUID, exclude_jti: UUID):
-        tokens = await self.redis.zrange(f"refresh_tokens:{user_id}", 0, -1)
-        tokens_to_remove = [t for t in tokens if t != str(exclude_jti)]
+        """Универсальное удаление всех токенов кроме указанного"""
+        try:
+            tokens = await self.redis.zrange(f"refresh_tokens:{user_id}", 0, -1)
+            tokens_to_remove = [
+                t for t in tokens
+                if self._ensure_str(t) != str(exclude_jti)
+            ]
 
-        if tokens_to_remove:
-            await self.redis.zrem(f"refresh_tokens:{user_id}", *tokens_to_remove)
-            for token in tokens_to_remove:
-                await self.redis.delete(f"refresh_token:{token}")
+            if tokens_to_remove:
+                tokens_bytes = [t.encode('utf-8') if isinstance(t, str) else t for t in tokens_to_remove]
+                await self.redis.zrem(f"refresh_tokens:{user_id}", *tokens_bytes)
 
+                for token in tokens_to_remove:
+                    await self.redis.delete(f"refresh_token:{self._ensure_str(token)}")
+        except Exception as e:
+            logger.error(f"Error removing tokens: {e}")
+            raise
