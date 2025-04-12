@@ -70,3 +70,13 @@ export const fetchProfile = async (): Promise<ProfileProps> => {
     throw error;
   }
 };
+
+export const getCurrentUserOrganizations = async () => {
+  try {
+    const response = await axiosInstance.get('/me');
+    return response.data.user_organizations;
+  } catch (error) {
+    console.error('User info error:', error);
+    throw error;
+  }
+};

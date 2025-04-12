@@ -44,3 +44,11 @@ class UserNotFoundErrorByCode(ApplicationError):
     @property
     def title(self) -> str:
         return f"User not found by code {self.code}"
+
+
+@dataclass(eq=False)
+class UserNotSuperAdmin(ApplicationError):
+
+    @property
+    def title(self) -> str:
+        return f"User not super admin"

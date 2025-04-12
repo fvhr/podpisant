@@ -148,7 +148,6 @@
     grid-template-columns: 1fr;
   }
 }
-	
 
 .employee-modal-overlay {
   position: fixed;
@@ -260,3 +259,39 @@
     }
   }
 }
+
+.employees-select {
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.employee-item {
+  padding: 10px 15px;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.employee-item:hover {
+  background: #f5f5f5;
+}
+
+.employee-item.selected {
+  background: #e6f7ff;
+}
+
+.checkbox {
+  width: 18px;
+  height: 18px;
+  border: 1px solid #1890ff;
+  border-radius: 2px;
+  margin-right: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #1890ff;
+}
+

@@ -119,3 +119,26 @@ async def get_document(user: User = Depends(get_current_user), session: AsyncSes
         ) for document in documents
     ]
     return data
+
+
+@documents_router.get("/{organization_id}")
+async def get_documents_by_organization_id(organization_id: int, session: AsyncSession = Depends(get_db)) -> list[DocumentSchema]:
+    documents = await session.execute(select(Document).where(Document.organization_id == organization_id))
+    documents = documents.scalars().all()
+    data = [
+        DocumentSchema(
+            id=document.id,
+            name=document.name,
+            organization_id=document.organization_id,
+            creator_id=document.creator_id,
+            created_at=document.created_at.isoformat(),
+            file_url=f"https://menoitami/api/documents/{document.id}/file",
+            status=document.status,
+            type=document.type
+        ) for document in documents
+    ]
+    return data
+
+
+# @documents_router.post("/stages")
+# async def add_stages_to_document(data: AddStagesToDocumentSchema):
