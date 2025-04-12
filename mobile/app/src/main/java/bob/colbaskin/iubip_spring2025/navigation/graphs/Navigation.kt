@@ -43,7 +43,10 @@ fun NavGraphBuilder.onBoardingGraph(
         }
         animatedTransition<Screens.EmailInput> {
             EmailInputScreen(
-                onNextScreen = { navController.navigate(Screens.OTPScreen)}
+                onNextScreen = { navController.navigate(Screens.OTPScreen) },
+                onError = { navController.navigate(Screens.EmailInput) {
+                    popUpTo(Screens.EmailInput) { inclusive = true}
+                }}
             )
         }
         animatedTransition<Screens.OTPScreen> {
@@ -78,8 +81,6 @@ fun NavGraphBuilder.mainGraph(navController: NavHostController) {
         }
         animatedTransition<Screens.Profile> { backStackEntry ->
             val profile: Screens.Profile = backStackEntry.toRoute()
-            Log.d("Logging", "profile id: ${profile.id}")
-            Log.d("Logging", "profile: $profile")
             Box(
                 modifier = Modifier.fillMaxSize(),
                 contentAlignment = Alignment.Center
@@ -89,8 +90,6 @@ fun NavGraphBuilder.mainGraph(navController: NavHostController) {
         }
         animatedTransition<Screens.OrganizationDetailed> { backStackEntry ->
             val detailedOrganization: Screens.OrganizationDetailed = backStackEntry.toRoute()
-            Log.d("Logging", "detailed id: ${detailedOrganization.organizationId}")
-            Log.d("Logging", "detailed org: $detailedOrganization")
             OrganizationDetailedScreen(
                 organizationId = detailedOrganization.organizationId,
                 onBack = { navController.navigateUp() }

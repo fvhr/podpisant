@@ -4,6 +4,9 @@ import kotlinx.coroutines.flow.Flow
 
 interface AuthDataStoreRepository {
 
+    suspend fun saveDeviceId(deviceId: String)
+    fun getDeviceId(): Flow<String?>
+
     fun getToken(): Flow<String?>
     suspend fun saveToken(token: String)
 

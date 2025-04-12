@@ -25,12 +25,34 @@ class AuthDataStoreRepositoryImpl @Inject constructor(
         val token = stringPreferencesKey(name = "token")
         val refreshToken = stringPreferencesKey(name = "refreshToken")
         val codeVerifier = stringPreferencesKey(name = "codeVerifier")
+        val deviceId = stringPreferencesKey(name = "device_id")
+    }
+
+    override suspend fun saveDeviceId(deviceId: String) {
+        context.tokenDataStore.edit { preferences ->
+            preferences[PreferencesKey.deviceId] = deviceId
+            Log.d("Logging", "Device ID saved: $deviceId")
+        }
+    }
+
+    override fun getDeviceId(): Flow<String?> {
+        return context.tokenDataStore.data
+            .catch { exception ->
+                if (exception is IOException) {
+                    emit(emptyPreferences())
+                } else {
+                    throw exception
+                }
+            }
+            .map { preferences ->
+                preferences[PreferencesKey.deviceId]
+            }
     }
 
     override suspend fun saveToken(token: String) {
          context.tokenDataStore.edit { preferences ->
             preferences[PreferencesKey.token] = token
-            Log.d("Auth", "token saved in datastore: $token")
+            Log.d("Logging", "token saved in datastore: $token")
         }
     }
 
@@ -45,7 +67,7 @@ class AuthDataStoreRepositoryImpl @Inject constructor(
             }
             .map { preferences ->
                 val token = preferences[PreferencesKey.token]
-                Log.d("Auth", "Get token from datastore: $token")
+                Log.d("Logging", "Get token from datastore: $token")
                 token
             }
     }
@@ -53,7 +75,7 @@ class AuthDataStoreRepositoryImpl @Inject constructor(
     override suspend fun saveRefreshToken(refreshToken: String) {
         context.tokenDataStore.edit { preferences ->
             preferences[PreferencesKey.refreshToken] = refreshToken
-            Log.d("Auth", "refresh token saved: $refreshToken")
+            Log.d("Logging", "refresh token saved: $refreshToken")
         }
     }
 
@@ -68,7 +90,7 @@ class AuthDataStoreRepositoryImpl @Inject constructor(
             }
             .map { preferences ->
                 val refreshToken = preferences[PreferencesKey.refreshToken]
-                Log.d("Auth", "Get refresh token from datastore: $refreshToken")
+                Log.d("Logging", "Get refresh token from datastore: $refreshToken")
                 refreshToken
             }
     }
@@ -76,7 +98,7 @@ class AuthDataStoreRepositoryImpl @Inject constructor(
     override suspend fun saveCodeVerifier(codeVerifier: String) {
         context.tokenDataStore.edit { preferences ->
             preferences[PreferencesKey.codeVerifier] = codeVerifier
-            Log.d("Auth", "Saved code verifier: $codeVerifier")
+            Log.d("Logging", "Saved code verifier: $codeVerifier")
         }
     }
 
@@ -98,11 +120,13 @@ class AuthDataStoreRepositoryImpl @Inject constructor(
     override suspend fun clearAll() {
         context.tokenDataStore.edit { preferences ->
             preferences[PreferencesKey.token] = ""
-            Log.d("Auth", "Cleared token")
+            Log.d("Logging", "Cleared token")
             preferences[PreferencesKey.refreshToken] = ""
-            Log.d("Auth", "Cleared refresh token")
+            Log.d("Logging", "Cleared refresh token")
             preferences[PreferencesKey.codeVerifier] = ""
-            Log.d("Auth", "Cleared code verifier")
+            Log.d("Logging", "Cleared code verifier")
+            preferences[PreferencesKey.deviceId] = ""
+            Log.d("Logging", "Cleared device id")
         }
     }
 }
