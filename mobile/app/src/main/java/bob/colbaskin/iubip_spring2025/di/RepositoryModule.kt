@@ -6,6 +6,9 @@ import bob.colbaskin.iubip_spring2025.auth.data.remote.AuthRepositoryImpl
 import bob.colbaskin.iubip_spring2025.auth.domain.local.AuthDataStoreRepository
 import bob.colbaskin.iubip_spring2025.auth.domain.remote.AuthApiService
 import bob.colbaskin.iubip_spring2025.auth.domain.remote.AuthRepository
+import bob.colbaskin.iubip_spring2025.documents.data.remote.DocumentsRepositoryImpl
+import bob.colbaskin.iubip_spring2025.documents.domain.remote.DocumentApiService
+import bob.colbaskin.iubip_spring2025.documents.domain.remote.DocumentsRepository
 import bob.colbaskin.iubip_spring2025.onboarding.data.UserPreferencesRepositoryImpl
 import bob.colbaskin.iubip_spring2025.onboarding.domain.UserPreferencesRepository
 import bob.colbaskin.iubip_spring2025.organizations.data.OrganizationsRepositoryImpl
@@ -58,5 +61,17 @@ object RepositoryModule {
     @Singleton
     fun provideOrganizationsRepository(organizationApiService: OrganizationApiService): OrganizationsRepository {
         return OrganizationsRepositoryImpl(organizationApiService)
+    }
+
+    @Provides
+    @Singleton
+    fun provideDocumentApiService(retrofit: Retrofit): DocumentApiService {
+        return retrofit.create(DocumentApiService::class.java)
+    }
+
+    @Provides
+    @Singleton
+    fun provideDocumentsRepository(documentApiService: DocumentApiService): DocumentsRepository {
+        return DocumentsRepositoryImpl(documentApiService)
     }
 }

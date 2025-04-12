@@ -1,4 +1,5 @@
 [versions]
+accompanistPager = "0.28.0"
 agp = "8.9.1"
 kotlin = "2.1.0"
 coreKtx = "1.16.0"
@@ -45,6 +46,8 @@ datastore = "1.1.4"
 protobufPlugin = "0.9.4"
 
 [libraries]
+accompanist-pager = { module = "com.google.accompanist:accompanist-pager", version.ref = "accompanistPager" }
+accompanist-pager-indicators = { module = "com.google.accompanist:accompanist-pager-indicators", version.ref = "accompanistPager" }
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }

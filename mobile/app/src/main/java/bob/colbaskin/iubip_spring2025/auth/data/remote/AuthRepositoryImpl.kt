@@ -26,4 +26,9 @@ class AuthRepositoryImpl @Inject constructor(
         Log.d("Logging", "DeviceId from loginWithCode in AuthRepositoryImpl: $deviceId")
         return response.status == "success"
     }
+
+    override suspend fun refreshToken(): String {
+        val response = authApi.refreshToken()
+        return response.status.toString()
+    }
 }
