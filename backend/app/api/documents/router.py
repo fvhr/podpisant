@@ -11,7 +11,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from api.auth.idp import get_current_user
 from api.auth.user_service import get_user_orgs_with_admin_and_tags
-from api.documents.schemas import CreateDocumentSchema
+from api.documents.schemas import CreateDocumentSchema, DocumentSchema
 from database.models import User, Document
 from database.session_manager import get_db
 from minio_client.client import get_minio_client, DOCUMENTS_BUCKET_NAME, MINIO_PUBLIC_URL
@@ -101,8 +101,20 @@ async def get_document_file(
     )
 
 
-# @documents_router.get("")
-# async def get_document(user: User = Depends(get_current_user), session: AsyncSession = Depends(get_db)) -> UserDocumentsSchema:
-#     org_ids, _, _ = await get_user_orgs_with_admin_and_tags(session, user.id)
-#     documents = await session.execute(select(Document).where(Document.organization_id.in_(org_ids)))
-#     return
+@documents_router.get("")
+async def get_document(user: User = Depends(get_current_user), session: AsyncSession = Depends(get_db)) -> list[DocumentSchema]:
+    org_ids, _, _ = await get_user_orgs_with_admin_and_tags(session, user.id)
+    documents = await session.execute(select(Document).where(Document.organization_id.in_(org_ids)))
+    documents = documents.scalars().all()
+    data = [
+        DocumentSchema(
+            name=document.name,
+            organization_id=document.organization_id,
+            creator_id=document.creator_id,
+            created_at=document.created_at.isoformat(),
+            file_url=f"https://menoitami/api/documents/{document.id}/file",
+            status=document.status,
+            type=document.type
+        ) for document in documents
+    ]
+    return data

@@ -1,4 +1,8 @@
+from uuid import UUID
+
 from pydantic import BaseModel
+
+from database.models.document import DocumentTypeEnum, DocSignStatus
 
 
 class CreateDocumentSchema(BaseModel):
@@ -13,3 +17,9 @@ class CreateDocumentSchema(BaseModel):
 
 class DocumentSchema(BaseModel):
     name: str
+    organization_id: int
+    file_url: str
+    created_at: str
+    status: DocSignStatus
+    type: DocumentTypeEnum | None
+    creator_id: UUID
