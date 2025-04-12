@@ -1,2 +1,8 @@
 @import './lib/normalize';
 @import './components/all';
+@import './lib/variables';
+
+.wrapper {
+	min-height: 100vh;
+  background-color: $color-bg;
+}
