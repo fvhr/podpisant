@@ -8,5 +8,7 @@ __pycache__/
 venv/
 .venv/
 
+nginx-logs/
+
 .idea/
 

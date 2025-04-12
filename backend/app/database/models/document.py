@@ -1,7 +1,7 @@
 from datetime import datetime
-from enum import StrEnum
+from enum import StrEnum, Enum
 
-from sqlalchemy import Column, Integer, String, ForeignKey, DateTime
+from sqlalchemy import Column, Integer, String, ForeignKey, DateTime, UUID
 from sqlalchemy.orm import mapped_column, relationship, Mapped
 from sqlalchemy.dialects.postgresql import ENUM as PgEnum
 
@@ -13,10 +13,10 @@ class DocumentTypeEnum(StrEnum):
     GROUP = 'group'
 
 
-class DocSignStatus(StrEnum):
-    IN_PROGRESS = 'В процессе'
-    SIGNED = 'Подписан'
-    REJECTED = 'Отклонен'
+class DocSignStatus(str, Enum):
+    IN_PROGRESS = 'in_progress'
+    SIGNED = 'signed'
+    REJECTED = 'rejected'
 
 
 class Document(Base):
@@ -25,7 +25,7 @@ class Document(Base):
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
     name: Mapped[str] = mapped_column(String(255), nullable=False)
     organization_id: Mapped[int] = mapped_column(ForeignKey('organization.id'))
-    creator_id: Mapped[int] = mapped_column(ForeignKey('user.id'))
+    creator_id: Mapped[UUID] = mapped_column(ForeignKey('user.id'))
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
     status: Mapped[DocSignStatus] = mapped_column(PgEnum(DocSignStatus), default=DocSignStatus.IN_PROGRESS)
     type: Mapped[DocumentTypeEnum | None] = mapped_column(
