@@ -416,10 +416,10 @@ async def reject_document(
         signer.rejected_at = datetime.now(timezone.utc)
         signer.signature_type = "rejected"
 
-        document = await session.get(Document, document_id)
-        document.status = DocSignStatus.REJECTED
-        document.rejected_by = current_user.id
-        document.rejected_at = datetime.now(timezone.utc)
+        # document = await session.get(Document, document_id)
+        # document.status = DocSignStatus.REJECTED
+        # document.rejected_by = current_user.id
+        # document.rejected_at = datetime.now(timezone.utc)
 
         stage.is_current = False
 
