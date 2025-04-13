@@ -1,8 +1,10 @@
+from typing import Optional, List
 from uuid import UUID
 
 from pydantic import BaseModel, Field
+from sqlalchemy.ext.asyncio import AsyncSession
 
-from api.user.phone_encryptor import encryptor
+from api.user.phone_encryptor import encryptor, PhoneEncryptor
 from database.models import User
 
 
@@ -21,52 +23,56 @@ class CreateOrganizationSchema(BaseModel):
     admin_id: UUID | None = None
 
 
-class UserResponse(BaseModel):
+class DepartmentInfo(BaseModel):
+    id: int
+    name: str
+    is_admin: bool
+
+
+class DepartmentUserResponse(BaseModel):
+    department_id: int
+    department_name: str
+    is_admin: bool
+
+class FullUserResponse(BaseModel):
     id: UUID
     fio: str
     email: str
-    phone: str | None = None
-    telegram_username: str | None = None
+    phone: Optional[str]
+    telegram_username: Optional[str]
     is_super_admin: bool
-    type_notification: str | None = None
-    departments: list[str] = Field(default_factory=list)  # Исправлено здесь
+    type_notification: Optional[str]
+    departments: List[DepartmentUserResponse] = Field(default_factory=list)
 
     @classmethod
-    async def from_db(cls, user: User) -> "UserResponse":
-        try:
-            # Дешифруем только если данные похожи на зашифрованные
-            phone = user.phone
-            if phone and len(phone) > 32:  # Примерная проверка на зашифрованные данные
-                phone = encryptor.decrypt(phone)
+    async def from_db(cls, user: User, encryptor: PhoneEncryptor) -> "FullUserResponse":
+        def safe_decrypt(data: str | None) -> str | None:
+            if not data:
+                return None
+            try:
+                if len(data) > 32:
+                    return encryptor.decrypt(data)
+                return data
+            except Exception:
+                return data
 
-            fio = user.fio
-            if fio and len(fio) > 32:
-                fio = encryptor.decrypt(fio)
-
-            return cls(
-                id=user.id,
-                fio=fio or "",
-                email=user.email,
-                phone=phone,
-                telegram_username=user.telegram_username,
-                is_super_admin=user.is_super_admin,
-                type_notification=user.type_notification.value if user.type_notification else None,
-                departments=[ud.department.name for ud in user.user_departments if ud.department]
-            )
-        except Exception as e:
-            # Логируем ошибку, но возвращаем данные без дешифровки
-            print(f"Decryption error for user {user.id}: {str(e)}")
-            return cls(
-                id=user.id,
-                fio=user.fio or "",
-                email=user.email,
-                phone=user.phone,
-                telegram_username=user.telegram_username,
-                is_super_admin=user.is_super_admin,
-                type_notification=user.type_notification.value if user.type_notification else None,
-                departments=[ud.department.name for ud in user.user_departments if ud.department]
-            )
-
+        return cls(
+            id=user.id,
+            fio=safe_decrypt(user.fio) or "",
+            email=user.email,
+            phone=safe_decrypt(user.phone),
+            telegram_username=user.telegram_username,
+            is_super_admin=user.is_super_admin,
+            type_notification=user.type_notification.value if user.type_notification else None,
+            departments=[
+                DepartmentUserResponse(
+                    department_id=ud.department_id,
+                    department_name=ud.department.name if ud.department else f"Департамент {ud.department_id}",
+                    is_admin=ud.is_admin
+                )
+                for ud in user.user_departments
+            ]
+        )
 
 # class OrganizationUserView(BaseModel):
 #     id: UUID
