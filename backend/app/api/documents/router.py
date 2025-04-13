@@ -233,35 +233,35 @@ async def get_document_stages_with_signers(
 
         result = []
         for stage in stages:
-            signed_users = []
-            unsigned_users = []
             signatures = []
+            signed_count = 0
 
             for signer in stage.signers:
-                signature_info = None
+                # Формируем информацию о цифровой подписи
+                digital_signature = None
                 if signer.digital_signature:
                     signature_id = f"{document_id}:{stage.id}:{signer.user_id}"
-                    signature_info = DigitalSignatureSchema(
+                    digital_signature = DigitalSignatureSchema(
                         signature_id=signature_id,
-                        signed_at=signer.signed_at
+                        signed_at=signer.signed_at,
+                        is_valid=True
                     )
 
+                # Создаем полную информацию о подписанте
                 signer_info = StageSignerInfoSchema(
                     user_id=signer.user_id,
                     fio=signer.user.fio,
                     email=signer.user.email,
                     signed_at=signer.signed_at,
                     signature_type=signer.signature_type,
-                    digital_signature=signature_info
+                    digital_signature=digital_signature
                 )
+
                 signatures.append(signer_info)
-
                 if signer.signed_at:
-                    signed_users.append(signature_info)
-                else:
-                    unsigned_users.append(signature_info)
+                    signed_count += 1
 
-            is_completed = len(unsigned_users) == 0 and len(stage.signers) > 0
+            is_completed = signed_count == len(stage.signers) and len(stage.signers) > 0
 
             result.append(DocumentStageDetailSchema(
                 id=stage.id,
@@ -270,10 +270,10 @@ async def get_document_stages_with_signers(
                 deadline=stage.deadline,
                 is_current=stage.is_current,
                 created_at=stage.created_at,
-                signed_users=signed_users,
-                unsigned_users=unsigned_users,
                 is_completed=is_completed,
-                signatures=signatures
+                signatures=signatures,
+                signed_count=signed_count,
+                total_signers=len(stage.signers)
             ))
 
         return result

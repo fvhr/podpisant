@@ -54,7 +54,7 @@ class DocSignStageCreateSchema(BaseModel):
 class DigitalSignatureSchema(BaseModel):
     signature_id: str
     signed_at: datetime
-    is_valid: bool = Field(default=True)
+    is_valid: bool = True
 
 class StageSignerInfoSchema(BaseModel):
     user_id: UUID
@@ -64,6 +64,7 @@ class StageSignerInfoSchema(BaseModel):
     signature_type: str | None
     digital_signature: DigitalSignatureSchema | None
 
+
 class DocumentStageDetailSchema(BaseModel):
     id: int
     name: str
@@ -71,10 +72,10 @@ class DocumentStageDetailSchema(BaseModel):
     deadline: datetime | None
     is_current: bool
     created_at: datetime
-    signed_users: list[StageSignerInfoSchema]
-    unsigned_users: list[StageSignerInfoSchema]
     is_completed: bool
-    signatures: list[StageSignerInfoSchema]
+    signatures: list[StageSignerInfoSchema]  # Все подписи (подписанные и неподписанные)
+    signed_count: int  # Количество подписавших
+    total_signers: int  # Всего подписантов
 
 
 class DocumentSchema(BaseModel):
