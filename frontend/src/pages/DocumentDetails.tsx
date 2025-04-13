@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { FiArrowLeft } from 'react-icons/fi';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
-import { signatureDocument } from '../api/documents';
+import { rejectDocument, signatureDocument } from '../api/documents';
 import { getAllEmployes } from '../api/employes';
 import { CreateStageModal, DocumentButtons, DocumentHeader, DocumentStages } from '../components';
 import { Sidebar } from '../components/sidebar';
@@ -51,11 +51,25 @@ export const DocumentDetails: React.FC = () => {
       if (stageId) {
         const stageIdNumber = +stageId;
         await signatureDocument(documentId, stageIdNumber);
-        setRefreshTrigger((prev) => !prev); 
+        setRefreshTrigger((prev) => !prev);
       }
     } catch (error) {
       console.error('Ошибка при подписании документа:', error);
       alert('Не удалось подписать документ');
+    }
+  };
+  const handleRejectDocument = async () => {
+    try {
+      const stageId = localStorage.getItem('currentStageId');
+      if (stageId) {
+        const stageIdNumber = +stageId;
+        await rejectDocument(documentId, stageIdNumber);
+        setRefreshTrigger((prev) => !prev);
+        alert('Документ успешно отклонен');
+      }
+    } catch (error) {
+      console.error('Ошибка при отклонении документа:', error);
+      alert('Не удалось отклонить документ');
     }
   };
 
@@ -89,6 +103,7 @@ export const DocumentDetails: React.FC = () => {
             <DocumentButtons
               onCreateStage={() => setIsStageModalOpen(true)}
               onSignDocument={handleSignDocument}
+							onRejectDocument={handleRejectDocument}
             />
           </div>
         </div>

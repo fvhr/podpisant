@@ -9,6 +9,7 @@ type Signature = {
   status: 'signed' | 'in_progress' | 'rejected';
   signed_at?: string;
   signature_type: string | null;
+  rejected_at: string | null;
 };
 
 type Stage = {
@@ -102,10 +103,12 @@ export const DocumentStages = ({ refreshTrigger }: Props) => {
                     <li key={signature.user_id} className="employee-item">
                       <span>{signature.fio}</span>
                       <div className="status-indicator">
-                        {signature.signature_type !== null && (
+                        {signature.signature_type !== null && signature.rejected_at === null && (
                           <FiCheck style={{ color: 'green', fontSize: '1.2rem' }} />
                         )}
-                        {signature.signature_type === '' && <FiX style={{ color: 'red' }} />}
+                        {signature.signature_type === 'rejected' && (
+                          <FiX style={{ color: 'red' }} />
+                        )}
                         {signature.signature_type === null && (
                           <span className="pending">ожидает...</span>
                         )}
