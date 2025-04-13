@@ -2,9 +2,6 @@ from uuid import UUID
 
 from pydantic import BaseModel
 
-from api.auth.schema import UserView
-
-
 class OrganizationBase(BaseModel):
     name: str
     description: str
