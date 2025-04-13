@@ -112,7 +112,7 @@ async def get_document(user: User = Depends(get_current_user), session: AsyncSes
     return data
 
 
-@documents_router.get("/{organization_id}")
+@documents_router.get("/organizations/{organization_id}")
 async def get_documents_by_organization_id(organization_id: int, session: AsyncSession = Depends(get_db)) -> list[DocumentSchema]:
     documents = await session.execute(select(Document).where(Document.organization_id == organization_id))
     documents = documents.scalars().all()
