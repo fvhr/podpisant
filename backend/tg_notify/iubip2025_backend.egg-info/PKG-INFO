@@ -1,0 +1,20 @@
+Metadata-Version: 2.4
+Name: iubip2025_backend
+Version: 0.1.0
+Summary: Флагман case
+Requires-Python: >=3.11
+Requires-Dist: redis<6.0.0,>=5.2.0
+Requires-Dist: python-dotenv>=1.1.0
+Requires-Dist: nats-py==2.10.0
+Requires-Dist: aiogram==3.19.0
+Provides-Extra: dev
+Requires-Dist: setuptools<76.0.0,>=75.2.0; extra == "dev"
+Requires-Dist: autoflake<3.0.0,>=2.3.1; extra == "dev"
+Requires-Dist: ruff<0.7.0,>=0.6.0; extra == "dev"
+Requires-Dist: black<25.0.0,>=24.8.0; extra == "dev"
+Requires-Dist: pre-commit>=3.8.0; extra == "dev"
+Provides-Extra: test
+Requires-Dist: docker>=7.1.0; extra == "test"
+Requires-Dist: pytest>=8.3.2; extra == "test"
+Requires-Dist: pytest-asyncio>=0.24.0; extra == "test"
+Requires-Dist: psycopg2-binary>=2.9.8; extra == "test"
