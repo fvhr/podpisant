@@ -65,11 +65,11 @@ export const MainOrganizations: React.FC = () => {
       console.error('Ошибка при удалении:', error);
     }
   };
-
+  
   const handleOrganizationClick = (orgId: number) => {
     navigate(`/documents/${orgId}`);
   };
-
+    
   if (isLoading) {
     return <div className="loading-message">Загрузка организаций...</div>;
   }

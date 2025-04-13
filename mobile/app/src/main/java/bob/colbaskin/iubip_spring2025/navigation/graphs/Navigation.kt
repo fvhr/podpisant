@@ -21,6 +21,7 @@ import bob.colbaskin.iubip_spring2025.onboarding.presentation.IntroductionScreen
 import bob.colbaskin.iubip_spring2025.onboarding.presentation.WelcomeScreen
 import bob.colbaskin.iubip_spring2025.organizations.presentation.OrganizationDetailedScreen
 import bob.colbaskin.iubip_spring2025.organizations.presentation.OrganizationsScreen
+import bob.colbaskin.iubip_spring2025.profile.presentation.ProfileScreen
 
 fun NavGraphBuilder.onBoardingGraph(
     navController: NavHostController,
@@ -69,14 +70,14 @@ fun NavGraphBuilder.mainGraph(navController: NavHostController) {
         animatedTransition<Screens.Organizations> {
             OrganizationsScreen(
                 onNavigateToOrganizationDetails = { orgId ->
-                    navController.navigate(Screens.OrganizationDetailed(orgId))
+                    navController.navigate(Screens.OrganizationDetailed(orgId.toInt()))
                 }
             )
         }
         animatedTransition<Screens.OrganizationDetailed> { backStackEntry ->
             val detailedOrganization: Screens.OrganizationDetailed = backStackEntry.toRoute()
             OrganizationDetailedScreen(
-                organizationId = detailedOrganization.organizationId,
+                organizationId = detailedOrganization.organizationId.toInt(),
                 onBack = { navController.navigateUp() }
             )
         }
@@ -94,14 +95,8 @@ fun NavGraphBuilder.mainGraph(navController: NavHostController) {
                 onBack = { navController.navigateUp() }
             )
         }
-        animatedTransition<Screens.Profile> { backStackEntry ->
-            val profile: Screens.Profile = backStackEntry.toRoute()
-            Box(
-                modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center
-            ) {
-                Text(profile.id)
-            }
+        animatedTransition<Screens.Profile> {
+            ProfileScreen()
         }
     }
 }

@@ -10,8 +10,8 @@ class Organization(Base):
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
     name: Mapped[str] = mapped_column(String(255), nullable=False)
     description: Mapped[str] = mapped_column(String(1024), nullable=False)
-    admin_id: Mapped[int] = mapped_column(ForeignKey('user.id'))
+    admin_id: Mapped[int] = mapped_column(ForeignKey('user.id'), nullable=False)
 
     users = relationship("UserOrganization", back_populates="organization")
-    org_documents = relationship("Document", back_populates="organization")
-    departments = relationship("Department", back_populates="organization")
+    org_documents = relationship("Document", back_populates="organization", cascade="all, delete-orphan")
+    departments = relationship("Department", back_populates="organization", cascade="all, delete-orphan")

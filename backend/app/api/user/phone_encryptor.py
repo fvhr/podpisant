@@ -57,7 +57,8 @@ class PhoneEncryptor:
         unpadder = padding.PKCS7(128).unpadder()
         return unpadder.update(data) + unpadder.finalize()
 
-encryptor = PhoneEncryptor(CRYPT_KEY)
+
+encryptor = PhoneEncryptor(base64.b64decode(CRYPT_KEY))
 
 # phone = "+79161234567"
 # encrypted_phone = encryptor.encrypt(phone)

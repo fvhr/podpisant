@@ -37,7 +37,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import bob.colbaskin.iubip_spring2025.designsystem.ErrorScreen
 import bob.colbaskin.iubip_spring2025.designsystem.LoadingScreen
 import bob.colbaskin.iubip_spring2025.documents.domain.models.Document
-import bob.colbaskin.iubip_spring2025.documents.domain.models.DocumentStatus
+import bob.colbaskin.iubip_spring2025.documents.domain.models.Document.DocumentStatus
 import bob.colbaskin.iubip_spring2025.ui.theme.BackgroundColor
 import bob.colbaskin.iubip_spring2025.ui.theme.BottomBarColor
 import bob.colbaskin.iubip_spring2025.ui.theme.ButtonColor
@@ -47,7 +47,7 @@ import bob.colbaskin.iubip_spring2025.ui.theme.TextColor
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DocumentDetailedScreen(
-    documentId: String,
+    documentId: Int,
     viewModel: DocumentDetailsViewModel = hiltViewModel(),
     onBack: () -> Unit
 ) {
@@ -62,7 +62,7 @@ fun DocumentDetailedScreen(
             TopAppBar(
                 title = {
                     Text(
-                        state.document?.title ?: "Ищем документ...",
+                        state.document?.name ?: "Ищем документ...",
                         color = TextColor
                     )
                 },
@@ -118,7 +118,7 @@ private fun DocumentInfo(document: Document) {
         Column(Modifier.padding(16.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(
-                    "Автор: ${document.author}",
+                    "Создатель: ${document.creatorId}",
                     style = MaterialTheme.typography.bodyMedium
                 )
                 Spacer(Modifier.weight(1f))
@@ -129,7 +129,7 @@ private fun DocumentInfo(document: Document) {
                 )
             }
             Text(
-                "Дата создания: ${document.creationDate}",
+                "Дата создания: ${document.createdAt}",
                 style = MaterialTheme.typography.bodyMedium,
                 modifier = Modifier.padding(top = 8.dp)
             )
@@ -138,12 +138,22 @@ private fun DocumentInfo(document: Document) {
                 style = MaterialTheme.typography.bodyMedium,
                 modifier = Modifier.padding(top = 8.dp)
             )
+            document.type?.let {
+                Text(
+                    "Тип: ${getTypeName(it)}",
+                    style = MaterialTheme.typography.bodyMedium,
+                    modifier = Modifier.padding(top = 8.dp)
+                )
+            }
         }
     }
 }
 
 @Composable
-private fun ActionButtons(viewModel: DocumentDetailsViewModel, status: DocumentStatus) {
+private fun ActionButtons(
+    viewModel: DocumentDetailsViewModel,
+    status: DocumentStatus
+) {
     Row(
         Modifier
             .fillMaxWidth()
@@ -151,7 +161,7 @@ private fun ActionButtons(viewModel: DocumentDetailsViewModel, status: DocumentS
         verticalAlignment = Alignment.CenterVertically
     ) {
         Button(
-            onClick = {  },
+            onClick = { /* download logic */ },
             colors = ButtonDefaults.buttonColors(
                 containerColor = ButtonColor,
                 contentColor = TextColor
@@ -162,33 +172,52 @@ private fun ActionButtons(viewModel: DocumentDetailsViewModel, status: DocumentS
 
         Spacer(Modifier.weight(1f))
 
-        if (status == DocumentStatus.UNSIGNED) {
-            OutlinedButton(
-                onClick = viewModel::rejectDocument,
-                border = BorderStroke(1.dp, MaterialTheme.colorScheme.error),
-                colors = ButtonDefaults.outlinedButtonColors(
-                    contentColor = MaterialTheme.colorScheme.error,
-                )
-            ) {
-                Text("Отклонить")
+        when (status) {
+            DocumentStatus.REJECTED -> {
+                Button(
+                    onClick = viewModel::signDocument,
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = ButtonColor,
+                        contentColor = TextColor
+                    )
+                ) {
+                    Text("Подписать")
+                }
             }
-            Spacer(Modifier.width(8.dp))
-            Button(
-                onClick = viewModel::signDocument,
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = ButtonColor,
-                    contentColor = TextColor
-                )
-            ) {
-                Text("Подписать")
+            DocumentStatus.IN_PROGRESS -> {
+                OutlinedButton(
+                    onClick = viewModel::rejectDocument,
+                    border = BorderStroke(1.dp, MaterialTheme.colorScheme.error),
+                    colors = ButtonDefaults.outlinedButtonColors(
+                        contentColor = MaterialTheme.colorScheme.error,
+                    )
+                ) {
+                    Text("Отклонить")
+                }
+                Spacer(Modifier.width(8.dp))
+                Button(
+                    onClick = viewModel::signDocument,
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = ButtonColor,
+                        contentColor = TextColor
+                    )
+                ) {
+                    Text("Подтвердить")
+                }
             }
+            else -> {}
         }
     }
 }
 
 private fun getStatusName(status: DocumentStatus): String = when(status) {
-    DocumentStatus.UNSIGNED -> "Неподписанный"
-    DocumentStatus.VERIFICATION -> "На проверке"
-    DocumentStatus.SIGNED -> "Подписанный"
+    DocumentStatus.IN_PROGRESS -> "В процессе"
+    DocumentStatus.SIGNED -> "Подписано"
+    DocumentStatus.REJECTED -> "Отклонено"
     DocumentStatus.ALL -> "Все статусы"
+}
+
+private fun getTypeName(type: Document.DocumentType): String = when(type) {
+    Document.DocumentType.STRICT -> "Строгий"
+    Document.DocumentType.REGULAR -> "Обычный"
 }

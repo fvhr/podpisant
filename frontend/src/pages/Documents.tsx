@@ -14,7 +14,7 @@ export const Documents: React.FC = () => {
   };
 
   const handleRefresh = () => {
-    setRefreshTrigger((prev) => prev + 1); // Увеличиваем триггер для обновления списка
+    setRefreshTrigger((prev) => prev + 1); 
   };
 
   return (

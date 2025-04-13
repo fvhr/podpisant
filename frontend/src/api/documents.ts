@@ -2,7 +2,7 @@ import { axiosInstance } from './instance';
 
 export const getDocumentsCurrentOrganizations = async (id: number) => {
   try {
-    const response = await axiosInstance.get(`/documents/${id}`);
+    const response = await axiosInstance.get(`/documents/organizations/${id}`);
     return response.data;
   } catch (error) {
     console.error('Documents error:', error);

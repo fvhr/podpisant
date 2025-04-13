@@ -28,7 +28,7 @@ import bob.colbaskin.iubip_spring2025.ui.theme.TextColor
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun OrganizationDetailedScreen(
-    organizationId: String,
+    organizationId: Int,
     onBack: () -> Unit,
     viewModel: OrganizationDetailsViewModel = hiltViewModel()
 ) {
@@ -75,7 +75,7 @@ fun OrganizationDetailedScreen(
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
-                        text = state.organization?.id ?: "Нет данных",
+                        text = state.organization?.id.toString(),
                         style = MaterialTheme.typography.headlineMedium
                     )
                 }

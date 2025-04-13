@@ -25,6 +25,6 @@ enum class Destinations(
     PROFILE(
         icon = Icons.Default.Person,
         label = "Профиль",
-        screen = Screens.Profile(id = UUID.randomUUID().toString())
+        screen = Screens.Profile
     )
 }

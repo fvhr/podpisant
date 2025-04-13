@@ -14,6 +14,9 @@ import bob.colbaskin.iubip_spring2025.onboarding.domain.UserPreferencesRepositor
 import bob.colbaskin.iubip_spring2025.organizations.data.OrganizationsRepositoryImpl
 import bob.colbaskin.iubip_spring2025.organizations.domain.remote.OrganizationApiService
 import bob.colbaskin.iubip_spring2025.organizations.domain.remote.OrganizationsRepository
+import bob.colbaskin.iubip_spring2025.profile.data.remote.ProfileRepositoryImpl
+import bob.colbaskin.iubip_spring2025.profile.domain.remote.ProfileApiService
+import bob.colbaskin.iubip_spring2025.profile.domain.remote.ProfileRepository
 import bob.colbaskin.iubip_spring2025.utils.user.UserDataStore
 import dagger.Module
 import dagger.Provides
@@ -73,5 +76,17 @@ object RepositoryModule {
     @Singleton
     fun provideDocumentsRepository(documentApiService: DocumentApiService): DocumentsRepository {
         return DocumentsRepositoryImpl(documentApiService)
+    }
+
+    @Provides
+    @Singleton
+    fun provideProfileApiService(retrofit: Retrofit): ProfileApiService {
+        return retrofit.create(ProfileApiService::class.java)
+    }
+
+    @Provides
+    @Singleton
+    fun provideProfileRepository(profileApiService: ProfileApiService): ProfileRepository {
+        return ProfileRepositoryImpl(profileApiService)
     }
 }

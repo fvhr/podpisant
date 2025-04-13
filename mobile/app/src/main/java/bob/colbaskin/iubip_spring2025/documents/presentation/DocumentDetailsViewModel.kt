@@ -3,7 +3,7 @@ package bob.colbaskin.iubip_spring2025.documents.presentation
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import bob.colbaskin.iubip_spring2025.documents.domain.models.Document
-import bob.colbaskin.iubip_spring2025.documents.domain.models.DocumentStatus
+import bob.colbaskin.iubip_spring2025.documents.domain.models.Document.DocumentStatus
 import bob.colbaskin.iubip_spring2025.documents.domain.remote.DocumentsRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -32,7 +32,7 @@ class DocumentDetailsViewModel @Inject constructor(
             initialValue = DocumentDetailsState(isLoading = true)
         )
 
-    fun loadDocument(id: String) {
+    fun loadDocument(id: Int) {
         viewModelScope.launch {
             _state.update { it.copy(isLoading = true) }
             try {
@@ -56,7 +56,7 @@ class DocumentDetailsViewModel @Inject constructor(
     fun rejectDocument() {
         viewModelScope.launch {
             _state.value.document?.id?.let { id ->
-                repository.updateDocumentStatus(id, DocumentStatus.UNSIGNED)
+                repository.updateDocumentStatus(id, DocumentStatus.REJECTED)
                 loadDocument(id)
             }
         }

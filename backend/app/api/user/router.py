@@ -1,3 +1,4 @@
+import uuid
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException
@@ -7,6 +8,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from api.auth.idp import get_current_user
 from api.auth.schema import UserView
 from api.auth.user_service import get_user_orgs_with_admin_and_tags
+from api.user.phone_encryptor import encryptor
 from api.user.schema import UserDepartament
 from app_errors.user_errors import UserNotFoundByIdError, UserNotSuperAdmin
 from database.models import UserDepartment, User
@@ -28,9 +30,9 @@ async def get_user_by_id(user_id: UUID, session: AsyncSession = Depends(get_db))
 
     response = UserView(
         id=user.id,
-        fio=user.fio,
+        fio=encryptor.decrypt(user.fio),
         email=user.email,
-        phone=user.phone if user.phone else "",
+        phone=encryptor.decrypt(user.phone) if user.phone else "",
         type_notification=user.type_notification,
         user_organizations=user_organizations,
         admin_in_organization=admin_in_organizations[0] if admin_in_organizations else None,
@@ -59,11 +61,13 @@ async def user_departament(
             raise UserNotSuperAdmin
         if data.is_dep_admin:
             raise HTTPException(status_code=403, detail="Вы не можете назначать других пользователей администраторами")
+    user_uuid = uuid.uuid4()
     new_user = User(
-        fio=data.fio,
+        id=user_uuid,
+        fio=encryptor.encrypt(data.fio),
         email=data.email,
         telegram_username=data.telegram_username,
-        phone=data.phone,
+        phone=encryptor.encrypt(data.phone),
         type_notification=data.type_notification
     )
     dep_us = UserDepartment(
@@ -77,5 +81,6 @@ async def user_departament(
         session.add(dep_us)
         await session.commit()
         return await get_user_by_id(new_user.id, session)
-    except Exception:
+    except Exception as ex:
+        print(ex)
         raise HTTPException(detail='Internal server error', status_code=500)

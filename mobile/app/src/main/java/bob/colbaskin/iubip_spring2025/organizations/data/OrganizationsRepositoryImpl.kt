@@ -14,12 +14,12 @@ class OrganizationsRepositoryImpl @Inject constructor(
 ): OrganizationsRepository {
     private val mockOrganizations = listOf(
         Organization(
-            id = "1",
+            id = 1,
             name = "ООО Ромашка",
             description = "Цветочный магазин премиум класса"
         ),
         Organization(
-            id = "2",
+            id = 2,
             name = "ИП Иванов",
             description = "Строительные и отделочные работы"
         )
@@ -28,21 +28,21 @@ class OrganizationsRepositoryImpl @Inject constructor(
     override suspend fun getAllOrganizations(): List<Organization> {
         delay(1500)
         return listOf(
-            Organization("1", "ООО Ромашка", "Цветочный магазин"),
-            Organization("2", "ИП Иванов", "Строительные услуги")
+            Organization(1, "ООО Ромашка", "Цветочный магазин"),
+            Organization(2, "ИП Иванов", "Строительные услуги")
         )
     }
 
     override suspend fun createOrganization(name: String, description: String): Organization {
         delay(1000)
         return Organization(
-            id = UUID.randomUUID().toString(),
+            id = 5,
             name = name,
             description = description
         )
     }
 
-    override suspend fun getOrganizationById(id: String): Organization {
+    override suspend fun getOrganizationById(id: Int): Organization {
         delay(1500)
 
         return mockOrganizations.find { it.id == id }

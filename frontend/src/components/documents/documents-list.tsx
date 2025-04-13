@@ -28,6 +28,7 @@ export const DocumentsList = ({ activeTab, refreshTrigger = 0 }: DocumentsListPr
     }
   };
   const orgIdNumber = Number(orgId);
+  localStorage.setItem('currentOrgId', orgIdNumber.toString());
 
   useEffect(() => {
     const fetchDocuments = async () => {
