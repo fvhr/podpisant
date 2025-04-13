@@ -5,6 +5,7 @@ import { rejectDocument, signatureDocument } from '../api/documents';
 import { getAllEmployes } from '../api/employes';
 import { CreateStageModal, DocumentButtons, DocumentHeader, DocumentStages } from '../components';
 import { Sidebar } from '../components/sidebar';
+import { useParams } from 'react-router-dom';
 
 interface Employee {
   id: number;
@@ -28,6 +29,9 @@ export const DocumentDetails: React.FC = () => {
   const documentId = Number(docId);
 
   const orgId = location.state?.orgId;
+
+  const { docId } = useParams();
+  const documentId = Number(docId);
 
   const toggleSidebar = () => {
     setIsSidebarOpen(!isSidebarOpen);
