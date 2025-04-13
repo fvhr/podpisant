@@ -56,3 +56,13 @@ export const getDocumentOrganization = async (id: number) => {
     throw error;
   }
 };
+
+export const signatureDocument = async (document_id: number, stage_id: number) => {
+  try {
+    const response = await axiosInstance.post(`/documents/${document_id}/stages/${stage_id}/sign`);
+    return response.data;
+  } catch (error) {
+    console.error('Documents error:', error);
+    throw error;
+  }
+};
