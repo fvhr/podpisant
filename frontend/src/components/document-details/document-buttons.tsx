@@ -3,6 +3,7 @@ interface DocumentButtonsProps {
   onCreateStage: () => void; 
 }
 export const DocumentButtons = ({ onCreateStage }: DocumentButtonsProps) => {
+	
   return (
     <div className="document-actions">
       <button className="action-btn edit" onClick={onCreateStage}>

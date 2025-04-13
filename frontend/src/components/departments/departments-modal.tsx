@@ -47,13 +47,6 @@ export const DepartmentModal: React.FC<DepartmentModalProps> = ({ onClose, onAdd
                         >
                             {isLoading ? 'Создание...' : 'Создать отдел'}
                         </button>
-                        <button
-                            type="button"
-                            className="employee-cancel-button"
-                            onClick={onClose}
-                        >
-                            Отмена
-                        </button>
                     </div>
                 </form>
             </div>
