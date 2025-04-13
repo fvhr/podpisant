@@ -17,27 +17,44 @@ export const DepartmentModal: React.FC<DepartmentModalProps> = ({ onClose, onAdd
     };
 
     return (
-        <div className="modal">
-            <div className="modal-content">
-                <h2>Создать новый отдел</h2>
+        <div className="employee-modal-overlay">
+            <div className="employee-modal-content">
+                <div className="employee-modal-header">
+                    <h2>Создать новый отдел</h2>
+                    <button className="employee-modal-close-button" onClick={onClose}>
+                        &times;
+                    </button>
+                </div>
+
                 <form onSubmit={handleSubmit}>
-                    <div className="form-group">
+                    <div className="employee-modal-form-group">
                         <label htmlFor="departmentName">Название отдела</label>
                         <input
                             id="departmentName"
                             type="text"
                             value={departmentName}
                             onChange={(e) => setDepartmentName(e.target.value)}
+                            placeholder="Введите название отдела"
                             required
                         />
                     </div>
 
-                    <button type="submit" disabled={isLoading}>
-                        {isLoading ? 'Создание...' : 'Создать отдел'}
-                    </button>
-                    <button type="button" onClick={onClose}>
-                        Отменить
-                    </button>
+                    <div className="employee-modal-actions">
+                        <button
+                            type="submit"
+                            className="employee-submit-button"
+                            disabled={isLoading}
+                        >
+                            {isLoading ? 'Создание...' : 'Создать отдел'}
+                        </button>
+                        <button
+                            type="button"
+                            className="employee-cancel-button"
+                            onClick={onClose}
+                        >
+                            Отмена
+                        </button>
+                    </div>
                 </form>
             </div>
         </div>
