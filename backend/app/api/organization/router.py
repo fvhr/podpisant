@@ -21,6 +21,6 @@ async def delete_organization(organization_id: int, session: AsyncSession = Depe
     await session.commit()
 
 
-@organization_router.get("/{organization_id}/users")
-async def get_users_by_organization_id(organization_id: int, session: AsyncSession = Depends(get_db)):
-
+# @organization_router.get("/{organization_id}/users")
+# async def get_users_by_organization_id(organization_id: int, session: AsyncSession = Depends(get_db)):
+#     organization
