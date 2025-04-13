@@ -137,7 +137,7 @@ export const DepartmentsList: React.FC = () => {
                     department.users.map((user) => (
                       <div key={user.id} className="access-control__employee">
                         <span>{user.fio}</span>
-                        {
+                        {profile?.is_super_admin && (
                           <div className="access-control__checkbox-wrapper">
                             <span className="access-control__label">Групповая рассылка</span>
                             <label className="access-control__checkbox">
@@ -151,7 +151,7 @@ export const DepartmentsList: React.FC = () => {
                               </span>
                             </label>
                           </div>
-                        }
+                        )}
                       </div>
                     ))
                   )}
