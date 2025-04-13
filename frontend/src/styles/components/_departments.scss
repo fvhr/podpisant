@@ -10,6 +10,18 @@
     color: $color-text;
   }
 
+  &__loading,
+  &__error,
+  &__empty {
+    text-align: center;
+    padding: 1rem;
+    color: $color-text-muted;
+  }
+
+  &__error {
+    color: $color-error;
+  }
+
   &__list {
     display: flex;
     flex-direction: column;
@@ -53,35 +65,20 @@
   }
 
   &__content {
-    padding: 0.5rem 1.5rem 1rem;
+    padding: 0.5rem 1.5rem 0.5rem 1.5rem;
     border-top: 1px solid $color-input-border;
   }
 
   &__employee {
     display: flex;
     justify-content: space-between;
-    align-items: flex-start;
+    align-items: center;
     padding: 0.75rem 0;
+    border-bottom: 1px solid $color-input-border;
 
     &:last-child {
       border-bottom: none;
     }
-
-    span {
-      font-size: 1rem;
-    }
-  }
-
-  &__checkbox-wrapper {
-    display: flex;
-    align-items: end;
-    gap: 15px;
-  }
-
-  &__label {
-    font-size: 0.75rem;
-    text-align: right;
-    color: $color-text-muted;
   }
 
   &__checkbox {
@@ -94,48 +91,53 @@
     input {
       position: absolute;
       opacity: 0;
-      width: 100%;
-      height: 100%;
-      margin: 0;
       cursor: pointer;
-      z-index: 2;
+      height: 0;
+      width: 0;
     }
 
-    .access-control__checkmark {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 20px;
-      height: 20px;
-      border: 2px solid $color-input-border;
-      border-radius: 5px;
-      transition: all 0.2s;
+    &-wrapper {
       display: flex;
       align-items: center;
-      justify-content: center;
-      background-color: transparent;
-      z-index: 1;
-
-      svg {
-        color: white;
-        width: 14px;
-        height: 14px;
-        opacity: 0;
-        transition: opacity 0.2s;
-      }
+      gap: 1rem;
     }
+  }
 
-    input:checked + .access-control__checkmark {
-      background-color: $color-button;
-      border-color: $color-button;
+  &__checkmark {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 20px;
+    height: 20px;
+    background-color: $color-card;
+    border: 2px solid $color-input-border;
+    border-radius: 4px;
+    transition: all 0.2s ease;
 
-      svg {
-        opacity: 1;
-      }
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    svg {
+      color: $color-button;
+      opacity: 0;
+      transition: opacity 0.2s ease;
+      width: 14px;
+      height: 14px;
     }
+  }
 
-    &:hover .access-control__checkmark {
-      border-color: $color-button;
+  &__checkbox input:checked ~ &__checkmark {
+    background-color: $color-button;
+    border-color: $color-button;
+
+    svg {
+      opacity: 1;
+      color: white;
     }
+  }
+
+  &__checkbox:hover &__checkmark {
+    border-color: $color-button;
   }
 }

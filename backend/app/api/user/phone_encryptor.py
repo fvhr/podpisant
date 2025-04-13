@@ -1,4 +1,6 @@
 import base64
+import re
+
 from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 from cryptography.hazmat.primitives import padding
 from cryptography.hazmat.backends import default_backend
@@ -30,20 +32,28 @@ class PhoneEncryptor:
         encrypted_data = iv + encryptor.tag + ciphertext
         return base64.b64encode(encrypted_data).decode()
 
-    def decrypt(self, encrypted_phone: str) -> str:
-        """Дешифрует Base64 строку обратно в номер телефона."""
-        encrypted_data = base64.b64decode(encrypted_phone.encode())
-        iv = encrypted_data[:16]
-        tag = encrypted_data[16:32]
-        ciphertext = encrypted_data[32:]
-        cipher = Cipher(
-            algorithms.AES(self.key),
-            modes.GCM(iv, tag),
-            backend=default_backend()
-        )
-        decryptor = cipher.decryptor()
-        padded_phone = decryptor.update(ciphertext) + decryptor.finalize()
-        return self._unpad(padded_phone).decode()
+    def decrypt(self, encrypted_data: str) -> str:
+        try:
+            if not encrypted_data:
+                return ""
+
+            if not re.match(r'^[A-Za-z0-9+/]+={0,2}$', encrypted_data):
+                return encrypted_data
+
+            encrypted = base64.b64decode(encrypted_data.encode())
+            if len(encrypted) < 32:
+                return encrypted_data
+
+            iv = encrypted[:16]
+            tag = encrypted[16:32]
+            ciphertext = encrypted[32:]
+
+            cipher = Cipher(algorithms.AES(self.key), modes.GCM(iv, tag), backend=default_backend())
+            decryptor = cipher.decryptor()
+            return self._unpad(decryptor.update(ciphertext) + decryptor.finalize()).decode()
+
+        except Exception:
+            return encrypted_data
 
     @staticmethod
     def _pad(data: bytes) -> bytes:

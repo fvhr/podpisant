@@ -5,6 +5,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from api.auth.router import auth_router
+from api.department.router import department_router
 from api.documents.router import documents_router
 from api.main_router import api_router
 from api.organization.router import organization_router
@@ -20,6 +21,7 @@ app.include_router(auth_router)
 app.include_router(documents_router)
 app.include_router(user_router)
 app.include_router(organization_router)
+app.include_router(department_router)
 
 origins = [
     "http://localhost:5173",

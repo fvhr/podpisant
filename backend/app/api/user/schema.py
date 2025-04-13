@@ -9,6 +9,6 @@ class UserDepartament(BaseModel):
 
     email: str | None
     phone: str | None
-    telegram_username: str | None
+    telegram_username: str | None = None
     type_notification: TypeNotificationEnum
     is_dep_admin: bool

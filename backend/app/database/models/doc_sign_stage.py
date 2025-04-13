@@ -13,7 +13,7 @@ class DocSignStage(Base):
     doc_id: Mapped[int] = mapped_column(ForeignKey("document.id"))
     stage_number: Mapped[int] = mapped_column(Integer, nullable=False, default=1)
     name: Mapped[str] = mapped_column(String(100), nullable=False)
-    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=func.now())
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
     deadline: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=True)
     is_current: Mapped[bool] = mapped_column(Boolean, default=False)
 

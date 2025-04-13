@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { FiArrowLeft } from 'react-icons/fi';
-import { useLocation, useNavigate, useParams } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { CreateStageModal, DocumentButtons, DocumentHeader, DocumentStages } from '../components';
 import { Sidebar } from '../components/sidebar';
 
@@ -8,14 +8,18 @@ export const DocumentDetails: React.FC = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isStageModalOpen, setIsStageModalOpen] = useState(false);
   const navigate = useNavigate();
-	const location = useLocation();
+  const location = useLocation();
 
-	const orgId = location.state?.orgId;
+  const orgId = location.state?.orgId;
 
   const employees = [
     'Иванов Иван Иванович',
     'Петрова Анна Сергеевна',
     'Сидоров Алексей Владимирович',
+    'Сидоров Алексей Владимирович',
+    'Сидоров Алексей Владимирович',
+    'Сидоров Алексей Владимирович',
+		
   ];
 
   const toggleSidebar = () => {
@@ -27,11 +31,11 @@ export const DocumentDetails: React.FC = () => {
     setIsStageModalOpen(false);
   };
 
-	const handleBack = () => {
+  const handleBack = () => {
     if (orgId) {
-      navigate(`/documents/${orgId}`); 
+      navigate(`/documents/${orgId}`);
     } else {
-      navigate('/documents'); 
+      navigate('/documents');
     }
   };
 
@@ -42,7 +46,7 @@ export const DocumentDetails: React.FC = () => {
       <main className={`content ${isSidebarOpen ? 'with-sidebar' : 'full-width'}`}>
         <div className="document-details-layout">
           <div className="document-content-section">
-            <div style={{width: '70%'}}>
+            <div style={{ width: '70%' }}>
               <div onClick={handleBack} className="document-back">
                 <FiArrowLeft /> Назад
               </div>

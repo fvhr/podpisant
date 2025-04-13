@@ -1,6 +1,5 @@
+import { ProfileProps } from '../types/profile.ts';
 import { axiosInstance } from './instance';
-import {ProfileProps} from "../types/profile.ts";
-import axios from "axios";
 
 export const userEmailLogin = async (email: string) => {
   try {
@@ -77,6 +76,30 @@ export const getCurrentUserOrganizations = async () => {
     return response.data.user_organizations;
   } catch (error) {
     console.error('User info error:', error);
+    throw error;
+  }
+};
+
+export const addEmployee = async (
+  dep_id: number,
+  fio: string,
+  email: string,
+  phone: string,
+  type_notification: string,
+  is_dep_admin: boolean,
+) => {
+  try {
+    const response = await axiosInstance.post('/users/user/departament', {
+      dep_id,
+      fio,
+      email,
+      phone,
+      type_notification,
+      is_dep_admin,
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Error adding employee:', error);
     throw error;
   }
 };
