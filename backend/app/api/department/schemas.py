@@ -41,3 +41,8 @@ class DepartmentView(BaseModel):
                 ) for user in users
             ]
         )
+
+class CreateDepartmentSchema(BaseModel):
+    name: str
+    description: str
+

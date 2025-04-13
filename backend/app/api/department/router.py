@@ -1,9 +1,13 @@
+from datetime import datetime
+from zoneinfo import ZoneInfo
+
 from fastapi import APIRouter, Depends
+from fastapi.responses import ORJSONResponse
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
-from api.department.schemas import DepartmentView
+from api.department.schemas import DepartmentView, CreateDepartmentSchema
 from database.models import Department, UserDepartment
 from database.session_manager import get_db
 
@@ -24,3 +28,27 @@ async def get_departments_by_org_id(
     )).scalars().all()
 
     return [await DepartmentView.from_db(department, session) for department in departments]
+
+
+@department_router.post("/{org_id}")
+async def create_department(
+    org_id: int,
+    department_data: CreateDepartmentSchema,
+    session: AsyncSession = Depends(get_db)
+) -> ORJSONResponse:
+    department = Department(
+        name=department_data.name,
+        desc=department_data.description,
+        organization_id=org_id,
+        created_at=datetime.now(ZoneInfo("Europe/Moscow"))
+    )
+
+    session.add(department)
+
+    await session.flush()
+
+    await session.refresh(department)
+
+    return ORJSONResponse({
+        "department_id": department.id,
+    })
