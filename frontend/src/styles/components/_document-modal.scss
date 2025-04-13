@@ -70,7 +70,7 @@
 
       &:focus {
         outline: none;
-        border-color: $color-button;
+        border-color: $color-button-dark;
       }
     }
   }
@@ -97,17 +97,17 @@
   position: relative;
 
   &:hover {
-    background: rgba($color-button, 0.1);
+    background: rgba($color-button-dark, 0.1);
   }
 
   &.selected {
-    background: rgba($color-button, 0.2);
+    background: rgba($color-button-dark, 0.2);
   }
 
   .checkmark {
     position: absolute;
     right: 1rem;
-    color: $color-button;
+    color: $color-button-dark;
   }
 }
 
@@ -121,7 +121,7 @@
     border-radius: 6px;
     font-weight: 500;
     cursor: pointer;
-    background: $color-button;
+    background: $color-button-dark;
     color: $color-text;
     border: none;
     transition: background 0.2s;
