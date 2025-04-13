@@ -12,6 +12,8 @@ interface DocumentsRepository {
 
     suspend fun getDownloadLink(documentId: Int): String
 
+    suspend fun getDepartments(orgId: Int): String
+
     suspend fun createDocument(title: String, author: String): Document
 
     suspend fun updateDocumentStatus(id: Int, status: DocumentStatus)

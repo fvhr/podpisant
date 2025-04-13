@@ -1,17 +1,6 @@
 package bob.colbaskin.iubip_spring2025.documents.presentation
 
-import android.app.Activity
-import android.app.DownloadManager
-import android.content.Context
-import android.content.pm.PackageManager
-import android.net.Uri
-import android.os.Build
-import android.os.Environment
 import android.util.Log
-import android.widget.Toast
-import androidx.core.app.ActivityCompat
-import androidx.core.content.ContentProviderCompat.requireContext
-import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import bob.colbaskin.iubip_spring2025.auth.domain.remote.AuthRepository
@@ -20,7 +9,6 @@ import bob.colbaskin.iubip_spring2025.documents.domain.models.Document.DocumentS
 import bob.colbaskin.iubip_spring2025.documents.domain.remote.DocumentsRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.TimeoutCancellationException
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -30,7 +18,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withTimeout
 import retrofit2.HttpException
 import java.io.IOException
-import java.util.jar.Manifest
 import javax.inject.Inject
 
 data class DocumentDetailsState(
@@ -93,7 +80,6 @@ class DocumentDetailsViewModel @Inject constructor(
                 Log.e("Logging", "${e.message}")
             }
         }
-
     }
 
     fun getDownloadLink() {

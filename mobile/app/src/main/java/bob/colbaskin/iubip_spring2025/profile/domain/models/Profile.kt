@@ -9,7 +9,7 @@ data class Profile(
     val phone: String,
     val isSuperAdmin: Boolean,
     val notificationType: NotificationType,
-    val adminOrganizationId: Int,
+    val adminOrganizationId: List<Int>,
     val userOrganizations:  List<Organization> = emptyList(),
     val userDepartmentsIds: List<Int>,
     val organizationTags: OrganizationTags = OrganizationTags()
