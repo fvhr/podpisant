@@ -9,3 +9,16 @@ export const getAllDepartaments = async (id: number) => {
     throw error;
   }
 };
+
+export const createDepartment = async (org_id: number, name: string, description: string) => {
+  try {
+    const response = await axiosInstance.post(`/departments/${org_id}`, {
+      name,
+      description,
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Ошибка при создании отдела:', error);
+    throw error;
+  }
+};
