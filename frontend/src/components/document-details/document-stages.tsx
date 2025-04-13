@@ -14,22 +14,16 @@ type Stage = {
   id: number;
   name: string;
   signatures: Signature[];
-  // другие поля стадии...
 };
 
-type DocumentData = {
-  id: number;
-  name: string;
-  created_at: string;
-  stages: Stage[];
-};
+type DocumentData = Stage[];
 
 export const DocumentStages: React.FC = () => {
   const [expandedStage, setExpandedStage] = useState<number | null>(null);
-  const [documentData, setDocumentData] = useState([]);
+  const [documentData, setDocumentData] = useState<DocumentData>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const { docId } = useParams();
+  const { docId } = useParams<{ docId?: string }>();
 
   useEffect(() => {
     const fetchDocumentStages = async () => {
@@ -66,14 +60,14 @@ export const DocumentStages: React.FC = () => {
     return <div className="error">{error}</div>;
   }
 
-  if (!documentData) {
+  if (!documentData || documentData.length === 0) {
     return <div className="error">Данные документа не найдены</div>;
   }
 
   return (
     <div className="document-details">
       <div className="document-stages">
-        {documentData?.map((stage) => (
+        {documentData.map((stage) => (
           <div key={stage.id} className="stage-card">
             <div className="stage-header" onClick={() => toggleStage(stage.id)}>
               <h3>{stage.name}</h3>
@@ -85,7 +79,7 @@ export const DocumentStages: React.FC = () => {
             {expandedStage === stage.id && (
               <div className="stage-content">
                 <ul className="employees-list">
-                  {stage.signatures?.map((signature) => (
+                  {stage.signatures.map((signature) => (
                     <li key={signature.user_id} className="employee-item">
                       <span>{signature.fio}</span>
                       <div className="status-indicator">
