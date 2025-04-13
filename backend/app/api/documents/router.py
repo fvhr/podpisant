@@ -8,6 +8,7 @@ from zoneinfo import ZoneInfo
 
 from fastapi import APIRouter, UploadFile, File, Form, Depends, HTTPException, Response
 from minio import Minio
+from pydantic import Field
 from sqlalchemy import select, func
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload, session
@@ -236,9 +237,10 @@ async def get_document_stages_with_signers(
         for stage in stages:
             signatures = []
             signed_count = 0
+            rejected_count = 0
 
             for signer in stage.signers:
-                # Формируем информацию о цифровой подписи
+                # Формируем информацию о подписи/отклонении
                 digital_signature = None
                 if signer.digital_signature:
                     signature_id = f"{document_id}:{stage.id}:{signer.user_id}"
@@ -248,12 +250,12 @@ async def get_document_stages_with_signers(
                         is_valid=True
                     )
 
-                # Создаем полную информацию о подписанте
                 signer_info = StageSignerInfoSchema(
                     user_id=signer.user_id,
                     fio=signer.user.fio,
                     email=signer.user.email,
                     signed_at=signer.signed_at,
+                    rejected_at=signer.rejected_at,
                     signature_type=signer.signature_type,
                     digital_signature=digital_signature
                 )
@@ -261,8 +263,10 @@ async def get_document_stages_with_signers(
                 signatures.append(signer_info)
                 if signer.signed_at:
                     signed_count += 1
+                if signer.rejected_at:
+                    rejected_count += 1
 
-            is_completed = signed_count == len(stage.signers) and len(stage.signers) > 0
+            is_completed = (signed_count == len(stage.signers) or rejected_count > 0) and len(stage.signers) > 0
 
             result.append(DocumentStageDetailSchema(
                 id=stage.id,
@@ -272,6 +276,7 @@ async def get_document_stages_with_signers(
                 is_current=stage.is_current,
                 created_at=stage.created_at,
                 is_completed=is_completed,
+                is_rejected=rejected_count == len(stage.signers),
                 signatures=signatures,
                 signed_count=signed_count,
                 total_signers=len(stage.signers)
@@ -372,11 +377,63 @@ async def sign_document(
         await session.rollback()
         raise HTTPException(status_code=500, detail=str(e))
 
-# @documents_router.post("/{document_id}/stages/{stage_id}")
-# async def reject_document(
-#     document_id: int,
-#     stage_id: int,
-#     session: AsyncSession = Depends(get_db),
-#     current_user: User = Depends(get_current_user)
-# ) -> dict:
+@documents_router.post("/{document_id}/stages/{stage_id}/reject")
+async def reject_document(
+    document_id: int,
+    stage_id: int,
+    session: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+) -> dict:
+    """
+    Отклонение подписания документа пользователем
+    """
+    try:
+        stage = await session.get(DocSignStage, stage_id)
+        if not stage:
+            raise HTTPException(status_code=404, detail="Stage not found")
+
+        if not stage.is_current:
+            raise HTTPException(
+                status_code=400,
+                detail="Can only reject current stage documents"
+            )
+
+        signer = (await session.execute(
+            select(StageSigner)
+            .where(StageSigner.stage_id == stage_id)
+            .where(StageSigner.user_id == current_user.id)
+        )).scalar_one_or_none()
+
+        if not signer:
+            raise HTTPException(status_code=404, detail="Signing record not found")
+
+        if signer.signed_at:
+            raise HTTPException(status_code=400, detail="Document already signed")
+
+        if signer.rejected_at:
+            raise HTTPException(status_code=400, detail="Document already rejected")
+
+        signer.rejected_at = datetime.now(timezone.utc)
+        signer.signature_type = "rejected"
+
+        document = await session.get(Document, document_id)
+        document.status = DocSignStatus.REJECTED
+        document.rejected_by = current_user.id
+        document.rejected_at = datetime.now(timezone.utc)
+
+        stage.is_current = False
+
+        await session.commit()
+
+        return {
+            "status": "rejected",
+            "document_id": document_id,
+            "stage_id": stage_id,
+            "rejected_at": signer.rejected_at.isoformat(),
+            "rejected_by": str(current_user.id)
+        }
+
+    except Exception as e:
+        await session.rollback()
+        raise HTTPException(status_code=500, detail=str(e))
 

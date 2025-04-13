@@ -45,4 +45,3 @@ class DepartmentView(BaseModel):
 class CreateDepartmentSchema(BaseModel):
     name: str
     description: str | None
-

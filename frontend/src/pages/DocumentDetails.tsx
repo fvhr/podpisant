@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { FiArrowLeft } from 'react-icons/fi';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
+import { signatureDocument } from '../api/documents';
 import { getAllEmployes } from '../api/employes';
 import { CreateStageModal, DocumentButtons, DocumentHeader, DocumentStages } from '../components';
 import { Sidebar } from '../components/sidebar';
@@ -19,8 +20,12 @@ export const DocumentDetails: React.FC = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isStageModalOpen, setIsStageModalOpen] = useState(false);
   const [employees, setEmployees] = useState<Employee[]>([]);
+  const [refreshTrigger, setRefreshTrigger] = useState(false);
+
   const navigate = useNavigate();
   const location = useLocation();
+  const { docId } = useParams();
+  const documentId = Number(docId);
 
   const orgId = location.state?.orgId;
 
@@ -28,8 +33,7 @@ export const DocumentDetails: React.FC = () => {
     setIsSidebarOpen(!isSidebarOpen);
   };
 
-  const handleCreateStage = (stageData: { name: string; stageNumber: number, deadline: Date, user_ids: string[] }) => {
-    console.log('Создан новый этап:', stageData);
+  const handleCreateStage = () => {
     setIsStageModalOpen(false);
   };
 
@@ -38,6 +42,20 @@ export const DocumentDetails: React.FC = () => {
       navigate(`/documents/${orgId}`);
     } else {
       navigate('/documents');
+    }
+  };
+
+  const handleSignDocument = async () => {
+    try {
+      const stageId = localStorage.getItem('currentStageId');
+      if (stageId) {
+        const stageIdNumber = +stageId;
+        await signatureDocument(documentId, stageIdNumber);
+        setRefreshTrigger((prev) => !prev); 
+      }
+    } catch (error) {
+      console.error('Ошибка при подписании документа:', error);
+      alert('Не удалось подписать документ');
     }
   };
 
@@ -51,7 +69,7 @@ export const DocumentDetails: React.FC = () => {
       }
     };
     fetchEmployees();
-  }, []);
+  }, [orgId]);
 
   return (
     <div className="documents-page">
@@ -65,10 +83,13 @@ export const DocumentDetails: React.FC = () => {
                 <FiArrowLeft /> Назад
               </div>
               <DocumentHeader />
-              <DocumentStages />
+              <DocumentStages refreshTrigger={refreshTrigger} />
             </div>
 
-            <DocumentButtons onCreateStage={() => setIsStageModalOpen(true)} />
+            <DocumentButtons
+              onCreateStage={() => setIsStageModalOpen(true)}
+              onSignDocument={handleSignDocument}
+            />
           </div>
         </div>
       </main>

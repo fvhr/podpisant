@@ -14,7 +14,7 @@ export const Documents: React.FC = () => {
   };
 
   const handleRefresh = () => {
-    setRefreshTrigger((prev) => prev + 1); 
+    setRefreshTrigger((prev) => prev + 1);
   };
 
   return (
@@ -31,10 +31,7 @@ export const Documents: React.FC = () => {
       </main>
 
       {isModalOpen && (
-        <DocumentModal
-          onClose={() => setIsModalOpen(false)}
-          onSuccess={handleRefresh} 
-        />
+        <DocumentModal onClose={() => setIsModalOpen(false)} onSuccess={handleRefresh} />
       )}
     </div>
   );

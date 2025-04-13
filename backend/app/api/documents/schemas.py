@@ -61,6 +61,7 @@ class StageSignerInfoSchema(BaseModel):
     fio: str
     email: str
     signed_at: datetime | None
+    rejected_at: datetime | None  # Новое поле
     signature_type: str | None
     digital_signature: DigitalSignatureSchema | None
 
@@ -73,9 +74,10 @@ class DocumentStageDetailSchema(BaseModel):
     is_current: bool
     created_at: datetime
     is_completed: bool
-    signatures: list[StageSignerInfoSchema]  # Все подписи (подписанные и неподписанные)
-    signed_count: int  # Количество подписавших
-    total_signers: int  # Всего подписантов
+    signatures: list[StageSignerInfoSchema]
+    signed_count: int
+    is_rejected: bool
+    total_signers: int
 
 
 class DocumentSchema(BaseModel):
