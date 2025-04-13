@@ -29,11 +29,14 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import bob.colbaskin.iubip_spring2025.MainActivity
 import bob.colbaskin.iubip_spring2025.designsystem.ErrorScreen
 import bob.colbaskin.iubip_spring2025.designsystem.LoadingScreen
 import bob.colbaskin.iubip_spring2025.documents.domain.models.Document
@@ -160,18 +163,6 @@ private fun ActionButtons(
             .padding(16.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Button(
-            onClick = { /* download logic */ },
-            colors = ButtonDefaults.buttonColors(
-                containerColor = ButtonColor,
-                contentColor = TextColor
-            )
-        ) {
-            Text("Скачать")
-        }
-
-        Spacer(Modifier.weight(1f))
-
         when (status) {
             DocumentStatus.REJECTED -> {
                 Button(

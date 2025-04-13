@@ -1,5 +1,6 @@
 package bob.colbaskin.iubip_spring2025.organizations.presentation
 
+import android.util.Log
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -57,7 +58,9 @@ fun OrganizationsScreen(
         floatingActionButton = {
             if (state.isAdmin) {
                 FloatingActionButton(
-                    onClick = { viewModel.toggleCreateDialog(true) },
+                    onClick = {
+                        viewModel.toggleCreateDialog(true)
+                    },
                     containerColor = ButtonColor,
                     contentColor = TextColor
                 ) {
@@ -88,7 +91,10 @@ fun OrganizationsScreen(
     if (showCreateDialog) {
         CreateOrganizationDialog(
             onDismiss = { viewModel.toggleCreateDialog(false) },
-            onCreate = { name, desc -> viewModel.createOrganization(name, desc) }
+            onCreate = { name, desc ->
+                Log.d("Logging", "Create organization: $name, $desc")
+                viewModel.createOrganization(name, desc)
+            }
         )
     }
 }
