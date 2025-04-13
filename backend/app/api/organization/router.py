@@ -19,3 +19,8 @@ async def create_organization(organization_data: CreateOrganizationSchema, sessi
 async def delete_organization(organization_id: int, session: AsyncSession = Depends(get_db)):
     await session.delete(organization)
     await session.commit()
+
+
+@organization_router.get("/{organization_id}/users")
+async def get_users_by_organization_id(organization_id: int, session: AsyncSession = Depends(get_db)):
+
