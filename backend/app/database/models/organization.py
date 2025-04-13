@@ -12,6 +12,8 @@ class Organization(Base):
     description: Mapped[str] = mapped_column(String(1024), nullable=False)
     admin_id: Mapped[int] = mapped_column(ForeignKey('user.id'), nullable=False)
 
-    users = relationship("UserOrganization", back_populates="organization")
+    users = relationship("UserOrganization", back_populates="organization",
+        cascade="all, delete-orphan",  # Добавьте это
+        passive_deletes=True)
     org_documents = relationship("Document", back_populates="organization", cascade="all, delete-orphan")
     departments = relationship("Department", back_populates="organization", cascade="all, delete-orphan")

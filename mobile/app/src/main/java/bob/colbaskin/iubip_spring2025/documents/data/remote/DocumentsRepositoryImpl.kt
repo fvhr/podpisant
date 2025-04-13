@@ -9,11 +9,19 @@ import bob.colbaskin.iubip_spring2025.documents.domain.remote.DocumentsRepositor
 import javax.inject.Inject
 
 class DocumentsRepositoryImpl @Inject constructor(
-    private val documentApiService: DocumentApiService
+    private val documentApiService: DocumentApiService,
 ) : DocumentsRepository {
 
     override suspend fun getAllDocuments(): List<Document> {
         return documentApiService.getAllDocuments().map { it.toDomain() }
+    }
+
+    override suspend fun getDocumentById(id: Int): Document {
+        return documentApiService.getDocumentById(id).toDomain()
+    }
+
+    override suspend fun getDownloadLink(documentId: Int): String {
+        return documentApiService.getDownloadLink(documentId)
     }
 
     override suspend fun createDocument(title: String, author: String): Document {
@@ -31,18 +39,5 @@ class DocumentsRepositoryImpl @Inject constructor(
 
     override suspend fun updateDocumentStatus(id: Int, status: DocumentStatus) {
 
-    }
-
-    override suspend fun getDocumentById(id: Int): Document {
-        return Document(
-            id = 12345,
-            name = "name 1",
-            organizationId = 1,
-            fileUrl = "asd",
-            createdAt = "asd",
-            status = DocumentStatus.SIGNED,
-            type = DocumentType.STRICT,
-            creatorId = ""
-        )
     }
 }

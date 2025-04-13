@@ -48,7 +48,7 @@ class OrganizationsViewModel @Inject constructor(
             _state.update { it.copy(isLoading = true, error = null) }
             try {
                 val organizations = withTimeout(5_000) {
-                    organizationsRepository.getAllOrganizations()
+                    organizationsRepository.getAllOrganizationsForCurrentUser()
                 }
                 _state.update {
                     it.copy(
@@ -97,15 +97,10 @@ class OrganizationsViewModel @Inject constructor(
             _showCreateDialog.update { false }
             _state.update { it.copy(isLoading = true, error = null) }
             try {
-                val newOrganization = withTimeout(5_000) {
+                val newOrganizationId = withTimeout(5_000) {
                     organizationsRepository.createOrganization(name, description)
                 }
-                _state.update { state ->
-                    state.copy(
-                        organizations = state.organizations + newOrganization,
-                        isLoading = false
-                    )
-                }
+                _state.update { it.copy(isLoading = false) }
             } catch (e: TimeoutCancellationException) {
                 _state.update {
                     it.copy(

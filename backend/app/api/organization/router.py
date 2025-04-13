@@ -1,11 +1,13 @@
+from typing import List
+
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
-from api.organization.schemas import CreateOrganizationSchema, UserResponse
+from api.organization.schemas import CreateOrganizationSchema, FullUserResponse
 from api.user.phone_encryptor import encryptor
-from database.models import Organization, organization, UserOrganization, User, UserDepartment
+from database.models import Organization, organization, UserOrganization, User, UserDepartment, Department
 from database.session_manager import get_db
 
 organization_router = APIRouter(prefix="/organizations", tags=["organizations"])
@@ -20,34 +22,42 @@ async def create_organization(organization_data: CreateOrganizationSchema, sessi
 
 @organization_router.delete("/{organization_id}")
 async def delete_organization(organization_id: int, session: AsyncSession = Depends(get_db)):
+    organization = await session.get(Organization, organization_id)
     await session.delete(organization)
     await session.commit()
 
 
-@organization_router.get("/{organization_id}/users", response_model=list[UserResponse])
-async def get_users_by_organization_id(
-    organization_id: int,
-    session: AsyncSession = Depends(get_db)
-) -> list[UserResponse]:
-    org = await session.execute(
-        select(Organization)
-        .where(Organization.id == organization_id)
-        .options(
-            selectinload(Organization.users)
-            .selectinload(UserOrganization.user)
-            .selectinload(User.user_departments)
-            .selectinload(UserDepartment.department)
-        )
-    )
-    org = org.scalars().first()
+@organization_router.get("/{org_id}/users", response_model=List[FullUserResponse])
+async def get_org_users(
+    org_id: int,
+    session: AsyncSession = Depends(get_db),
+):
+    try:
+        org_users = (await session.execute(
+            select(User)
+            .join(UserOrganization, UserOrganization.user_id == User.id)
+            .join(Organization, Organization.id == UserOrganization.organization_id)
+            .where(Organization.id == org_id)
+            .options(
+                selectinload(User.user_departments).joinedload(UserDepartment.department),
+                selectinload(User.organizations)
+            )
+        )).scalars().unique().all()
 
-    if not org:
-        raise HTTPException(status_code=404, detail="Organization not found")
+        dept_users = (await session.execute(
+            select(User)
+            .join(UserDepartment, UserDepartment.user_id == User.id)
+            .join(Department, Department.id == UserDepartment.department_id)
+            .where(Department.organization_id == org_id)
+            .options(
+                selectinload(User.user_departments).joinedload(UserDepartment.department),
+                selectinload(User.organizations)
+            )
+        )).scalars().unique().all()
 
-    users_response = []
-    for user_org in org.users:
-        user = user_org.user
-        if user:
-            users_response.append(await UserResponse.from_db(user))
+        all_users = {user.id: user for user in org_users + dept_users}.values()
 
-    return users_response
+        return [await FullUserResponse.from_db(user, encryptor) for user in all_users]
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
