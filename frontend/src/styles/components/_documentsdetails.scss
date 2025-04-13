@@ -56,23 +56,22 @@
       color: #0e9f6e;
     }
 
-    &.canceled {
+    &.rejected {
       background: rgba(240, 82, 82, 0.1);
       color: variables.$color-error;
     }
 
-    &.in-progress {
+    &.in_progress {
       background: rgba(186, 248, 63, 0.1);
       color: #c1e700fe;
     }
   }
 }
 
-
 .document-content-section {
   display: flex;
-	justify-content: space-between;
-	width: 100%;
+  justify-content: space-between;
+  width: 100%;
 }
 
 .modal-overlay {
@@ -149,15 +148,19 @@
     }
 
     .status-indicator {
-      .approved {
+      &.signed {
+        background: rgba(14, 159, 110, 0.1);
         color: #0e9f6e;
       }
-      .rejected {
+
+      &.canceled {
+        background: rgba(240, 82, 82, 0.1);
         color: variables.$color-error;
       }
-      .pending {
-        color: variables.$color-text-muted;
-        font-size: 0.8rem;
+
+      &.in-progress {
+        background: rgba(186, 248, 63, 0.1);
+        color: #c1e700fe;
       }
     }
   }
@@ -169,7 +172,7 @@
   gap: 1rem;
   padding-top: 1rem;
   margin-bottom: 0.8rem;
-	justify-content: flex-end;
+  justify-content: flex-end;
 
   .action-btn {
     padding: 0.9rem 2.6rem;

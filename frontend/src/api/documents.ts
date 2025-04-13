@@ -10,6 +10,16 @@ export const getDocumentsCurrentOrganizations = async (id: number) => {
   }
 };
 
+export const getDocumentInfo = async (id: number) => {
+  try {
+    const response = await axiosInstance.get(`/documents/${id}`);
+    return response.data;
+  } catch (error) {
+    console.error('Documents error:', error);
+    throw error;
+  }
+};
+
 interface CreateDocumentParams {
   name: string;
   organization_id: number;
@@ -33,6 +43,16 @@ export const createDocument = async ({ name, organization_id, file }: CreateDocu
     return response.data;
   } catch (error) {
     console.error('Ошибка при создании документа:', error);
+    throw error;
+  }
+};
+
+export const getDocumentOrganization = async (id: number) => {
+  try {
+    const response = await axiosInstance.get(`/documents/${id}/stages`);
+    return response.data;
+  } catch (error) {
+    console.error('Documents error:', error);
     throw error;
   }
 };
