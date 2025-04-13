@@ -43,7 +43,6 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import bob.colbaskin.iubip_spring2025.documents.domain.models.Document
-import bob.colbaskin.iubip_spring2025.documents.domain.models.DocumentStatus
 import bob.colbaskin.iubip_spring2025.ui.theme.BottomBarColor
 import bob.colbaskin.iubip_spring2025.ui.theme.ButtonColor
 import bob.colbaskin.iubip_spring2025.ui.theme.CardColor
@@ -59,6 +58,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.graphics.Color
 import bob.colbaskin.iubip_spring2025.designsystem.ErrorScreen
 import bob.colbaskin.iubip_spring2025.designsystem.LoadingScreen
+import bob.colbaskin.iubip_spring2025.documents.domain.models.Document.DocumentStatus
 import bob.colbaskin.iubip_spring2025.ui.theme.BackgroundColor
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
@@ -70,7 +70,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun DocumentsScreen(
     viewModel: DocumentsViewModel = hiltViewModel(),
-    onDocumentClick: (String) -> Unit
+    onDocumentClick: (Int) -> Unit
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val pagerState = rememberPagerState()
@@ -206,8 +206,8 @@ private fun FilterButton(
     ) {
         Text(
             text = when (status) {
-                DocumentStatus.UNSIGNED -> "Неподписанные"
-                DocumentStatus.VERIFICATION -> "Проверка"
+                DocumentStatus.REJECTED -> "Неподписанные"
+                DocumentStatus.IN_PROGRESS -> "Проверка"
                 DocumentStatus.SIGNED -> "Подписанные"
                 DocumentStatus.ALL -> "Все"
             },
@@ -221,7 +221,8 @@ private fun FilterButton(
 private fun DocumentList(
     documents: List<Document>,
     modifier: Modifier = Modifier,
-    onDocumentClick: (String) -> Unit
+    onDocumentClick: (Int) -> Unit,
+
 ) {
     LazyColumn(modifier) {
         items(documents) { doc ->
@@ -248,7 +249,8 @@ private fun DocumentCard(document: Document, modifier: Modifier = Modifier) {
         Column(Modifier.padding(16.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(
-                    document.title, style = MaterialTheme.typography.titleMedium,
+                    document.name,
+                    style = MaterialTheme.typography.titleMedium,
                     color = TextColor
                 )
                 Spacer(Modifier.weight(1f))
@@ -259,12 +261,12 @@ private fun DocumentCard(document: Document, modifier: Modifier = Modifier) {
                 )
             }
             Text(
-                "Автор: ${document.author}",
+                "Организация: ${document.organizationId}",
                 Modifier.padding(top = 8.dp),
                 color = TextColor
             )
             Text(
-                "Дата создания: ${document.creationDate}",
+                "Дата создания: ${document.createdAt}",
                 color = TextColor
             )
         }

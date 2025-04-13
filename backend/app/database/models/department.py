@@ -10,8 +10,8 @@ class Department(Base):
     __tablename__ = 'department'
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
-    name: Mapped[str] = mapped_column(String(255), unique=True)
-    desc: Mapped[str] = mapped_column(String(1024))
+    name: Mapped[str] = mapped_column(String(255))
+    desc: Mapped[str] = mapped_column(String(1024), nullable=True)
     organization_id: Mapped[int] = mapped_column(ForeignKey('organization.id'))
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
 

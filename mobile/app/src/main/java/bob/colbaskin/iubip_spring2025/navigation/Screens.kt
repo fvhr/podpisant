@@ -7,16 +7,16 @@ sealed interface Screens {
     data object Organizations: Screens
 
     @Serializable
-    data class OrganizationDetailed(val organizationId: String): Screens
+    data class OrganizationDetailed(val organizationId: Int): Screens
 
     @Serializable
     data object Documents: Screens
 
     @Serializable
-    data class DocumentDetailed(val documentId: String): Screens
+    data class DocumentDetailed(val documentId: Int): Screens
 
     @Serializable
-    data class Profile(val id: String): Screens
+    data object Profile: Screens
 
     @Serializable
     data object Welcome: Screens

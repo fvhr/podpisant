@@ -2,6 +2,16 @@ import { axiosInstance } from './instance';
 
 export const getDocumentsCurrentOrganizations = async (id: number) => {
   try {
+    const response = await axiosInstance.get(`/documents/organizations/${id}`);
+    return response.data;
+  } catch (error) {
+    console.error('Documents error:', error);
+    throw error;
+  }
+};
+
+export const getDocumentInfo = async (id: number) => {
+  try {
     const response = await axiosInstance.get(`/documents/${id}`);
     return response.data;
   } catch (error) {
@@ -33,6 +43,16 @@ export const createDocument = async ({ name, organization_id, file }: CreateDocu
     return response.data;
   } catch (error) {
     console.error('Ошибка при создании документа:', error);
+    throw error;
+  }
+};
+
+export const getDocumentOrganization = async (id: number) => {
+  try {
+    const response = await axiosInstance.get(`/documents/${id}/stages`);
+    return response.data;
+  } catch (error) {
+    console.error('Documents error:', error);
     throw error;
   }
 };

@@ -122,6 +122,10 @@ textarea {
   }
 }
 
+.org-modal-text {
+  color: white;
+}
+
 .org-modal-actions {
   display: flex;
   justify-content: flex-end;
@@ -142,6 +146,25 @@ textarea {
 
     &:hover {
       background-color: #5d54d6;
+    }
+  }
+
+  .org-modal-cancel-button {
+    background-color: #9c9c9c;
+    color: black;
+
+    &:hover {
+      opacity: 80%;
+    }
+  }
+
+  .org-modal-delete-button {
+    background-color: $color-error;
+    color: white;
+
+    &:hover {
+      background-color: $color-error;
+      opacity: 80%;
     }
   }
 }

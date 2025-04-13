@@ -16,7 +16,6 @@ import bob.colbaskin.iubip_spring2025.common.models.AuthConfig
 import bob.colbaskin.iubip_spring2025.onboarding.domain.UserPreferencesRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.TimeoutCancellationException
-import kotlinx.coroutines.delay
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted

@@ -1,6 +1,6 @@
 @import '../lib/variables';
 
-.modal-overlay {
+.doc-modal-overlay {
   position: fixed;
   top: 0;
   left: 0;
@@ -13,7 +13,7 @@
   z-index: 1000;
 }
 
-.modal-container {
+.doc-modal-container {
   background: $color-card;
   border-radius: 8px;
   width: 100%;
@@ -22,20 +22,20 @@
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
 }
 
-.modal-header {
+.doc-modal-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 1.5rem;
 
-  .modal-title {
+  .doc-modal-title {
     color: $color-text;
     margin: 0;
     font-size: 1.5rem;
   }
 }
 
-.modal-close-btn {
+.doc-modal-close-btn {
   background: none;
   border: none;
   color: $color-text;
@@ -48,18 +48,29 @@
   }
 }
 
-.modal-form {
-  .form-field {
+.doc-modal-form {
+  .doc-form-row {
+    display: flex;
+    gap: 1rem;
     margin-bottom: 1.5rem;
 
-    .form-label {
+    .doc-form-field {
+      flex: 1;
+      margin-bottom: 0;
+    }
+  }
+
+  .doc-form-field {
+    margin-bottom: 1.5rem;
+
+    .doc-form-label {
       display: block;
       margin-bottom: 0.5rem;
       color: $color-text;
       font-weight: 500;
     }
 
-    .form-input {
+    .doc-form-input {
       width: 100%;
       padding: 0.75rem;
       border: 1px solid $color-input-border;
@@ -70,12 +81,18 @@
 
       &:focus {
         outline: none;
-        border-color: $color-button;
+        border-color: $color-button-dark;
       }
+    }
+
+    .doc-form-hint {
+      font-size: 0.85rem;
+      color: $color-text-muted;
+      margin-top: 0.25rem;
     }
   }
 
-  .form-error {
+  .doc-form-error {
     display: block;
     margin-top: 0.5rem;
     color: $color-error;
@@ -83,45 +100,77 @@
   }
 }
 
-.multi-select-container {
+.doc-multi-select-header {
+  padding: 0.75rem;
+  border: 1px solid $color-input-border;
+  border-radius: 6px;
+  cursor: pointer;
+  color: white;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: $color-input;
+  transition: border-color 0.2s;
+
+  &:hover {
+    border-color: $color-button;
+  }
+}
+
+.doc-multi-select-container {
   max-height: 200px;
   overflow-y: auto;
   border: 1px solid $color-input-border;
   border-radius: 6px;
+  margin-top: 0.5rem;
+  background: $color-input;
 }
 
-.select-option {
+.doc-select-option {
   padding: 0.75rem 1rem;
   cursor: pointer;
   transition: background 0.2s;
-  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
 
   &:hover {
-    background: rgba($color-button, 0.1);
+    background: rgba($color-button-dark, 0.1);
   }
 
   &.selected {
-    background: rgba($color-button, 0.2);
+    background: rgba($color-button-dark, 0.2);
   }
 
   .checkmark {
     position: absolute;
     right: 1rem;
-    color: $color-button;
+    color: $color-button-dark;
+  }
+  
+  .doc-employee-checkbox {
+    accent-color: $color-button;
+    width: 1rem;
+    height: 1rem;
+    cursor: pointer;
+  }
+
+  .doc-employee-name {
+    color: $color-text;
   }
 }
 
-.form-actions {
+.doc-form-actions {
   display: flex;
   justify-content: flex-end;
   margin-top: 2rem;
 
-  .form-submit-btn {
+  .doc-form-submit-btn {
     padding: 0.75rem 1.5rem;
     border-radius: 6px;
     font-weight: 500;
     cursor: pointer;
-    background: $color-button;
+    background: $color-button-dark;
     color: $color-text;
     border: none;
     transition: background 0.2s;
@@ -129,5 +178,63 @@
     &:hover {
       background: $color-button-dark;
     }
+  }
+}
+
+.doc-multi-select-container {
+  border: 1px solid $color-input-border;
+  border-radius: 6px;
+  margin-top: 0.5rem;
+  background: $color-input;
+  overflow-y: auto; // Добавляем вертикальный скролл
+  transition: max-height 0.2s ease;
+
+  /* Стилизация скроллбара */
+  &::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: rgba($color-text-muted, 0.1);
+    border-radius: 3px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: $color-button;
+    border-radius: 3px;
+  }
+
+  &::-webkit-scrollbar-thumb:hover {
+    background: $color-button-dark;
+  }
+}
+
+.doc-select-option {
+  padding: 0.75rem 1rem;
+  cursor: pointer;
+  transition: background 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  min-height: 44px; // Фиксированная высота элемента
+  box-sizing: border-box;
+
+  &:hover {
+    background: rgba($color-button, 0.1);
+  }
+
+  .doc-employee-checkbox {
+    accent-color: $color-button;
+    width: 1rem;
+    height: 1rem;
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+
+  .doc-employee-name {
+    color: $color-text;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 }
