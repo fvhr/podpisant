@@ -4,6 +4,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { getAllEmployes } from '../api/employes';
 import { CreateStageModal, DocumentButtons, DocumentHeader, DocumentStages } from '../components';
 import { Sidebar } from '../components/sidebar';
+import { useParams } from 'react-router-dom';
 
 interface Employee {
   id: number;
@@ -23,6 +24,9 @@ export const DocumentDetails: React.FC = () => {
   const location = useLocation();
 
   const orgId = location.state?.orgId;
+
+  const { docId } = useParams();
+  const documentId = Number(docId);
 
   const toggleSidebar = () => {
     setIsSidebarOpen(!isSidebarOpen);
@@ -68,7 +72,7 @@ export const DocumentDetails: React.FC = () => {
               <DocumentStages />
             </div>
 
-            <DocumentButtons onCreateStage={() => setIsStageModalOpen(true)} />
+            <DocumentButtons onCreateStage={() => setIsStageModalOpen(true)} document_id={documentId} />
           </div>
         </div>
       </main>

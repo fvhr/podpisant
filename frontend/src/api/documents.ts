@@ -56,3 +56,34 @@ export const getDocumentOrganization = async (id: number) => {
     throw error;
   }
 };
+
+export const downloadDocument = async (id: number) => {
+  try {
+    const response = await axiosInstance.get(`/documents/${id}/file`, {
+      responseType: 'blob',
+    });
+
+    const url = window.URL.createObjectURL(new Blob([response.data]));
+    const link = document.createElement('a');
+    link.href = url;
+
+    const contentDisposition = response.headers['content-disposition'];
+    let filename = 'document.pdf';
+
+    if (contentDisposition) {
+      const match = contentDisposition.match(/filename="?(.+)"?/);
+      if (match && match[1]) {
+        filename = decodeURIComponent(match[1]);
+      }
+    }
+
+    link.setAttribute('download', filename);
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    window.URL.revokeObjectURL(url);
+  } catch (error) {
+    console.error('Ошибка при скачивании документа:', error);
+    throw error;
+  }
+};

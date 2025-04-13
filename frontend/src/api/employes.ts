@@ -9,3 +9,13 @@ export const getAllEmployes = async (id: number) => {
 		throw error;
 	}
 }
+
+export const deleteUserFromDepartment = async (userUuid: string, depId: number) => {
+	try {
+		const response = await axiosInstance.delete(`/users/${userUuid}/${depId}`);
+		return response.data;
+	} catch (error) {
+		console.error('Error deleting user from department:', error);
+		throw error;
+	}
+};
