@@ -75,9 +75,3 @@ port = 6379
 ```
 
 ---
-
-## ERD (Entity Relationship Diagram)
-
-![erd](erd.jpg)
-
----
