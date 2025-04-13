@@ -25,6 +25,7 @@ class StageSigner(Base):
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     stage_id: Mapped[int] = mapped_column(ForeignKey("doc_sign_stage.id"))
     user_id: Mapped[UUID] = mapped_column(ForeignKey("user.id"))
+    digital_signature: Mapped[str] = mapped_column(String(512), nullable=True)
 
     signature_type: Mapped[str] = mapped_column(String(50), nullable=True)
     signed_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=True)

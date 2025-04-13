@@ -1,7 +1,9 @@
 import io
 import json
 import os
-from datetime import datetime
+import secrets
+from datetime import datetime, timezone
+from hashlib import sha256
 from zoneinfo import ZoneInfo
 
 from fastapi import APIRouter, UploadFile, File, Form, Depends, HTTPException, Response
@@ -13,7 +15,8 @@ from sqlalchemy.orm import selectinload, session
 from api.auth.idp import get_current_user
 from api.auth.user_service import get_user_orgs_with_admin_and_tags
 from api.documents.schemas import CreateDocumentSchema, DocumentSchema, AddStagesToDocumentSchema, \
-    DocSignStageCreateSchema, DocumentStageDetailSchema, StageSignerInfoSchema
+    DocSignStageCreateSchema, DocumentStageDetailSchema, StageSignerInfoSchema, SignDocumentRequest, \
+    DigitalSignatureSchema
 from database.models import User, Document, DocSignStage, StageSigner
 from database.session_manager import get_db
 from minio_client.client import get_minio_client, DOCUMENTS_BUCKET_NAME, MINIO_PUBLIC_URL
@@ -78,9 +81,6 @@ async def get_document_file(
     document = await session.get(Document, document_id)
     if not document:
         raise HTTPException(status_code=404, detail="Document not found")
-
-    # if document.organization_id not in [org.id for org in user.organizations]:
-    #     raise HTTPException(status_code=403, detail="Access denied")
 
     object_name = f"document_{document_id}"
 
@@ -235,20 +235,31 @@ async def get_document_stages_with_signers(
         for stage in stages:
             signed_users = []
             unsigned_users = []
+            signatures = []
 
             for signer in stage.signers:
-                user_info = StageSignerInfoSchema(
+                signature_info = None
+                if signer.digital_signature:
+                    signature_id = f"{document_id}:{stage.id}:{signer.user_id}"
+                    signature_info = DigitalSignatureSchema(
+                        signature_id=signature_id,
+                        signed_at=signer.signed_at
+                    )
+
+                signer_info = StageSignerInfoSchema(
                     user_id=signer.user_id,
                     fio=signer.user.fio,
                     email=signer.user.email,
                     signed_at=signer.signed_at,
-                    signature_type=signer.signature_type
+                    signature_type=signer.signature_type,
+                    digital_signature=signature_info
                 )
+                signatures.append(signer_info)
 
                 if signer.signed_at:
-                    signed_users.append(user_info)
+                    signed_users.append(signature_info)
                 else:
-                    unsigned_users.append(user_info)
+                    unsigned_users.append(signature_info)
 
             is_completed = len(unsigned_users) == 0 and len(stage.signers) > 0
 
@@ -261,10 +272,65 @@ async def get_document_stages_with_signers(
                 created_at=stage.created_at,
                 signed_users=signed_users,
                 unsigned_users=unsigned_users,
-                is_completed=is_completed
+                is_completed=is_completed,
+                signatures=signatures
             ))
 
         return result
 
     except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@documents_router.post("/{document_id}/stages/{stage_id}/sign")
+async def sign_document(
+    document_id: int,
+    stage_id: int,
+    session: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+) -> dict:
+    """
+    Создаем цифровую подпись документа на основе данных пользователя из БД
+    """
+    try:
+        # Получаем запись о подписании с информацией о пользователе
+        signer = (await session.execute(
+            select(StageSigner)
+            .join(StageSigner.user)
+            .where(StageSigner.stage_id == stage_id)
+            .where(StageSigner.user_id == current_user.id)
+        )).scalar_one_or_none()
+
+        if not signer or not signer.user:
+            raise HTTPException(status_code=404, detail="Signing record or user not found")
+
+        if signer.signed_at:
+            raise HTTPException(status_code=400, detail="Document already signed")
+
+        # Генерируем подпись на основе данных из БД
+        salt = secrets.token_hex(32)
+        sign_time = datetime.now(timezone.utc).isoformat()
+
+        # Хэшируем данные
+        phone_hash = sha256((signer.user.phone + salt).encode()).hexdigest()
+        fio_hash = sha256((signer.user.fio + salt).encode()).hexdigest()
+
+        # Создаем цифровую подпись
+        digital_signature = f"{salt}:{sign_time}:{phone_hash}:{fio_hash}"
+
+        # Обновляем запись
+        signer.signed_at = datetime.now(timezone.utc)
+        signer.digital_signature = digital_signature
+        signer.signature_type = "digital_auto"
+
+        await session.commit()
+
+        return {
+            "status": "signed",
+            "signature_id": f"{document_id}:{stage_id}:{current_user.id}",
+            "signed_at": signer.signed_at.isoformat()
+        }
+
+    except Exception as e:
+        await session.rollback()
         raise HTTPException(status_code=500, detail=str(e))
