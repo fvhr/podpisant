@@ -2,18 +2,31 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import { useForm } from 'react-hook-form';
 import { FiChevronDown, FiChevronUp, FiX } from 'react-icons/fi';
+import { addStage } from '../../api/stage';
+import { useParams } from 'react-router-dom';
+
+interface Employee {
+  id: number;
+  fio: string;
+  phone: string;
+  email: string;
+  type_notification: string;
+  is_dep_admin: boolean;
+  id_dep: number;
+}
 
 interface StageFormData {
   name: string;
   stageNumber: number;
   deadline: string;
   employees: string[];
+	selectedEmployees: string[]
 }
 
 interface CreateStageModalProps {
   onClose: () => void;
   onCreate: (stage: StageFormData) => void;
-  employees: string[];
+  employees: Employee[];
 }
 
 export const CreateStageModal: React.FC<CreateStageModalProps> = ({
@@ -36,6 +49,8 @@ export const CreateStageModal: React.FC<CreateStageModalProps> = ({
 
   const [isEmployeesOpen, setIsEmployeesOpen] = React.useState(false);
   const selectedEmployees = watch('employees') || [];
+	const { docId } = useParams();
+  const documentId = Number(docId);
 
   const toggleEmployee = (employee: string) => {
     const newSelection = selectedEmployees.includes(employee)
@@ -44,9 +59,23 @@ export const CreateStageModal: React.FC<CreateStageModalProps> = ({
     setValue('employees', newSelection);
   };
 
-  const onSubmit = (data: StageFormData) => {
-    onCreate(data);
-    onClose();
+	console.log(selectedEmployees)
+
+  const onSubmit = async (data: StageFormData) => {
+    try {
+      const stageData = {
+        name: data.name,
+        stageNumber: data.stageNumber,
+        deadline: new Date(data.deadline),
+        user_ids: selectedEmployees,
+      };
+
+      await addStage(documentId, stageData.name, stageData.stageNumber, stageData.deadline, stageData.user_ids);
+      onCreate(stageData); 
+      onClose();
+    } catch (error) {
+      console.error('Ошибка при создании этапа:', error);
+    }
   };
 
   const getContainerHeight = () => {
@@ -83,8 +112,8 @@ export const CreateStageModal: React.FC<CreateStageModalProps> = ({
               <label className="doc-form-label">Номер этапа*</label>
               <select
                 className="doc-form-input"
-                {...register('stageNumber', { required: true, min: 1, max: 5 })}>
-                {[1, 2, 3, 4, 5].map((num) => (
+                {...register('stageNumber', { required: true, min: 1, max: 10 })}>
+                {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((num) => (
                   <option key={num} value={num}>
                     Этап {num}
                   </option>
@@ -121,15 +150,15 @@ export const CreateStageModal: React.FC<CreateStageModalProps> = ({
               <div
                 className="doc-multi-select-container"
                 style={{ maxHeight: getContainerHeight() }}>
-                {employees.map((employee) => (
-                  <label key={employee} className="doc-select-option">
+                {employees?.map((employee) => (
+                  <label key={employee.id} className="doc-select-option">
                     <input
                       type="checkbox"
-                      checked={selectedEmployees.includes(employee)}
-                      onChange={() => toggleEmployee(employee)}
+                      checked={selectedEmployees.includes(employee.id.toString())}
+                      onChange={() => toggleEmployee(employee.id.toString())}
                       className="doc-employee-checkbox"
                     />
-                    <span className="doc-employee-name">{employee}</span>
+                    <span className="doc-employee-name">{employee.fio}</span>
                   </label>
                 ))}
               </div>
