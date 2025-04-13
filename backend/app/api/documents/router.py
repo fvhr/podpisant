@@ -8,7 +8,7 @@ from zoneinfo import ZoneInfo
 
 from fastapi import APIRouter, UploadFile, File, Form, Depends, HTTPException, Response
 from minio import Minio
-from sqlalchemy import select
+from sqlalchemy import select, func
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload, session
 
@@ -18,6 +18,7 @@ from api.documents.schemas import CreateDocumentSchema, DocumentSchema, AddStage
     DocSignStageCreateSchema, DocumentStageDetailSchema, StageSignerInfoSchema, SignDocumentRequest, \
     DigitalSignatureSchema
 from database.models import User, Document, DocSignStage, StageSigner
+from database.models.document import DocSignStatus
 from database.session_manager import get_db
 from minio_client.client import get_minio_client, DOCUMENTS_BUCKET_NAME, MINIO_PUBLIC_URL
 
@@ -291,9 +292,21 @@ async def sign_document(
 ) -> dict:
     """
     Создаем цифровую подпись документа на основе данных пользователя из БД
+    Только для текущего этапа (is_current=True)
     """
     try:
-        # Получаем запись о подписании с информацией о пользователе
+        # Получаем этап и проверяем, что он текущий
+        stage = await session.get(DocSignStage, stage_id)
+        if not stage:
+            raise HTTPException(status_code=404, detail="Stage not found")
+
+        if not stage.is_current:
+            raise HTTPException(
+                status_code=400,
+                detail="Cannot sign - this is not the current stage"
+            )
+
+        # Получаем запись о подписании для текущего пользователя
         signer = (await session.execute(
             select(StageSigner)
             .join(StageSigner.user)
@@ -311,11 +324,9 @@ async def sign_document(
         salt = secrets.token_hex(32)
         sign_time = datetime.now(timezone.utc).isoformat()
 
-        # Хэшируем данные
         phone_hash = sha256((signer.user.phone + salt).encode()).hexdigest()
         fio_hash = sha256((signer.user.fio + salt).encode()).hexdigest()
 
-        # Создаем цифровую подпись
         digital_signature = f"{salt}:{sign_time}:{phone_hash}:{fio_hash}"
 
         # Обновляем запись
@@ -323,12 +334,38 @@ async def sign_document(
         signer.digital_signature = digital_signature
         signer.signature_type = "digital_auto"
 
+        unsigned_count = (await session.execute(
+            select(func.count())
+            .select_from(StageSigner)
+            .where(StageSigner.stage_id == stage_id)
+            .where(StageSigner.signed_at == None)
+        )).scalar()
+
+        if unsigned_count == 0:
+            # Находим следующий этап
+            next_stage = (await session.execute(
+                select(DocSignStage)
+                .where(DocSignStage.doc_id == document_id)
+                .where(DocSignStage.stage_number > stage.stage_number)
+                .order_by(DocSignStage.stage_number)
+                .limit(1)
+            )).scalar_one_or_none()
+
+            if next_stage:
+                next_stage.is_current = True
+                stage.is_current = False
+            else:
+                document = await session.get(Document, document_id)
+                document.status = DocSignStatus.SIGNED
+                stage.is_current = False
+
         await session.commit()
 
         return {
             "status": "signed",
             "signature_id": f"{document_id}:{stage_id}:{current_user.id}",
-            "signed_at": signer.signed_at.isoformat()
+            "signed_at": signer.signed_at.isoformat(),
+            "stage_completed": unsigned_count == 0
         }
 
     except Exception as e:
