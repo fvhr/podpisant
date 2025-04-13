@@ -1,9 +1,12 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { useForm } from 'react-hook-form';
+import { addOrganization } from '../../api/organization';
 
 interface MainModalProps {
   onClose: () => void;
+  onSuccess: () => void;
+  admin_id?: string;
 }
 
 interface OrganizationFormData {
@@ -11,7 +14,7 @@ interface OrganizationFormData {
   description: string;
 }
 
-export const MainModal: React.FC<MainModalProps> = ({ onClose }) => {
+export const MainModal: React.FC<MainModalProps> = ({ onClose, onSuccess, admin_id }) => {
   const {
     register,
     handleSubmit,
@@ -21,9 +24,19 @@ export const MainModal: React.FC<MainModalProps> = ({ onClose }) => {
     mode: 'onChange',
   });
 
-  const onSubmit = () => {
-    reset();
-    onClose();
+  const onSubmit = async (data: OrganizationFormData) => {
+    try {
+      await addOrganization({
+        ...data,
+        admin_id
+      });
+
+      reset();
+      onSuccess();
+      onClose();
+    } catch (err) {
+      console.error('Ошибка при создании организации', err);
+    }
   };
 
   const handleClose = () => {
