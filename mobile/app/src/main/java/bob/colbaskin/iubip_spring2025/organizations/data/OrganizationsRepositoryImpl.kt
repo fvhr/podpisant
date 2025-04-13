@@ -1,5 +1,6 @@
 package bob.colbaskin.iubip_spring2025.organizations.data
 
+import bob.colbaskin.iubip_spring2025.organizations.data.models.CreateOrgBody
 import bob.colbaskin.iubip_spring2025.organizations.domain.models.Organization
 import bob.colbaskin.iubip_spring2025.organizations.domain.remote.OrganizationApiService
 import bob.colbaskin.iubip_spring2025.organizations.domain.remote.OrganizationsRepository
@@ -25,21 +26,22 @@ class OrganizationsRepositoryImpl @Inject constructor(
         )
     )
 
-    override suspend fun getAllOrganizations(): List<Organization> {
-        delay(1500)
-        return listOf(
-            Organization(1, "ООО Ромашка", "Цветочный магазин"),
-            Organization(2, "ИП Иванов", "Строительные услуги")
-        )
+    override suspend fun getAllOrganizationsForCurrentUser(): List<Organization> {
+        val response = organizationApiService.getAllOrganizationsForCurrentUser()
+        return response.userOrganizations.map { it.toDomain() }
     }
 
-    override suspend fun createOrganization(name: String, description: String): Organization {
-        delay(1000)
-        return Organization(
-            id = 5,
-            name = name,
-            description = description
-        )
+    override suspend fun createOrganization(
+        name: String,
+        description: String
+    ): Int {
+        return organizationApiService.createOrganization(
+            CreateOrgBody(
+                name = name,
+                description = description,
+                adminId = "1e5a3582-96f7-4271-95e4-4247dd008dbb"
+            )
+        ).organizationId
     }
 
     override suspend fun getOrganizationById(id: Int): Organization {
