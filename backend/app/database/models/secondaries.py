@@ -30,6 +30,8 @@ class StageSigner(Base):
     signature_type: Mapped[str] = mapped_column(String(50), nullable=True)
     signed_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=True)
 
+    rejected_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=True)
+
     stage = relationship("DocSignStage", back_populates="signers")
     user = relationship("User", back_populates="signatures")
 

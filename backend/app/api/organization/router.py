@@ -5,6 +5,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
+from api.auth.idp import get_current_user
 from api.organization.schemas import CreateOrganizationSchema, FullUserResponse
 from api.user.phone_encryptor import encryptor
 from database.models import Organization, organization, UserOrganization, User, UserDepartment, Department
@@ -12,12 +13,28 @@ from database.session_manager import get_db
 
 organization_router = APIRouter(prefix="/organizations", tags=["organizations"])
 
+
 @organization_router.post("")
-async def create_organization(organization_data: CreateOrganizationSchema, session: AsyncSession = Depends(get_db)):
-    organization = Organization(**organization_data.model_dump())
-    organization = await session.merge(organization)
+async def create_organization(
+    organization_data: CreateOrganizationSchema,
+    session: AsyncSession = Depends(get_db),
+    user: User = Depends(get_current_user)
+):
+    organization = Organization(
+        **organization_data.model_dump(),
+    )
+
+    session.add(organization)
+    await session.flush()
+
+    user_organization = UserOrganization(
+        user_id=user.id,
+        organization_id=organization.id,
+    )
+    session.add(user_organization)
     await session.commit()
-    return {"oraganization_id": organization.id}
+    return {"organization_id": organization.id}
+
 
 
 @organization_router.delete("/{organization_id}")

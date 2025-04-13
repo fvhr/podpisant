@@ -371,3 +371,12 @@ async def sign_document(
     except Exception as e:
         await session.rollback()
         raise HTTPException(status_code=500, detail=str(e))
+
+# @documents_router.post("/{document_id}/stages/{stage_id}")
+# async def reject_document(
+#     document_id: int,
+#     stage_id: int,
+#     session: AsyncSession = Depends(get_db),
+#     current_user: User = Depends(get_current_user)
+# ) -> dict:
+
