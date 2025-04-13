@@ -28,7 +28,7 @@
   align-items: center;
   gap: 0.5rem;
   padding: 0.75rem 1.5rem;
-  background-color: $color-button; // #4e46b3
+  background-color:  #4e46b3; // #4e46b3
   color: white;
   border: none;
   border-radius: 8px;
@@ -146,7 +146,7 @@
 }
 
 .employee-notification {
-  color: $color-text-muted; 
+  color: $color-text-muted;
   font-size: 0.85rem;
 }
 
@@ -401,7 +401,7 @@
 }
 
 .employee-submit-button {
-  background-color: $color-button;
+  background-color:  #4e46b3;
   color: $color-text;
   border: none;
   padding: 0.75rem 1.5rem;
@@ -412,5 +412,21 @@
 
   &:hover {
     background-color: $color-button-dark;
+  }
+}
+
+.employee-cancel-button {
+  background-color: #8a8a8a;
+  color: $color-text;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 4px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: opacity 0.3s;
+  margin-left: 10px;
+
+  &:hover {
+    opacity: 80%;
   }
 }
