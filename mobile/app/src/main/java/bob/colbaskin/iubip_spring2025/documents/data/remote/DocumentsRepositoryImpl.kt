@@ -24,6 +24,10 @@ class DocumentsRepositoryImpl @Inject constructor(
         return documentApiService.getDownloadLink(documentId)
     }
 
+    override suspend fun getDepartments(orgId: Int): String {
+        return ""
+    }
+
     override suspend fun createDocument(title: String, author: String): Document {
         return Document(
             id = 2331,

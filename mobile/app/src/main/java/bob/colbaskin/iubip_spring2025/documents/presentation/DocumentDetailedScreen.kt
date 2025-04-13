@@ -33,10 +33,8 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import bob.colbaskin.iubip_spring2025.MainActivity
 import bob.colbaskin.iubip_spring2025.designsystem.ErrorScreen
 import bob.colbaskin.iubip_spring2025.designsystem.LoadingScreen
 import bob.colbaskin.iubip_spring2025.documents.domain.models.Document
@@ -119,12 +117,15 @@ private fun DocumentInfo(document: Document) {
         elevation = CardDefaults.cardElevation(8.dp)
     ) {
         Column(Modifier.padding(16.dp)) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
                 Text(
-                    "Создатель: ${document.creatorId}",
-                    style = MaterialTheme.typography.bodyMedium
+                    text = "Создатель: ${document.creatorId}",
+                    style = MaterialTheme.typography.bodyMedium,
+                    modifier = Modifier.weight(1f)
                 )
-                Spacer(Modifier.weight(1f))
                 Box(
                     modifier = Modifier
                         .size(24.dp)
@@ -132,18 +133,18 @@ private fun DocumentInfo(document: Document) {
                 )
             }
             Text(
-                "Дата создания: ${document.createdAt}",
+                text = "Дата создания: ${document.createdAt}",
                 style = MaterialTheme.typography.bodyMedium,
                 modifier = Modifier.padding(top = 8.dp)
             )
             Text(
-                "Статус: ${getStatusName(document.status)}",
+                text = "Статус: ${getStatusName(document.status)}",
                 style = MaterialTheme.typography.bodyMedium,
                 modifier = Modifier.padding(top = 8.dp)
             )
             document.type?.let {
                 Text(
-                    "Тип: ${getTypeName(it)}",
+                    text = "Тип: ${getTypeName(it)}",
                     style = MaterialTheme.typography.bodyMedium,
                     modifier = Modifier.padding(top = 8.dp)
                 )

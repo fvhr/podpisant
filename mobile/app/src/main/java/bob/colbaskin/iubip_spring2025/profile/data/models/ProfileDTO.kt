@@ -6,7 +6,7 @@ import kotlinx.serialization.SerialName
 
 @Serializable
 data class ProfileDTO(
-    @SerialName("admin_in_organization") val adminInOrganization: Int,
+    @SerialName("admin_in_organization") val adminInOrganization: List<Int>,
     val email: String,
     val fio: String,
     val id: String,
