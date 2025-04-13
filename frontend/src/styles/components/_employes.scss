@@ -155,7 +155,20 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: rgba(0, 0, 0, 0.5);
+  background-color: rgba(26, 28, 62, 0.8);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.employee-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(26, 28, 62, 0.8);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -163,12 +176,13 @@
 }
 
 .employee-modal-content {
-  background: variables.$color-card;
+  background: $color-card;
+  padding: 2rem;
   border-radius: 8px;
   width: 100%;
-  max-width: 500px;
-  padding: 2rem;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+  max-width: 700px; // Увеличиваем ширину
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  border: 1px solid $color-input-border;
 }
 
 .employee-modal-header {
@@ -176,122 +190,182 @@
   justify-content: space-between;
   align-items: center;
   margin-bottom: 1.5rem;
+  color: $color-text;
+}
 
-  h2 {
-    color: variables.$color-text;
-    margin: 0;
-    font-size: 1.5rem;
+.form-columns {
+  display: flex;
+  gap: 3rem;
+}
+
+.form-column {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.department-select {
+  width: 100%;
+  padding: 0.65rem;
+  background: $color-input;
+  border: 1px solid $color-input-border;
+  border-radius: 6px;
+  font-size: 0.95rem;
+  color: $color-text;
+  cursor: pointer;
+  transition: all 0.2s;
+  appearance: none;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23b0b0ff'%3e%3cpath d='M7 10l5 5 5-5z'/%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right 0.75rem center;
+  background-size: 1rem;
+
+  &:focus {
+    outline: none;
+    border-color: $color-button;
+    box-shadow: 0 0 0 2px rgba(78, 70, 179, 0.2);
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+
+  option {
+    background: $color-card;
+    color: $color-text;
+    padding: 0.5rem;
   }
 }
 
 .employee-modal-close-button {
   background: none;
   border: none;
-  color: variables.$color-text-muted;
   font-size: 1.5rem;
   cursor: pointer;
+  color: $color-text-muted;
   transition: color 0.2s;
 
   &:hover {
-    color: variables.$color-text;
+    color: $color-text;
   }
 }
+
 
 .employee-modal-form-group {
   margin-bottom: 1.5rem;
 
   label {
-    display: block;
+    display: flex;
     margin-bottom: 0.5rem;
-    color: variables.$color-text;
     font-weight: 500;
+    color: $color-text;
+    margin-top: 5px;
   }
 
-  input,
-  select {
+  input {
     width: 100%;
     padding: 0.75rem;
-    border: 1px solid variables.$color-input-border;
-    border-radius: 6px;
-    background: variables.$color-input;
-    color: variables.$color-text;
+    background: $color-input;
+    border: 1px solid $color-input-border;
+    border-radius: 4px;
     font-size: 1rem;
+    color: $color-text;
 
-    &:focus {
-      outline: none;
-      border-color: variables.$color-button;
+    &::placeholder {
+      color: $color-text-muted;
+      opacity: 0.7;
     }
-  }
-
-  select {
-    appearance: none;
-    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23b0b0ff'%3e%3cpath d='M7 10l5 5 5-5z'/%3e%3c/svg%3e");
-    background-repeat: no-repeat;
-    background-position: right 0.75rem center;
-    background-size: 1rem;
   }
 }
 
 .employee-modal-error {
+  color: $color-error;
+  font-size: 0.875rem;
+  margin-top: 0.25rem;
   display: block;
-  margin-top: 0.5rem;
-  color: variables.$color-error;
-  font-size: 0.85rem;
 }
 
-.employee-modal-actions {
+.employee-notification-options {
   display: flex;
-  justify-content: flex-end;
-  margin-top: 2rem;
+  gap: 1rem;
+  margin-top: 0.5rem;
+}
 
-  button {
-    padding: 0.75rem 1.5rem;
-    border-radius: 6px;
-    font-weight: 500;
-    cursor: pointer;
-    background: variables.$color-button;
-    color: variables.$color-text;
-    border: none;
-    transition: background 0.2s;
+.employee-notification-option {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  color: $color-text;
 
-    &:hover {
-      background: variables.$color-button-dark;
-    }
+  input[type='radio'] {
+    accent-color: $color-button;
   }
 }
 
-.employees-select {
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  max-height: 200px;
-  overflow-y: auto;
+.employee-option-label {
+  font-size: 0.95rem;
 }
 
-.employee-item {
-  padding: 10px 15px;
+.employee-admin-toggle {
   display: flex;
   align-items: center;
+  gap: 1rem;
+  margin-top: 0.5rem;
   cursor: pointer;
-  transition: background 0.2s;
+  color: $color-text;
 }
 
-.employee-item:hover {
-  background: #f5f5f5;
+.employee-toggle-switch {
+  width: 50px;
+  height: 26px;
+  background-color: $color-input-border;
+  border-radius: 13px;
+  position: relative;
+  transition: background-color 0.3s;
 }
 
-.employee-item.selected {
-  background: #e6f7ff;
+.employee-toggle-switch.active {
+  background-color: $color-button;
 }
 
-.checkbox {
-  width: 18px;
-  height: 18px;
-  border: 1px solid #1890ff;
-  border-radius: 2px;
-  margin-right: 10px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #1890ff;
+.employee-toggle-knob {
+  position: absolute;
+  width: 22px;
+  height: 22px;
+  background-color: $color-text;
+  border-radius: 50%;
+  top: 2px;
+  left: 2px;
+  transition: transform 0.3s;
 }
 
+.employee-toggle-switch.active .employee-toggle-knob {
+  transform: translateX(24px);
+}
+
+.employee-toggle-label {
+  font-size: 0.95rem;
+}
+
+.employee-modal-actions {
+  margin-top: 2rem;
+  text-align: right;
+}
+
+.employee-submit-button {
+  background-color: $color-button;
+  color: $color-text;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 4px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.3s;
+
+  &:hover {
+    background-color: $color-button-dark;
+  }
+}

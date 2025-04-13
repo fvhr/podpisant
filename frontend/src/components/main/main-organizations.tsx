@@ -38,8 +38,6 @@ export const MainOrganizations: React.FC = () => {
     navigate(`/documents/${orgId}`); 
   };
 
-  console.log(organizations);
-
   if (isLoading) {
     return <div className="loading-message">Загрузка организаций...</div>;
   }

@@ -1,107 +1,141 @@
 @use '../lib/variables';
 
-.profile-container {
-  background-color: variables.$color-bg;
-  min-height: 100vh;
-  padding: 2rem;
-  display: flex;
-  justify-content: center;
-  align-items: flex-start;
-}
-
-.profile {
-  background-color: variables.$color-card;
-  border: 1px solid variables.$color-input-border;
-  border-radius: 12px;
-  max-width: 700px;
-  width: 100%;
-  padding: 2rem;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-  margin: auto;
-
-  &__title {
-    font-size: 2rem;
-    color: variables.$color-text;
-    font-weight: 600;
-    text-align: left;
-  }
-
-  &__error {
-    color: variables.$color-error;
-  }
-
-  &__loading {
-    color: variables.$color-input;
-  }
-
-  &__container {
+.profile-page {
+  color: variables.$color-text;
+  
+  .profile-header {
     display: flex;
     align-items: center;
-    margin: 20px 0;
-    gap: 15px;
+    gap: 2rem;
+    margin-bottom: 3rem;
+    padding-bottom: 2rem;
+    border-bottom: 1px solid variables.$color-input-border;
   }
 
-  &__avatar {
-    width: 60px;
-    height: 60px;
+  .profile-avatar {
+    width: 100px;
+    height: 100px;
     border-radius: 50%;
     background-color: variables.$color-button;
-    color: #fff;
+    color: white;
     display: flex;
     align-items: center;
     justify-content: center;
+    font-size: 2.5rem;
     font-weight: 600;
-    font-size: 1.2rem;
-    text-transform: uppercase;
-    flex-shrink: 0;
   }
 
-  &__info {
+  .profile-title {
+    h1 {
+      font-size: 2.5rem;
+      margin: 0;
+      color: variables.$color-text;
+    }
+
+    .profile-subtitle {
+      font-size: 1.2rem;
+      color: variables.$color-text-muted;
+      margin: 0.5rem 0 0;
+    }
+  }
+
+  .profile-content {
     display: flex;
     flex-direction: column;
-    gap: 1rem;
+    gap: 3rem;
+  }
 
-    p {
-      font-size: 1rem;
+  .profile-section {
+    h2 {
+      font-size: 1.5rem;
+      margin-bottom: 1.5rem;
       color: variables.$color-text;
-      margin: 0;
+      padding-bottom: 0.5rem;
+      border-bottom: 1px solid variables.$color-input-border;
+    }
+  }
 
-      strong {
-        color: variables.$color-text-muted;
+  .profile-info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 2rem;
+
+    div {
+      label {
+        display: block;
         font-weight: 500;
-        margin-right: 0.5rem;
+        color: variables.$color-text-muted;
+        margin-bottom: 0.5rem;
+      }
+
+      p {
+        margin: 0;
+        font-size: 1.1rem;
       }
     }
   }
 
-  &__tags {
-    margin-top: 1.5rem;
+  .organizations-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1.5rem;
 
-    strong {
-      font-size: 1rem;
-      color: variables.$color-text;
-      margin-bottom: 0.5rem;
-      display: inline-block;
-    }
+    .organization-item {
+      background: variables.$color-card;
+      padding: 1.5rem;
+      border-radius: 8px;
+      border: 1px solid variables.$color-input-border;
 
-    ul {
-      padding-left: 1.2rem;
-      list-style: disc;
+      h3 {
+        margin: 0 0 0.5rem;
+        font-size: 1.2rem;
+      }
 
-      li {
+      p {
+        margin: 0;
         color: variables.$color-text-muted;
-        margin-bottom: 0.25rem;
+        font-size: 0.95rem;
+      }
+    }
+  }
 
-        ul {
-          padding-left: 1rem;
-          list-style: circle;
+  .tags-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 1.5rem;
 
-          li {
-            font-size: 0.95rem;
-            color: variables.$color-text-muted;
-          }
+    .tag-item {
+      background: variables.$color-card;
+      padding: 1.5rem;
+      border-radius: 8px;
+      border: 1px solid variables.$color-input-border;
+
+      h3 {
+        margin: 0 0 1rem;
+        font-size: 1.1rem;
+      }
+
+      ul {
+        margin: 0;
+        padding-left: 1.2rem;
+        list-style: disc;
+
+        li {
+          margin-bottom: 0.25rem;
+          color: variables.$color-text-muted;
         }
       }
     }
+  }
+
+  .profile-loading,
+  .profile-error {
+    text-align: center;
+    font-size: 1.2rem;
+    padding: 2rem;
+  }
+
+  .profile-error {
+    color: variables.$color-error;
   }
 }
