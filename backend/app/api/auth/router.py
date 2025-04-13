@@ -80,7 +80,7 @@ async def get_current_user(
         phone=user.phone if user.phone else "",
         type_notification=user.type_notification,
         user_organizations=organizations_data,
-        admin_in_organization=admin_in_organizations[0] if admin_in_organizations else None,
+        admin_in_organization=admin_in_organizations,
         is_super_admin=user.is_super_admin,
         user_departments_ids=user_departments_ids,
         organization_tags=org_tags
