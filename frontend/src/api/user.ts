@@ -1,6 +1,5 @@
 import { axiosInstance } from './instance';
 import {ProfileProps} from "../types/profile.ts";
-import axios from "axios";
 
 export const userEmailLogin = async (email: string) => {
   try {
