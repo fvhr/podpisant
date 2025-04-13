@@ -51,6 +51,24 @@ class DocSignStageCreateSchema(BaseModel):
             created_at=doc_sign_stage.created_at
         )
 
+class StageSignerInfoSchema(BaseModel):
+    user_id: UUID
+    fio: str
+    email: str
+    signed_at: datetime | None
+    signature_type: str | None
+
+class DocumentStageDetailSchema(BaseModel):
+    id: int
+    name: str
+    number: int
+    deadline: datetime | None
+    is_current: bool
+    created_at: datetime
+    signed_users: list[StageSignerInfoSchema]
+    unsigned_users: list[StageSignerInfoSchema]
+    is_completed: bool
+
 
 
 class DocumentSchema(BaseModel):

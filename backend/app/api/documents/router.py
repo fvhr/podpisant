@@ -8,12 +8,12 @@ from fastapi import APIRouter, UploadFile, File, Form, Depends, HTTPException, R
 from minio import Minio
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import selectinload
+from sqlalchemy.orm import selectinload, session
 
 from api.auth.idp import get_current_user
 from api.auth.user_service import get_user_orgs_with_admin_and_tags
 from api.documents.schemas import CreateDocumentSchema, DocumentSchema, AddStagesToDocumentSchema, \
-    DocSignStageCreateSchema
+    DocSignStageCreateSchema, DocumentStageDetailSchema, StageSignerInfoSchema
 from database.models import User, Document, DocSignStage, StageSigner
 from database.session_manager import get_db
 from minio_client.client import get_minio_client, DOCUMENTS_BUCKET_NAME, MINIO_PUBLIC_URL
@@ -210,3 +210,61 @@ async def add_stages_to_document(
         await session.rollback()
         raise HTTPException(status_code=500, detail=str(e))
 
+
+@documents_router.get("/{document_id}/stages", response_model=list[DocumentStageDetailSchema])
+async def get_document_stages_with_signers(
+    document_id: int,
+    session: AsyncSession = Depends(get_db)
+) -> list[DocumentStageDetailSchema]:
+    try:
+        document = await session.get(Document, document_id)
+        if not document:
+            raise HTTPException(status_code=404, detail="Document not found")
+
+        stages = (await session.execute(
+            select(DocSignStage)
+            .where(DocSignStage.doc_id == document_id)
+            .options(
+                selectinload(DocSignStage.signers).joinedload(StageSigner.user),
+                selectinload(DocSignStage.document)
+            )
+            .order_by(DocSignStage.stage_number)
+        )).scalars().all()
+
+        result = []
+        for stage in stages:
+            signed_users = []
+            unsigned_users = []
+
+            for signer in stage.signers:
+                user_info = StageSignerInfoSchema(
+                    user_id=signer.user_id,
+                    fio=signer.user.fio,
+                    email=signer.user.email,
+                    signed_at=signer.signed_at,
+                    signature_type=signer.signature_type
+                )
+
+                if signer.signed_at:
+                    signed_users.append(user_info)
+                else:
+                    unsigned_users.append(user_info)
+
+            is_completed = len(unsigned_users) == 0 and len(stage.signers) > 0
+
+            result.append(DocumentStageDetailSchema(
+                id=stage.id,
+                name=stage.name,
+                number=stage.stage_number,
+                deadline=stage.deadline,
+                is_current=stage.is_current,
+                created_at=stage.created_at,
+                signed_users=signed_users,
+                unsigned_users=unsigned_users,
+                is_completed=is_completed
+            ))
+
+        return result
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
