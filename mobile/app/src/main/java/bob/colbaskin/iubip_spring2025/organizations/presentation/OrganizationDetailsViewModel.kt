@@ -6,7 +6,6 @@ import bob.colbaskin.iubip_spring2025.organizations.domain.models.Organization
 import bob.colbaskin.iubip_spring2025.organizations.domain.remote.OrganizationsRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.TimeoutCancellationException
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
@@ -29,7 +28,7 @@ class OrganizationDetailsViewModel @Inject constructor(
     private val _state = MutableStateFlow(OrganizationDetailsState())
     val state: StateFlow<OrganizationDetailsState> = _state
 
-    fun loadOrganization(id: String) {
+    fun loadOrganization(id: Int) {
         viewModelScope.launch {
             _state.update { it.copy(isLoading = true, error = null) }
             try {
