@@ -38,7 +38,10 @@ class UserOrganization(Base):
     __tablename__ = "user_organization"
 
     user_id: Mapped[UUID] = mapped_column(ForeignKey("user.id"), primary_key=True)
-    organization_id: Mapped[int] = mapped_column(ForeignKey("organization.id"), primary_key=True)
+    organization_id: Mapped[int] = mapped_column(
+        ForeignKey('organization.id', ondelete="CASCADE"),
+        primary_key=True
+    )
     tags: Mapped[dict] = mapped_column(JSONB, nullable=True)
 
     user = relationship("User", back_populates="organizations")
