@@ -3,6 +3,7 @@ import { AiFillDelete, AiOutlinePlus } from 'react-icons/ai';
 import { getAllDepartaments } from '../../api/departament';
 import { getAllEmployes } from '../../api/employes';
 import { addEmployee } from '../../api/user';
+import { useProfile } from '../ProfileContext';
 import { AddEmployeeModal } from './employes-modal';
 
 interface Employee {
@@ -11,7 +12,7 @@ interface Employee {
   phone: string;
   email: string;
   type_notification: string;
-  is_dep_admin: boolean;
+  is_super_admin: boolean;
   id_dep: number;
 }
 
@@ -26,6 +27,8 @@ export const EmployeesList: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [departments, setDepartments] = useState<{ id: number; name: string }[]>([]);
   const orgId = Number(localStorage.getItem('currentOrgId'));
+
+  const { profile } = useProfile();
 
   const fetchEmployees = async () => {
     setIsLoading((prev) => ({ ...prev, list: true }));
@@ -93,13 +96,16 @@ export const EmployeesList: React.FC = () => {
     <main className="employees-container">
       <div className="employees-header">
         <h1 className="employees-title">Все сотрудники</h1>
-        <button
-          className="add-employee-btn"
-          onClick={() => setIsModalOpen(true)}
-          disabled={isLoading.add}>
-          <AiOutlinePlus className="icon" />
-          {isLoading.add ? 'Добавление...' : 'Добавить сотрудника'}
-        </button>
+        {profile?.is_super_admin && (
+          <button
+            className="add-employee-btn"
+            onClick={() => setIsModalOpen(true)}
+            disabled={isLoading.add}>
+            <AiOutlinePlus className="icon" />
+            {isLoading.add ? 'Добавление...' : 'Добавить сотрудника'}
+          </button>
+        )}
+
         {error && <div className="error-message">{error}</div>}
       </div>
 
@@ -112,14 +118,12 @@ export const EmployeesList: React.FC = () => {
               <div className="employee-content">
                 <h3 className="employee-name">{emp.fio}</h3>
                 <div className="employee-contacts">
-                  <p className="employee-phone">
-                    {emp.phone === null ? 'Не указан' : emp.phone}{' '}
-                  </p>
+                  <p className="employee-phone">{emp.phone === null ? 'Не указан' : emp.phone} </p>
                   <p className="employee-email">{emp.email}</p>
                 </div>
                 <div className="employee-meta">
-                  <span className={`employee-admin ${emp.is_dep_admin ? 'admin' : ''}`}>
-                    {emp.is_dep_admin ? 'Администратор' : 'Сотрудник'}
+                  <span className={`employee-admin ${emp.is_super_admin ? 'admin' : ''}`}>
+                    {emp.is_super_admin ? 'Администратор' : 'Сотрудник'}
                   </span>
                   <span className="employee-notification">
                     Предпочтительная связь:{' '}
@@ -131,10 +135,12 @@ export const EmployeesList: React.FC = () => {
                   </span>
                 </div>
               </div>
-              <div className="employee-actions">
-                <AiFillDelete className="delete-icon" />
-                <span className="delete-text">Удалить</span>
-              </div>
+              {profile?.is_super_admin &&
+                <div className="employee-actions">
+                  <AiFillDelete className="delete-icon" />
+                  <span className="delete-text">Удалить</span>
+                </div>
+              }
             </div>
           ))}
         </div>

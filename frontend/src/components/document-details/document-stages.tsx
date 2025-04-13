@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { FiCheck, FiChevronDown, FiChevronUp, FiX } from 'react-icons/fi';
 import { useParams } from 'react-router-dom';
 import { getDocumentOrganization } from '../../api/documents';
@@ -8,45 +8,60 @@ type Signature = {
   fio: string;
   status: 'signed' | 'in_progress' | 'rejected';
   signed_at?: string;
+  signature_type: string | null;
 };
 
 type Stage = {
   id: number;
   name: string;
+  number: number;
+  is_current: boolean;
   signatures: Signature[];
 };
 
 type DocumentData = Stage[];
 
-export const DocumentStages: React.FC = () => {
+interface Props {
+  refreshTrigger: boolean;
+}
+
+export const DocumentStages = ({ refreshTrigger }: Props) => {
   const [expandedStage, setExpandedStage] = useState<number | null>(null);
   const [documentData, setDocumentData] = useState<DocumentData>([]);
+  const [currentStage, setCurrentStage] = useState<Stage | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const { docId } = useParams<{ docId?: string }>();
 
-  useEffect(() => {
-    const fetchDocumentStages = async () => {
-      try {
-        setIsLoading(true);
-        const documentId = docId ? parseInt(docId, 10) : null;
+  const fetchDocumentStages = async () => {
+    try {
+      setIsLoading(true);
+      const documentId = docId ? parseInt(docId, 10) : null;
 
-        if (!documentId || isNaN(documentId)) {
-          throw new Error('Неверный ID документа');
-        }
-
-        const response = await getDocumentOrganization(documentId);
-        setDocumentData(response);
-      } catch (err) {
-        console.error('Ошибка загрузки стадий:', err);
-        setError('Не удалось загрузить данные документа');
-      } finally {
-        setIsLoading(false);
+      if (!documentId || isNaN(documentId)) {
+        throw new Error('Неверный ID документа');
       }
-    };
 
+      const response = await getDocumentOrganization(documentId);
+      setDocumentData(response);
+
+      const activeStage = response.find((stage: Stage) => stage.is_current);
+      if (activeStage) {
+        setCurrentStage(activeStage);
+        setExpandedStage(activeStage.id);
+        localStorage.setItem('currentStageId', activeStage.id.toString());
+      }
+    } catch (err) {
+      console.error('Ошибка загрузки стадий:', err);
+      setError('Не удалось загрузить данные документа');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
     fetchDocumentStages();
-  }, [docId]);
+  }, [docId, refreshTrigger]);
 
   const toggleStage = (stageId: number) => {
     setExpandedStage(expandedStage === stageId ? null : stageId);
@@ -63,14 +78,18 @@ export const DocumentStages: React.FC = () => {
   if (!documentData || documentData.length === 0) {
     return <div className="error">Данные документа не найдены</div>;
   }
+  console.log(currentStage);
 
   return (
     <div className="document-details">
       <div className="document-stages">
         {documentData.map((stage) => (
-          <div key={stage.id} className="stage-card">
+          <div key={stage.id} className={`stage-card ${stage.is_current ? 'current-stage' : ''}`}>
             <div className="stage-header" onClick={() => toggleStage(stage.id)}>
-              <h3>{stage.name}</h3>
+              <h3>
+                Этап {stage.number}: {stage.name}
+                {stage.is_current && <span className="current-badge">Текущий</span>}
+              </h3>
               <span className="toggle-icon">
                 {expandedStage === stage.id ? <FiChevronUp /> : <FiChevronDown />}
               </span>
@@ -83,10 +102,12 @@ export const DocumentStages: React.FC = () => {
                     <li key={signature.user_id} className="employee-item">
                       <span>{signature.fio}</span>
                       <div className="status-indicator">
-                        {signature.status === 'signed' && <FiCheck className="approved" />}
-                        {signature.status === 'rejected' && <FiX className="rejected" />}
-                        {signature.status === 'in_progress' && (
-                          <span className="pending">Ожидает</span>
+                        {signature.signature_type !== null && (
+                          <FiCheck style={{ color: 'green', fontSize: '1.2rem' }} />
+                        )}
+                        {signature.signature_type === '' && <FiX style={{ color: 'red' }} />}
+                        {signature.signature_type === null && (
+                          <span className="pending">ожидает...</span>
                         )}
                       </div>
                     </li>

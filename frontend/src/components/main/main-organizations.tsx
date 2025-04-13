@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { AiFillDelete, AiFillPlusCircle } from 'react-icons/ai';
 import { useNavigate } from 'react-router-dom';
-import {getCurrentUserOrganizations, fetchProfile} from '../../api/user';
 import { deleteOrganization } from '../../api/organization.ts';
+import { fetchProfile, getCurrentUserOrganizations } from '../../api/user';
+import { Organization } from '../../types/organization.ts';
+import { useProfile } from '../ProfileContext.tsx';
+import { MainDeleteModal } from './main-delete-modal.tsx';
 import { MainModal } from './main-modal';
-import {MainDeleteModal} from "./main-delete-modal.tsx";
-import {Organization} from "../../types/organization.ts";
 
 export const MainOrganizations: React.FC = () => {
   const navigate = useNavigate();
@@ -17,15 +18,14 @@ export const MainOrganizations: React.FC = () => {
   const [showModal, setShowModal] = useState(false);
   const [selectedOrgId, setSelectedOrgId] = useState<number | null>(null);
 
+  const { profile } = useProfile();
+
   useEffect(() => {
     const loadData = async () => {
       try {
         setIsLoading(true);
 
-        const [orgs, profile] = await Promise.all([
-          getCurrentUserOrganizations(),
-          fetchProfile(),
-        ]);
+        const [orgs, profile] = await Promise.all([getCurrentUserOrganizations(), fetchProfile()]);
 
         setOrganizations(orgs || []);
         setUserId(profile.id);
@@ -65,11 +65,11 @@ export const MainOrganizations: React.FC = () => {
       console.error('Ошибка при удалении:', error);
     }
   };
-  
+
   const handleOrganizationClick = (orgId: number) => {
     navigate(`/documents/${orgId}`);
   };
-    
+
   if (isLoading) {
     return <div className="loading-message">Загрузка организаций...</div>;
   }
@@ -79,52 +79,57 @@ export const MainOrganizations: React.FC = () => {
   }
 
   return (
-      <main className="organizations-container">
-        <div className="organizations-header">
+    <main className="organizations-container">
+      <div className="organizations-header">
+        {profile?.is_super_admin && (
           <button className="add-organization-button" onClick={() => setIsModalOpen(true)}>
             <AiFillPlusCircle className="button-icon" />
             Добавить организацию
           </button>
-          {error && <div className="error-message">{error}</div>}
-        </div>
+        )}
 
-        <div className="organizations-list">
-          {organizations.length > 0 ? (
-              organizations.map((org) => (
-                  <div key={org.id} className="organization-card">
-                    <div className="organization-content" onClick={() => handleOrganizationClick(org.id)}>
-                      <h3 className="organization-name">{org.name}</h3>
-                      <p className="organization-description">{org.description}</p>
-                    </div>
-                    <div
-                        className="organization-actions"
-                        onClick={() => {
-                          setSelectedOrgId(org.id);
-                          setShowModal(true);
-                        }}
-                    >
-                      <AiFillDelete className="delete-icon" />
-                    </div>
-                  </div>
-              ))
-          ) : (
-              <div className="no-organizations-message">
-                У вас пока нет организаций. Создайте первую!
+        {error && <div className="error-message">{error}</div>}
+      </div>
+
+      <div className="organizations-list">
+        {organizations.length > 0 ? (
+          organizations.map((org) => (
+            <div key={org.id} className="organization-card">
+              <div className="organization-content" onClick={() => handleOrganizationClick(org.id)}>
+                <h3 className="organization-name">{org.name}</h3>
+                <p className="organization-description">{org.description}</p>
               </div>
-          )}
-        </div>
 
-        {showModal && (
-            <MainDeleteModal onClose={() => setShowModal(false)} onConfirm={handleDelete} />
+              {profile?.is_super_admin && (
+                <div
+                  className="organization-actions"
+                  onClick={() => {
+                    setSelectedOrgId(org.id);
+                    setShowModal(true);
+                  }}>
+                  <AiFillDelete className="delete-icon" />
+                </div>
+              )}
+            </div>
+          ))
+        ) : (
+          <div className="no-organizations-message">
+            У вас пока нет организаций. Создайте первую!
+          </div>
         )}
+      </div>
 
-        {isModalOpen && userId && (
-            <MainModal
-                onClose={() => setIsModalOpen(false)}
-                onSuccess={refreshOrganizations}
-                admin_id='9fcc954f-dec7-45d7-911f-c8394c73e5d6'
-            />
-        )}
-      </main>
+      {showModal && (
+        <MainDeleteModal onClose={() => setShowModal(false)} onConfirm={handleDelete} />
+      )}
+
+      {isModalOpen && userId && (
+        <MainModal
+          onClose={() => setIsModalOpen(false)}
+          onSuccess={refreshOrganizations}
+          admin_id="9fcc954f-dec7-45d7-911f-c8394c73e5d6"
+        />
+      )}
+    </main>
   );
 };

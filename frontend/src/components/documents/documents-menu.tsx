@@ -1,4 +1,5 @@
 import { FiPlus } from 'react-icons/fi';
+import { useProfile } from '../ProfileContext';
 
 interface MenuProps {
   setActiveTab: (tab: 'all' | 'signed' | 'rejected' | 'in_progress') => void;
@@ -7,6 +8,7 @@ interface MenuProps {
 }
 
 export const DocumentsMenu = ({ activeTab, setActiveTab, onOpenModal }: MenuProps) => {
+  const { profile } = useProfile();
   return (
     <div className="documents-header">
       <div className="header-left">
@@ -34,11 +36,12 @@ export const DocumentsMenu = ({ activeTab, setActiveTab, onOpenModal }: MenuProp
           </button>
         </div>
       </div>
-
-      <button onClick={onOpenModal} className="create-document-btn">
-        <FiPlus className="icon" />
-        Создать документ
-      </button>
+      {profile?.is_super_admin && (
+        <button onClick={onOpenModal} className="create-document-btn">
+          <FiPlus className="icon" />
+          Создать документ
+        </button>
+      )}
     </div>
   );
 };

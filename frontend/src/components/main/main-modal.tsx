@@ -28,7 +28,7 @@ export const MainModal: React.FC<MainModalProps> = ({ onClose, onSuccess, admin_
     try {
       await addOrganization({
         ...data,
-        admin_id
+        admin_id,
       });
 
       reset();
