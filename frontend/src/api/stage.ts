@@ -1,7 +1,7 @@
 import { axiosInstance } from './instance';
 
 export const addStage = async (
-	id: number, 
+  id: number,
   name: string,
   number: number,
   deadline: Date,

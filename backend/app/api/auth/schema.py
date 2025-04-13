@@ -27,7 +27,7 @@ class UserView(BaseModel):
     phone: str | None
     is_super_admin: bool
     type_notification: TypeNotificationEnum | None
-    admin_in_organization: int | None
+    admin_in_organization: list[int] | None
     user_organizations: list[OrganizationView] | None
     user_departments_ids: list[int]
     organization_tags: Dict[int, dict]

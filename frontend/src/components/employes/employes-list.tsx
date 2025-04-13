@@ -3,6 +3,7 @@ import { AiFillDelete, AiOutlinePlus } from 'react-icons/ai';
 import { getAllDepartaments } from '../../api/departament';
 import { getAllEmployes, deleteUserFromDepartment } from '../../api/employes';
 import { addEmployee } from '../../api/user';
+import { useProfile } from '../ProfileContext';
 import { AddEmployeeModal } from './employes-modal';
 
 interface Employee {
@@ -89,7 +90,7 @@ export const EmployeesList: React.FC = () => {
             console.error('Ошибка: Не хватает данных для удаления');
             return;
         }
-
+          
         setIsLoading((prev) => ({ ...prev, list: true }));
         setError(null);
 
@@ -172,7 +173,17 @@ export const EmployeesList: React.FC = () => {
                     ))}
                 </div>
             )}
-
+              </div>
+              {profile?.is_super_admin &&
+                <div className="employee-actions">
+                  <AiFillDelete className="delete-icon" />
+                  <span className="delete-text">Удалить</span>
+                </div>
+              }
+            </div>
+          ))}
+        </div>
+      )}
             {isModalOpen && (
                 <AddEmployeeModal
                     onClose={() => setIsModalOpen(false)}

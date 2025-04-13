@@ -84,3 +84,30 @@ async def user_departament(
     except Exception as ex:
         print(ex)
         raise HTTPException(detail='Internal server error', status_code=500)
+
+
+@user_router.delete("/{user_uuid}/{dep_id}")
+async def user_departament(
+        user_uuid: str,
+        dep_id: int,
+        user: User = Depends(get_current_user),
+        session: AsyncSession = Depends(get_db)):
+    if not user.is_super_admin:
+        result = await session.execute(
+            select(UserDepartment).where(
+                UserDepartment.user_id == user.id,
+                UserDepartment.department_id == dep_id,
+                UserDepartment.is_admin is True
+            )
+        )
+        user_dep = result.scalar_one_or_none()
+        if not user_dep:
+            raise UserNotSuperAdmin
+    del_user = await session.get(User, user_uuid)
+    query = select(UserDepartment).where(UserDepartment.department_id == dep_id,
+                                         UserDepartment.user_id == user_uuid)
+    del_deps = await session.execute(query)
+    del_deps = del_deps.scalar_one_or_none()
+    if del_deps:
+        await session.delete(del_deps)
+    await session.delete(del_user)

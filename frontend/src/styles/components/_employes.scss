@@ -28,7 +28,7 @@
   align-items: center;
   gap: 0.5rem;
   padding: 0.75rem 1.5rem;
-  background-color:  #4e46b3; // #4e46b3
+  background-color: #4e46b3; // #4e46b3
   color: white;
   border: none;
   border-radius: 8px;
@@ -74,7 +74,7 @@
   border: 1px solid $color-input-border; // #3a3c6e
   overflow: hidden;
   transition: all 0.3s ease;
-	cursor: pointer;
+  cursor: pointer;
 
   &:hover {
     transform: translateY(-5px);
@@ -123,9 +123,9 @@
 /* Статус и уведомления */
 .employee-meta {
   display: flex;
-	align-items: center;
+  align-items: center;
   flex-wrap: wrap;
- gap: 1rem;
+  gap: 1rem;
 }
 
 .employee-admin {
@@ -297,7 +297,6 @@
   }
 }
 
-
 .employee-modal-form-group {
   margin-bottom: 1.5rem;
 
@@ -401,7 +400,7 @@
 }
 
 .employee-submit-button {
-  background-color:  #4e46b3;
+  background-color: #4e46b3;
   color: $color-text;
   border: none;
   padding: 0.75rem 1.5rem;

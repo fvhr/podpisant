@@ -84,6 +84,25 @@ export const downloadDocument = async (id: number) => {
     window.URL.revokeObjectURL(url);
   } catch (error) {
     console.error('Ошибка при скачивании документа:', error);
+  }
+}
+
+export const signatureDocument = async (document_id: number, stage_id: number) => {
+  try {
+    const response = await axiosInstance.post(`/documents/${document_id}/stages/${stage_id}/sign`);
+    return response.data;
+  } catch (error) {
+    console.error('Documents error:', error);
+    throw error;
+  }
+};
+
+export const rejectDocument = async (document_id: number, stage_id: number) => {
+  try {
+    const response = await axiosInstance.post(`/documents/${document_id}/stages/${stage_id}/reject`);
+    return response.data;
+  } catch (error) {
+    console.error('Documents error:', error);
     throw error;
   }
 };
