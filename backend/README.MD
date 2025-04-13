@@ -73,5 +73,3 @@ password = "postgres"
 host = "109.120.178.67"
 port = 6379
 ```
-
----
