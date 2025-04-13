@@ -386,8 +386,10 @@ async def reject_document(
 ) -> dict:
     """
     Отклонение подписания документа пользователем
+    Документ помечается как REJECTED только если все участники этапа отклонили его
     """
     try:
+        # Получаем этап и проверяем, что он текущий
         stage = await session.get(DocSignStage, stage_id)
         if not stage:
             raise HTTPException(status_code=404, detail="Stage not found")
@@ -398,6 +400,7 @@ async def reject_document(
                 detail="Can only reject current stage documents"
             )
 
+        # Получаем запись о подписании для текущего пользователя
         signer = (await session.execute(
             select(StageSigner)
             .where(StageSigner.stage_id == stage_id)
@@ -413,15 +416,42 @@ async def reject_document(
         if signer.rejected_at:
             raise HTTPException(status_code=400, detail="Document already rejected")
 
+        # Обновляем запись об отклонении
         signer.rejected_at = datetime.now(timezone.utc)
         signer.signature_type = "rejected"
 
-        # document = await session.get(Document, document_id)
-        # document.status = DocSignStatus.REJECTED
-        # document.rejected_by = current_user.id
-        # document.rejected_at = datetime.now(timezone.utc)
+        # Проверяем статус других участников этапа
+        total_signers = (await session.execute(
+            select(func.count())
+            .select_from(StageSigner)
+            .where(StageSigner.stage_id == stage_id)
+        )).scalar()
 
-        stage.is_current = False
+        rejected_count = (await session.execute(
+            select(func.count())
+            .select_from(StageSigner)
+            .where(StageSigner.stage_id == stage_id)
+            .where(StageSigner.rejected_at != None)
+        )).scalar() + 1  # +1 для текущего пользователя
+
+        signed_count = (await session.execute(
+            select(func.count())
+            .select_from(StageSigner)
+            .where(StageSigner.stage_id == stage_id)
+            .where(StageSigner.signed_at != None)
+        )).scalar()
+
+        document = await session.get(Document, document_id)
+
+        # Если все отклонили - помечаем документ как отклоненный
+        if rejected_count == total_signers and signed_count == 0:
+            document.status = DocSignStatus.REJECTED
+            document.rejected_by = current_user.id
+            document.rejected_at = datetime.now(timezone.utc)
+            stage.is_current = False
+            is_fully_rejected = True
+        else:
+            is_fully_rejected = False
 
         await session.commit()
 
@@ -430,7 +460,10 @@ async def reject_document(
             "document_id": document_id,
             "stage_id": stage_id,
             "rejected_at": signer.rejected_at.isoformat(),
-            "rejected_by": str(current_user.id)
+            "rejected_by": str(current_user.id),
+            "is_fully_rejected": is_fully_rejected,
+            "rejected_count": rejected_count,
+            "total_signers": total_signers
         }
 
     except Exception as e:
