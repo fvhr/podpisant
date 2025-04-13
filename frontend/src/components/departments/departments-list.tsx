@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { AiOutlinePlus } from 'react-icons/ai';
 import { FiCheck, FiChevronDown, FiChevronUp } from 'react-icons/fi';
 import { createDepartment, getAllDepartaments } from '../../api/departament';
+import { useProfile } from '../ProfileContext';
 import { DepartmentModal } from './departments-modal';
 
 type User = {
@@ -23,6 +24,8 @@ export const DepartmentsList: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const orgId = Number(localStorage.getItem('currentOrgId'));
+
+  const { profile } = useProfile();
 
   const fetchDepartments = async () => {
     try {
@@ -94,13 +97,16 @@ export const DepartmentsList: React.FC = () => {
     <div className="access-control">
       <div className="employees-header">
         <h1 className="employees-title">Управление отделами</h1>
-        <button
-          className="add-employee-btn"
-          onClick={() => setIsModalOpen(true)}
-          disabled={isLoading}>
-          <AiOutlinePlus className="icon" />
-          {isLoading ? 'Добавление...' : 'Добавить отдел'}
-        </button>
+        {profile?.is_super_admin && (
+          <button
+            className="add-employee-btn"
+            onClick={() => setIsModalOpen(true)}
+            disabled={isLoading}>
+            <AiOutlinePlus className="icon" />
+            {isLoading ? 'Добавление...' : 'Добавить отдел'}
+          </button>
+        )}
+
         {error && <div className="error-message">{error}</div>}
       </div>
 
@@ -131,19 +137,21 @@ export const DepartmentsList: React.FC = () => {
                     department.users.map((user) => (
                       <div key={user.id} className="access-control__employee">
                         <span>{user.fio}</span>
-                        <div className="access-control__checkbox-wrapper">
-                          <span className="access-control__label">Групповая рассылка</span>
-                          <label className="access-control__checkbox">
-                            <input
-                              type="checkbox"
-                              checked={user.hasAccess}
-                              onChange={() => toggleUserAccess(department.id, user.id)}
-                            />
-                            <span className="access-control__checkmark">
-                              {user.hasAccess && <FiCheck />}
-                            </span>
-                          </label>
-                        </div>
+                        {
+                          <div className="access-control__checkbox-wrapper">
+                            <span className="access-control__label">Групповая рассылка</span>
+                            <label className="access-control__checkbox">
+                              <input
+                                type="checkbox"
+                                checked={user.hasAccess}
+                                onChange={() => toggleUserAccess(department.id, user.id)}
+                              />
+                              <span className="access-control__checkmark">
+                                {user.hasAccess && <FiCheck />}
+                              </span>
+                            </label>
+                          </div>
+                        }
                       </div>
                     ))
                   )}

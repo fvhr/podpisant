@@ -1,4 +1,4 @@
-import {AiOutlineFile, AiOutlineSolution, AiOutlineTeam, AiOutlineUser} from 'react-icons/ai';
+import { AiOutlineFile, AiOutlineSolution, AiOutlineTeam, AiOutlineUser } from 'react-icons/ai';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import '../styles/app.scss';
 import { NavItem, SidebarProps } from '../types/navbar.ts';
@@ -13,7 +13,7 @@ export const navItems: NavItem[] = [
 export const Sidebar = ({ isOpen, toggleSidebar }: SidebarProps) => {
   const location = useLocation();
   const navigate = useNavigate();
-  
+
   // Проверяем активность маршрута, учитывая параметры
   const isActive = (path: string) => {
     // Для документов проверяем, начинается ли путь с /documents
@@ -41,10 +41,10 @@ export const Sidebar = ({ isOpen, toggleSidebar }: SidebarProps) => {
   const handleDocumentsClick = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    
+
     // Получаем orgId из localStorage или другого хранилища
     const orgId = localStorage.getItem('currentOrgId');
-    
+
     if (orgId) {
       navigate(`/documents/${orgId}`);
     } else {
@@ -92,8 +92,7 @@ export const Sidebar = ({ isOpen, toggleSidebar }: SidebarProps) => {
                 <a
                   href="#"
                   className={`sidebar__menu--button ${isActive(item.path) ? 'active' : ''}`}
-                  onClick={handleDocumentsClick}
-                >
+                  onClick={handleDocumentsClick}>
                   <div className="sidebar__icon-container">
                     <item.icon className="sidebar__menu--icon" />
                     {!isOpen && <span className="sidebar__icon-label">{item.label}</span>}
@@ -104,8 +103,7 @@ export const Sidebar = ({ isOpen, toggleSidebar }: SidebarProps) => {
                 <Link
                   to={item.path}
                   className={`sidebar__menu--button ${isActive(item.path) ? 'active' : ''}`}
-                  onClick={(e) => e.stopPropagation()}
-                >
+                  onClick={(e) => e.stopPropagation()}>
                   <div className="sidebar__icon-container">
                     <item.icon className="sidebar__menu--icon" />
                     {!isOpen && <span className="sidebar__icon-label">{item.label}</span>}

@@ -2,8 +2,8 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import { useForm } from 'react-hook-form';
 import { FiChevronDown, FiChevronUp, FiX } from 'react-icons/fi';
-import { addStage } from '../../api/stage';
 import { useParams } from 'react-router-dom';
+import { addStage } from '../../api/stage';
 
 interface Employee {
   id: number;
@@ -20,12 +20,12 @@ interface StageFormData {
   stageNumber: number;
   deadline: string;
   employees: string[];
-	selectedEmployees: string[]
+  user_ids: string[];
 }
 
 interface CreateStageModalProps {
   onClose: () => void;
-  onCreate: (stage: StageFormData) => void;
+  onCreate: () => void;
   employees: Employee[];
 }
 
@@ -49,7 +49,7 @@ export const CreateStageModal: React.FC<CreateStageModalProps> = ({
 
   const [isEmployeesOpen, setIsEmployeesOpen] = React.useState(false);
   const selectedEmployees = watch('employees') || [];
-	const { docId } = useParams();
+  const { docId } = useParams();
   const documentId = Number(docId);
 
   const toggleEmployee = (employee: string) => {
@@ -59,7 +59,7 @@ export const CreateStageModal: React.FC<CreateStageModalProps> = ({
     setValue('employees', newSelection);
   };
 
-	console.log(selectedEmployees)
+  console.log(selectedEmployees);
 
   const onSubmit = async (data: StageFormData) => {
     try {
@@ -68,10 +68,17 @@ export const CreateStageModal: React.FC<CreateStageModalProps> = ({
         stageNumber: data.stageNumber,
         deadline: new Date(data.deadline),
         user_ids: selectedEmployees,
+        employees: data.employees, // Сохраняем для формы
       };
 
-      await addStage(documentId, stageData.name, stageData.stageNumber, stageData.deadline, stageData.user_ids);
-      onCreate(stageData); 
+      await addStage(
+        documentId,
+        stageData.name,
+        stageData.stageNumber,
+        stageData.deadline,
+        stageData.user_ids,
+      );
+      onCreate();
       onClose();
     } catch (error) {
       console.error('Ошибка при создании этапа:', error);
