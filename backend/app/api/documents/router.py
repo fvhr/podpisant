@@ -240,15 +240,6 @@ async def get_document_stages_with_signers(
             rejected_count = 0
 
             for signer in stage.signers:
-                # Безопасное декодирование данных
-                try:
-                    decrypted_phone = encryptor.decrypt(signer.user.phone) if signer.user.phone else None
-                    decrypted_fio = encryptor.decrypt(signer.user.fio) if signer.user.fio else signer.user.fio
-                except Exception as e:
-                    logger.error(f"Decryption error for user {signer.user_id}: {str(e)}")
-                    decrypted_phone = "[encrypted]"
-                    decrypted_fio = signer.user.fio or "[encrypted]"
-
                 # Формируем информацию о подписи/отклонении
                 digital_signature = None
                 if signer.digital_signature:
@@ -258,12 +249,14 @@ async def get_document_stages_with_signers(
                         signed_at=signer.signed_at,
                         is_valid=True
                     )
-
+                try:
+                    fio = encryptor.decrypt(signer.user.fio)
+                except Exception:
+                    fio = signer.user.fio
                 signer_info = StageSignerInfoSchema(
                     user_id=signer.user_id,
-                    fio=decrypted_fio,
+                    fio=fio,
                     email=signer.user.email,
-                    phone_last4=decrypted_phone[-4:] if decrypted_phone else None,
                     signed_at=signer.signed_at,
                     rejected_at=signer.rejected_at,
                     signature_type=signer.signature_type,
@@ -276,13 +269,7 @@ async def get_document_stages_with_signers(
                 if signer.rejected_at:
                     rejected_count += 1
 
-            # Определяем статусы этапа
-            all_signed = signed_count == len(stage.signers)
-            all_rejected = rejected_count == len(stage.signers)
-            any_rejected = rejected_count > 0
-
-            is_completed = (all_signed or any_rejected) and len(stage.signers) > 0
-            is_rejected = all_rejected
+            is_completed = (signed_count == len(stage.signers) or rejected_count > 0) and len(stage.signers) > 0
 
             result.append(DocumentStageDetailSchema(
                 id=stage.id,
@@ -292,17 +279,15 @@ async def get_document_stages_with_signers(
                 is_current=stage.is_current,
                 created_at=stage.created_at,
                 is_completed=is_completed,
-                is_rejected=is_rejected,
+                is_rejected=rejected_count == len(stage.signers),
                 signatures=signatures,
                 signed_count=signed_count,
-                rejected_count=rejected_count,
                 total_signers=len(stage.signers)
             ))
 
         return result
 
     except Exception as e:
-        logger.exception("Error fetching document stages")
         raise HTTPException(status_code=500, detail=str(e))
 
 
