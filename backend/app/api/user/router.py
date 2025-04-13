@@ -43,8 +43,8 @@ async def get_user_by_id(user_id: UUID, session: AsyncSession = Depends(get_db))
     return response
 
 
-@user_router.post("/user/departament")
-async def user_departament(
+@user_router.post("/user/department", response_model=UserResponse)
+async def add_user_to_department(
     data: UserDepartament,
     current_user: User = Depends(get_current_user),
     session: AsyncSession = Depends(get_db)
@@ -54,8 +54,8 @@ async def user_departament(
             select(UserDepartment)
             .where(
                 UserDepartment.user_id == current_user.id,
-                UserDepartment.department_id == data.department_id,
-                UserDepartment.is_admin == True  # Исправлено сравнение
+                UserDepartment.department_id == data.dep_id,
+                UserDepartment.is_admin == True
             )
         )
         if not admin_check.scalar_one_or_none():
@@ -64,25 +64,28 @@ async def user_departament(
                 detail="Недостаточно прав для добавления пользователя"
             )
 
-        # Проверка на попытку назначить админом департамента
-        if data.is_department_admin:
+        if data.is_dep_admin:
             raise HTTPException(
                 status_code=403,
                 detail="Только супер-админ может назначать администраторов департамента"
             )
 
-    existing_user = await session.execute(
-        select(User)
-        .where(User.email == data.email)
-    )
-    existing_user = existing_user.scalar_one_or_none()
+    # 2. Проверяем существование пользователя по email (если email указан)
+    existing_user = None
+    if data.email:
+        existing_user = await session.execute(
+            select(User)
+            .where(User.email == data.email)
+        )
+        existing_user = existing_user.scalar_one_or_none()
 
     if existing_user:
+        # 3. Если пользователь существует - добавляем связь с департаментом
         existing_link = await session.execute(
             select(UserDepartment)
             .where(
                 UserDepartment.user_id == existing_user.id,
-                UserDepartment.department_id == data.department_id
+                UserDepartment.department_id == data.dep_id
             )
         )
 
@@ -92,35 +95,42 @@ async def user_departament(
                 detail="Пользователь уже состоит в этом департаменте"
             )
 
-        # Создаем новую связь
         user_department = UserDepartment(
             user_id=existing_user.id,
-            department_id=data.department_id,
-            is_admin=data.is_department_admin
+            department_id=data.dep_id,
+            is_admin=data.is_dep_admin
         )
         session.add(user_department)
     else:
         # 4. Если пользователя нет - создаем нового
         new_user = User(
-            fio=encryptor.encrypt(data.fio),
+            fio=data.fio,
             email=data.email,
             telegram_username=data.telegram_username,
-            phone=encryptor.encrypt(data.phone),
+            phone=data.phone,
             type_notification=data.type_notification
         )
         session.add(new_user)
-        await session.flush()  # Получаем ID нового пользователя
+        await session.flush()
 
         user_department = UserDepartment(
             user_id=new_user.id,
-            department_id=data.department_id,
-            is_admin=data.is_department_admin
+            department_id=data.dep_id,
+            is_admin=data.is_dep_admin
         )
         session.add(user_department)
 
-    await session.commit()
-    user = existing_user if existing_user else new_user
-    return await get_user_by_id(user.id, session)
+    try:
+        await session.commit()
+        user = existing_user if existing_user else new_user
+        return await get_user_by_id(user.id, session)
+    except Exception as ex:
+        await session.rollback()
+        logger.error(f"Error adding user to department: {str(ex)}")
+        raise HTTPException(
+            status_code=500,
+            detail="Internal server error"
+        )
 
 
 @user_router.delete("/{user_uuid}/{dep_id}")

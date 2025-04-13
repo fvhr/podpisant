@@ -5,10 +5,14 @@ from nats.aio.client import Client as NATS
 from aiogram import Bot
 from typing import Dict
 import logging
+from dotenv import load_dotenv
 
 # Настройка логгирования
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
+
+
+load_dotenv()
 
 
 class TelegramNotifier:
@@ -61,7 +65,7 @@ TOKEN = os.getenv("BOT_TOKEN")
 
 async def main():
     notifier = TelegramNotifier(
-        nats_url="nats://localhost:4222",
+        nats_url=os.getenv("NATS_URL"),
         bot_token=TOKEN
     )
 
