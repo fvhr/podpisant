@@ -2,6 +2,9 @@ from uuid import UUID
 
 from pydantic import BaseModel
 
+from api.auth.schema import UserView
+
+
 class OrganizationBase(BaseModel):
     name: str
     description: str
@@ -14,7 +17,12 @@ class OrganizationView(BaseModel):
 class CreateOrganizationSchema(BaseModel):
     name: str
     description: str
-    admin_id: UUID | None
+    admin_id: UUID | None = None
+
+
+# class OrganizationUserView(UserView):
+#     department_ids: list[int] = []
+#     department_names: list[str] = []
 
 
 # class OrganizationUserView(BaseModel):
