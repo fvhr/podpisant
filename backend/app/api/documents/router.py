@@ -8,11 +8,13 @@ from fastapi import APIRouter, UploadFile, File, Form, Depends, HTTPException, R
 from minio import Minio
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import selectinload
 
 from api.auth.idp import get_current_user
 from api.auth.user_service import get_user_orgs_with_admin_and_tags
-from api.documents.schemas import CreateDocumentSchema, DocumentSchema
-from database.models import User, Document
+from api.documents.schemas import CreateDocumentSchema, DocumentSchema, AddStagesToDocumentSchema, \
+    DocSignStageCreateSchema
+from database.models import User, Document, DocSignStage, StageSigner
 from database.session_manager import get_db
 from minio_client.client import get_minio_client, DOCUMENTS_BUCKET_NAME, MINIO_PUBLIC_URL
 
@@ -130,5 +132,81 @@ async def get_document_by_id(document_id: int, session: AsyncSession = Depends(g
     data = DocumentSchema.from_db(document)
     return data
 
-# @documents_router.post("/stages")
-# async def add_stages_to_document(data: AddStagesToDocumentSchema):
+
+@documents_router.post("/{document_id}/stages")
+async def add_stages_to_document(
+    data: list[AddStagesToDocumentSchema],
+    document_id: int,
+    session: AsyncSession = Depends(get_db)
+) -> list[DocSignStageCreateSchema]:
+    try:
+        result = []
+
+        document = await session.get(Document, document_id)
+        if not document:
+            raise HTTPException(status_code=404, detail="Document not found")
+
+        existing_stages = (await session.execute(
+            select(DocSignStage)
+            .where(DocSignStage.doc_id == document_id)
+            .options(selectinload(DocSignStage.signers))
+        )).scalars().all()
+
+        existing_numbers = {stage.stage_number for stage in existing_stages}
+
+        MOSCOW_TZ = ZoneInfo("Europe/Moscow")
+        created_at = datetime.now(MOSCOW_TZ)
+
+        for stage_data in data:
+            if stage_data.number in existing_numbers:
+                raise HTTPException(
+                    status_code=400,
+                    detail=f"Stage number {stage_data.number} already exists"
+                )
+
+            stage_db = DocSignStage(
+                name=stage_data.name,
+                doc_id=document_id,
+                deadline=stage_data.deadline,
+                stage_number=stage_data.number,
+                is_current=False,
+                created_at=created_at,
+            )
+
+            session.add(stage_db)
+            await session.flush()
+
+            if stage_data.user_ids:
+                for user_id in stage_data.user_ids:
+                    user = await session.get(User, user_id)
+                    if not user:
+                        raise HTTPException(
+                            status_code=404,
+                            detail=f"User with ID {user_id} not found"
+                        )
+
+                    signer = StageSigner(
+                        user_id=user_id,
+                        stage_id=stage_db.id,
+                    )
+                    session.add(signer)
+
+            result.append(stage_db)
+            existing_numbers.add(stage_data.number)
+
+        if not existing_stages and result:
+            first_stage = result[0]
+            first_stage.is_current = True
+            document.current_stage_id = first_stage.id
+
+        await session.commit()
+
+        return [await DocSignStageCreateSchema.from_db(stage, session) for stage in result]
+
+    except HTTPException:
+        await session.rollback()
+        raise
+    except Exception as e:
+        await session.rollback()
+        raise HTTPException(status_code=500, detail=str(e))
+
