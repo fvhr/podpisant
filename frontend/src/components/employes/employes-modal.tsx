@@ -9,23 +9,23 @@ interface Department {
 }
 
 interface EmployeeFormData {
+  id_dep: number;
   fullName: string;
   phone: string;
   email: string;
   type_notification: string;
   isAdmin: boolean;
-  departmentId: number;
 }
 
 interface AddEmployeeModalProps {
   onClose: () => void;
   onAdd: (data: {
+    id_dep: number;
     fullName: string;
     phone: string;
     email: string;
     typeNotification: string;
     isAdmin: boolean;
-    departmentId: number;
   }) => Promise<void>;
   isLoading: boolean;
   departments: Department[];
@@ -54,7 +54,7 @@ export const AddEmployeeModal: React.FC<AddEmployeeModalProps> = ({
     defaultValues: {
       type_notification: 'EMAIL',
       isAdmin: false,
-      departmentId: departments[0]?.id || 0, 
+      id_dep: departments[0]?.id || 0,
     },
   });
 
@@ -62,12 +62,12 @@ export const AddEmployeeModal: React.FC<AddEmployeeModalProps> = ({
 
   const onSubmit = async (data: EmployeeFormData) => {
     await onAdd({
+      id_dep: data.id_dep,
       fullName: data.fullName,
       phone: data.phone,
       email: data.email,
       typeNotification: data.type_notification,
       isAdmin: data.isAdmin,
-      departmentId: data.departmentId, 
     });
     reset();
   };
@@ -155,7 +155,7 @@ export const AddEmployeeModal: React.FC<AddEmployeeModalProps> = ({
                 <label htmlFor="department">Отдел</label>
                 <select
                   id="department"
-                  {...register('departmentId', { required: 'Выберите отдел' })}
+                  {...register('id_dep', { required: 'Выберите отдел' })}
                   disabled={isLoading}
                   className="department-select">
                   {departments.map((dept) => (
@@ -164,8 +164,8 @@ export const AddEmployeeModal: React.FC<AddEmployeeModalProps> = ({
                     </option>
                   ))}
                 </select>
-                {errors.departmentId && (
-                  <span className="employee-modal-error">{errors.departmentId.message}</span>
+                {errors.id_dep && (
+                  <span className="employee-modal-error">{errors.id_dep.message}</span>
                 )}
               </div>
 

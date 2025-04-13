@@ -1,5 +1,7 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { AiFillDelete, AiOutlinePlus } from 'react-icons/ai';
+import { getAllDepartaments } from '../../api/departament';
+import { getAllEmployes } from '../../api/employes';
 import { addEmployee } from '../../api/user';
 import { AddEmployeeModal } from './employes-modal';
 
@@ -10,55 +12,82 @@ interface Employee {
   email: string;
   type_notification: string;
   is_dep_admin: boolean;
+  id_dep: number;
 }
 
 export const EmployeesList: React.FC = () => {
   const [employees, setEmployees] = useState<Employee[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState({
+    list: false,
+    add: false,
+    departments: false,
+  });
   const [error, setError] = useState<string | null>(null);
+  const [departments, setDepartments] = useState<{ id: number; name: string }[]>([]);
+  const orgId = Number(localStorage.getItem('currentOrgId'));
 
-  const handleDeleteClick = (id: number, e: React.MouseEvent) => {
-    e.stopPropagation();
-    setEmployees((emps) => emps.filter((emp) => emp.id !== id));
+  const fetchEmployees = async () => {
+    setIsLoading((prev) => ({ ...prev, list: true }));
+    setError(null);
+    try {
+      const data = await getAllEmployes(orgId);
+      setEmployees(data || []);
+    } catch (err) {
+      setError('Не удалось загрузить список сотрудников');
+      console.error(err);
+    } finally {
+      setIsLoading((prev) => ({ ...prev, list: false }));
+    }
   };
 
-  const departaments = [
-    { id: 1, name: 'Отдел разработки' },
-    { id: 2, name: 'Отдел маркетинга' },
-    { id: 3, name: 'Отдел продаж' },
-    { id: 4, name: 'Финансовый отдел' },
-    { id: 5, name: 'HR отдел' },
-  ];
+  const fetchDepartments = async () => {
+    setIsLoading((prev) => ({ ...prev, departments: true }));
+    try {
+      const data = await getAllDepartaments(orgId);
+      setDepartments(data || []);
+    } catch (err) {
+      setError('Не удалось загрузить отделы');
+      console.error(err);
+    } finally {
+      setIsLoading((prev) => ({ ...prev, departments: false }));
+    }
+  };
 
   const handleAddEmployee = async (employeeData: {
+    id_dep: number;
     fullName: string;
     phone: string;
     email: string;
     typeNotification: string;
     isAdmin: boolean;
   }) => {
-    setIsLoading(true);
+    setIsLoading((prev) => ({ ...prev, add: true }));
     setError(null);
 
     try {
-      const newEmployee = await addEmployee(
+      await addEmployee(
+        employeeData.id_dep,
         employeeData.fullName,
         employeeData.email,
         employeeData.phone,
         employeeData.typeNotification,
         employeeData.isAdmin,
       );
-
-      setEmployees((prev) => [...prev, newEmployee]);
+      await fetchEmployees();
       setIsModalOpen(false);
     } catch (err) {
       setError('Не удалось добавить сотрудника');
       console.error(err);
     } finally {
-      setIsLoading(false);
+      setIsLoading((prev) => ({ ...prev, add: false }));
     }
   };
+
+  useEffect(() => {
+    fetchDepartments();
+    fetchEmployees();
+  }, []);
 
   return (
     <main className="employees-container">
@@ -67,43 +96,56 @@ export const EmployeesList: React.FC = () => {
         <button
           className="add-employee-btn"
           onClick={() => setIsModalOpen(true)}
-          disabled={isLoading}>
+          disabled={isLoading.add}>
           <AiOutlinePlus className="icon" />
-          {isLoading ? 'Добавление...' : 'Добавить сотрудника'}
+          {isLoading.add ? 'Добавление...' : 'Добавить сотрудника'}
         </button>
         {error && <div className="error-message">{error}</div>}
       </div>
 
-      <div className="employees-grid">
-        {employees.map((emp) => (
-          <div key={emp.id} className="employee-card">
-            <div className="employee-content">
-              <h3 className="employee-name">{emp.fio}</h3>
-              <div className="employee-contacts">
-                <p className="employee-phone">{emp.phone}</p>
-                <p className="employee-email">{emp.email}</p>
+      {isLoading.list ? (
+        <div className="loading-message">Загрузка сотрудников...</div>
+      ) : (
+        <div className="employees-grid">
+          {employees.map((emp) => (
+            <div key={emp.id} className="employee-card">
+              <div className="employee-content">
+                <h3 className="employee-name">{emp.fio}</h3>
+                <div className="employee-contacts">
+                  <p className="employee-phone">
+                    {emp.phone === null ? 'Не указан' : emp.phone}{' '}
+                  </p>
+                  <p className="employee-email">{emp.email}</p>
+                </div>
+                <div className="employee-meta">
+                  <span className={`employee-admin ${emp.is_dep_admin ? 'admin' : ''}`}>
+                    {emp.is_dep_admin ? 'Администратор' : 'Сотрудник'}
+                  </span>
+                  <span className="employee-notification">
+                    Предпочтительная связь:{' '}
+                    {emp.type_notification === 'TG'
+                      ? 'Telegram'
+                      : emp.type_notification === 'EMAIL'
+                      ? 'Email'
+                      : 'SMS'}
+                  </span>
+                </div>
               </div>
-              <div className="employee-meta">
-                <span className={`employee-admin ${emp.is_dep_admin ? 'admin' : ''}`}>
-                  {emp.is_dep_admin ? 'Администратор' : 'Сотрудник'}
-                </span>
-                <span className="employee-notification">Уведомления: {emp.type_notification}</span>
+              <div className="employee-actions">
+                <AiFillDelete className="delete-icon" />
+                <span className="delete-text">Удалить</span>
               </div>
             </div>
-            <div className="employee-actions" onClick={(e) => handleDeleteClick(emp.id, e)}>
-              <AiFillDelete className="delete-icon" />
-              <span className="delete-text">Удалить</span>
-            </div>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      )}
 
       {isModalOpen && (
         <AddEmployeeModal
           onClose={() => setIsModalOpen(false)}
           onAdd={handleAddEmployee}
-          isLoading={isLoading}
-          departments={departaments}
+          isLoading={isLoading.add}
+          departments={departments}
         />
       )}
     </main>

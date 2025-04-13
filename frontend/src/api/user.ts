@@ -81,6 +81,7 @@ export const getCurrentUserOrganizations = async () => {
 };
 
 export const addEmployee = async (
+  dep_id: number,
   fio: string,
   email: string,
   phone: string,
@@ -89,6 +90,7 @@ export const addEmployee = async (
 ) => {
   try {
     const response = await axiosInstance.post('/users/user/departament', {
+      dep_id,
       fio,
       email,
       phone,
