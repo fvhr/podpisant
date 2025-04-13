@@ -1,6 +1,5 @@
 import { ProfileProps } from '../types/profile.ts';
 import { axiosInstance } from './instance';
-import {ProfileProps} from "../types/profile.ts";
 
 export const userEmailLogin = async (email: string) => {
   try {
@@ -79,6 +78,7 @@ export const getCurrentUserOrganizations = async () => {
     console.error('User info error:', error);
     throw error;
   }
+};
 
 export const addEmployee = async (
   dep_id: number,
