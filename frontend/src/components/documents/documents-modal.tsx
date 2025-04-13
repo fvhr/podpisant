@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import ReactDOM from 'react-dom';
 import { useForm } from 'react-hook-form';
 import { FiUpload, FiX } from 'react-icons/fi';
+import { useParams } from 'react-router-dom';
 import { createDocument } from '../../api/documents';
 
 interface DocumentModalProps {
@@ -25,13 +26,15 @@ export const DocumentModal: React.FC<DocumentModalProps> = ({ onClose, onSuccess
 
   const fileName = watch('document')?.[0]?.name;
   const [isLoading, setIsLoading] = useState(false);
+  const { orgId } = useParams();
+  const numberOrgId = Number(orgId);
 
   const onSubmit = async (data: DocumentFormData) => {
     setIsLoading(true);
     try {
       await createDocument({
         name: data.name,
-        organization_id: 10,
+        organization_id: numberOrgId,
         file: data.document[0],
       });
 

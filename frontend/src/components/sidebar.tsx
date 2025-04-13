@@ -6,14 +6,22 @@ import { NavItem, SidebarProps } from '../types/navbar.ts';
 export const navItems: NavItem[] = [
   { label: 'Сотрудники', path: '/employees', icon: AiOutlineTeam },
   { label: 'Отделы', path: '/departments', icon: AiOutlineSolution },
-  { label: 'Документы', path: '/documents', icon: AiOutlineFile },
+  { label: 'Документы', path: '/documents', icon: AiOutlineFile }, // Базовый путь
   { label: 'Профиль', path: '/profile', icon: AiOutlineUser },
 ];
 
 export const Sidebar = ({ isOpen, toggleSidebar }: SidebarProps) => {
   const location = useLocation();
-  const isActive = (path: string) => location.pathname === path;
   const navigate = useNavigate();
+  
+  // Проверяем активность маршрута, учитывая параметры
+  const isActive = (path: string) => {
+    // Для документов проверяем, начинается ли путь с /documents
+    if (path === '/documents') {
+      return location.pathname.startsWith('/documents');
+    }
+    return location.pathname === path;
+  };
 
   const handleSidebarClick = (e: React.MouseEvent) => {
     const target = e.target as HTMLElement;
@@ -27,6 +35,21 @@ export const Sidebar = ({ isOpen, toggleSidebar }: SidebarProps) => {
 
   const handleLogout = () => {
     navigate('/main');
+  };
+
+  // Функция для обработки перехода к документам
+  const handleDocumentsClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    
+    // Получаем orgId из localStorage или другого хранилища
+    const orgId = localStorage.getItem('currentOrgId');
+    
+    if (orgId) {
+      navigate(`/documents/${orgId}`);
+    } else {
+      navigate('/documents'); // Переход на базовый маршрут, если orgId нет
+    }
   };
 
   return (
@@ -65,16 +88,31 @@ export const Sidebar = ({ isOpen, toggleSidebar }: SidebarProps) => {
         <ul className="sidebar__menu">
           {navItems.map((item) => (
             <li key={item.path} className="sidebar__menu--item">
-              <Link
-                to={item.path}
-                className={`sidebar__menu--button ${isActive(item.path) ? 'active' : ''}`}
-                onClick={(e) => e.stopPropagation()}>
-                <div className="sidebar__icon-container">
-                  <item.icon className="sidebar__menu--icon" />
-                  {!isOpen && <span className="sidebar__icon-label">{item.label}</span>}
-                </div>
-                {isOpen && <span className="sidebar__menu--text">{item.label}</span>}
-              </Link>
+              {item.path === '/documents' ? (
+                <a
+                  href="#"
+                  className={`sidebar__menu--button ${isActive(item.path) ? 'active' : ''}`}
+                  onClick={handleDocumentsClick}
+                >
+                  <div className="sidebar__icon-container">
+                    <item.icon className="sidebar__menu--icon" />
+                    {!isOpen && <span className="sidebar__icon-label">{item.label}</span>}
+                  </div>
+                  {isOpen && <span className="sidebar__menu--text">{item.label}</span>}
+                </a>
+              ) : (
+                <Link
+                  to={item.path}
+                  className={`sidebar__menu--button ${isActive(item.path) ? 'active' : ''}`}
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <div className="sidebar__icon-container">
+                    <item.icon className="sidebar__menu--icon" />
+                    {!isOpen && <span className="sidebar__icon-label">{item.label}</span>}
+                  </div>
+                  {isOpen && <span className="sidebar__menu--text">{item.label}</span>}
+                </Link>
+              )}
             </li>
           ))}
         </ul>
