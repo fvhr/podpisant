@@ -67,7 +67,7 @@
 
     &:focus {
       outline: none;
-      border-color: variables.$color-button;
+      border-color: $color-button-dark;
     }
   }
 }
@@ -90,7 +90,7 @@
   color: variables.$color-text-muted;
 
   &:hover {
-    border-color: variables.$color-button;
+    border-color: $color-button-dark;
     color: variables.$color-text;
   }
 
@@ -136,7 +136,7 @@
 }
 
 .submit-button {
-  background: variables.$color-button;
+  background: $color-button-dark;
   border: none;
   color: variables.$color-text;
 

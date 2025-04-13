@@ -69,7 +69,8 @@ export const DepartmentsList: React.FC = () => {
       const newDepartment = await createDepartment(orgId, departmentName, 'Описание нового отдела');
       console.log('New Department:', newDepartment);
 
-      setDepartments((prevDepartments) => [...prevDepartments, newDepartment]);
+      const updatedDepartments = await getAllDepartaments(orgId);
+      setDepartments(updatedDepartments || []);
 
       setIsModalOpen(false);
     } catch (error) {
@@ -77,6 +78,7 @@ export const DepartmentsList: React.FC = () => {
       console.error(error);
     }
   };
+
 
   if (isLoading) {
     return <div className="access-control__loading">Загрузка отделов...</div>;
@@ -111,14 +113,16 @@ export const DepartmentsList: React.FC = () => {
               {departments.map((department) => (
                   <div
                       key={department.id}
-                      className={`access-control__department ${expandedDepartment === department.id ? 'expanded' : ''}`}>
+                      className={`access-control__department ${expandedDepartment === department.id ? 'expanded' : ''}`}
+                  >
                     <div
                         className="access-control__header"
-                        onClick={() => toggleDepartment(department.id)}>
+                        onClick={() => toggleDepartment(department.id)}
+                    >
                       <h3>{department.name}</h3>
                       <span className="access-control__icon">
-                  {expandedDepartment === department.id ? <FiChevronUp /> : <FiChevronDown />}
-                </span>
+                {expandedDepartment === department.id ? <FiChevronUp /> : <FiChevronDown />}
+              </span>
                     </div>
 
                     {expandedDepartment === department.id && (
@@ -138,8 +142,8 @@ export const DepartmentsList: React.FC = () => {
                                             onChange={() => toggleUserAccess(department.id, user.id)}
                                         />
                                         <span className="access-control__checkmark">
-                              {user.hasAccess && <FiCheck />}
-                            </span>
+                            {user.hasAccess && <FiCheck />}
+                          </span>
                                       </label>
                                     </div>
                                   </div>

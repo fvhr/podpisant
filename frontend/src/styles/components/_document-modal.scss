@@ -81,7 +81,7 @@
 
       &:focus {
         outline: none;
-        border-color: $color-button;
+        border-color: $color-button-dark;
       }
     }
 
@@ -135,9 +135,19 @@
   gap: 0.75rem;
 
   &:hover {
-    background: rgba($color-button, 0.1);
+    background: rgba($color-button-dark, 0.1);
   }
 
+  &.selected {
+    background: rgba($color-button-dark, 0.2);
+  }
+
+  .checkmark {
+    position: absolute;
+    right: 1rem;
+    color: $color-button-dark;
+  }
+  
   .doc-employee-checkbox {
     accent-color: $color-button;
     width: 1rem;
@@ -160,7 +170,7 @@
     border-radius: 6px;
     font-weight: 500;
     cursor: pointer;
-    background: $color-button;
+    background: $color-button-dark;
     color: $color-text;
     border: none;
     transition: background 0.2s;
