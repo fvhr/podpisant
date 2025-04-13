@@ -89,7 +89,7 @@ async def user_departament(
 @user_router.delete("/{user_uuid}/{dep_id}")
 async def user_departament(
         user_uuid: str,
-        dep_id: str,
+        dep_id: int,
         user: User = Depends(get_current_user),
         session: AsyncSession = Depends(get_db)):
     if not user.is_super_admin:
