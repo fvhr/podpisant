@@ -3,7 +3,6 @@ import { AiFillDelete, AiOutlinePlus } from 'react-icons/ai';
 import { getAllDepartaments } from '../../api/departament';
 import { getAllEmployes, deleteUserFromDepartment } from '../../api/employes';
 import { addEmployee } from '../../api/user';
-import { useProfile } from '../ProfileContext';
 import { AddEmployeeModal } from './employes-modal';
 
 interface Employee {
@@ -85,12 +84,12 @@ export const EmployeesList: React.FC = () => {
         }
     };
 
-    const handleDeleteEmployee = async (userUuid: string, depId: number | null) => {
+    const handleDeleteEmployee = async (userUuid: string, depId: number) => {
         if (!userUuid) {
             console.error('Ошибка: Не хватает данных для удаления');
             return;
         }
-          
+
         setIsLoading((prev) => ({ ...prev, list: true }));
         setError(null);
 
@@ -152,13 +151,12 @@ export const EmployeesList: React.FC = () => {
                                 </div>
                             </div>
 
-                            {/* Скрываем блок действий для супер админов */}
                             {!emp.is_super_admin && (
                                 <div
                                     className="employee-actions"
                                     onClick={() => {
                                         if (emp.id) {
-                                            const depId = emp.departments.length > 0 ? Number(emp.departments[0].department_id) : null;
+                                            const depId = emp.departments.length > 0 ? Number(emp.departments[0].department_id) : 0;
                                             handleDeleteEmployee(emp.id, depId);
                                         } else {
                                             console.error('Ошибка: id не определен');
@@ -173,17 +171,7 @@ export const EmployeesList: React.FC = () => {
                     ))}
                 </div>
             )}
-              </div>
-              {profile?.is_super_admin &&
-                <div className="employee-actions">
-                  <AiFillDelete className="delete-icon" />
-                  <span className="delete-text">Удалить</span>
-                </div>
-              }
-            </div>
-          ))}
-        </div>
-      )}
+
             {isModalOpen && (
                 <AddEmployeeModal
                     onClose={() => setIsModalOpen(false)}
