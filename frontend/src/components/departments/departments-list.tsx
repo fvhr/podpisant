@@ -4,7 +4,7 @@ import { getAllDepartaments } from '../../api/departament';
 
 type User = {
   id: number;
-  fio: string; 
+  fio: string;
   hasAccess: boolean;
 };
 
