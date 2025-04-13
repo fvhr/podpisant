@@ -7,8 +7,9 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
+from api.auth.idp import get_current_user
 from api.department.schemas import DepartmentView, CreateDepartmentSchema
-from database.models import Department, UserDepartment
+from database.models import Department, UserDepartment, User
 from database.session_manager import get_db
 
 department_router = APIRouter(prefix="/departments", tags=["departments"])
@@ -51,3 +52,4 @@ async def create_department(
     return ORJSONResponse({
         "department_id": department.id,
     })
+

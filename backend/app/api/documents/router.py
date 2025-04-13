@@ -2,7 +2,7 @@ import io
 import json
 import os
 import secrets
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 from hashlib import sha256
 from zoneinfo import ZoneInfo
 
@@ -18,7 +18,7 @@ from api.auth.user_service import get_user_orgs_with_admin_and_tags
 from api.documents.schemas import CreateDocumentSchema, DocumentSchema, AddStagesToDocumentSchema, \
     DocSignStageCreateSchema, DocumentStageDetailSchema, StageSignerInfoSchema, SignDocumentRequest, \
     DigitalSignatureSchema
-from database.models import User, Document, DocSignStage, StageSigner
+from database.models import User, Document, DocSignStage, StageSigner, Department, UserDepartment
 from database.models.document import DocSignStatus
 from database.session_manager import get_db
 from minio_client.client import get_minio_client, DOCUMENTS_BUCKET_NAME, MINIO_PUBLIC_URL
@@ -437,3 +437,98 @@ async def reject_document(
         await session.rollback()
         raise HTTPException(status_code=500, detail=str(e))
 
+
+@documents_router.post("/{document_id}/broadcast/{dep_id}")
+async def broadcast_to_department(
+    document_id: int,
+    dep_id: int,
+    session: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+) -> dict:
+    """
+    Рассылает документ всем пользователям указанного департамента
+    Создает общий этап подписания (stage_number=1) для всех сотрудников департамента
+    """
+    try:
+        document = await session.get(Document, document_id)
+        if not document:
+            raise HTTPException(status_code=404, detail="Document not found")
+
+        department = await session.get(Department, dep_id)
+        if not department:
+            raise HTTPException(status_code=404, detail="Department not found")
+
+        # if not await check_department_admin(department.organization_id, current_user.id, session):
+        #     raise HTTPException(status_code=403, detail="No permission to broadcast")
+
+        # Получаем всех пользователей департамента
+        users = (await session.execute(
+            select(User)
+            .join(UserDepartment)
+            .where(UserDepartment.department_id == dep_id)
+            .where(UserDepartment.user_id == User.id)
+        )).scalars().all()
+
+        if not users:
+            raise HTTPException(status_code=400, detail="Department has no users")
+
+        # Создаем этап подписания для департамента
+        moscow_tz = ZoneInfo("Europe/Moscow")
+        deadline = datetime.now(moscow_tz) + timedelta(days=7)  # Срок подписания 7 дней
+
+        stage = DocSignStage(
+            name=f"Подписание для {department.name}",
+            doc_id=document_id,
+            stage_number=1,
+            created_at=datetime.now(moscow_tz),
+            deadline=deadline,
+            is_current=True
+        )
+
+        session.add(stage)
+        await session.flush()  # Нужно для получения stage.id
+
+        # Добавляем всех пользователей департамента как подписантов
+        for user in users:
+            signer = StageSigner(
+                stage_id=stage.id,
+                user_id=user.id,
+                signature_type=None,
+                signed_at=None
+            )
+            session.add(signer)
+
+        document.status = DocSignStatus.IN_PROGRESS
+
+        await session.commit()
+
+        return {
+            "status": "broadcasted",
+            "document_id": document_id,
+            "department_id": dep_id,
+            "stage_id": stage.id,
+            "users_count": len(users),
+            "deadline": deadline.isoformat()
+        }
+
+    except Exception as e:
+        await session.rollback()
+        raise HTTPException(status_code=500, detail=str(e))
+
+# async def check_department_admin(org_id: int, user_id: UUID, session: AsyncSession) -> bool:
+#     """
+#     Проверяет, является ли пользователь администратором организации или департамента
+#     """
+#     # Проверка на админа организации
+#     is_org_admin = (await session.execute(
+#         select(UserOrganization)
+#         .where(UserOrganization.organization_id == org_id)
+#         .where(UserOrganization.user_id == user_id)
+#         .where(UserOrganization.is_admin == True)
+#     )).scalar_one_or_none()
+#
+#     if is_org_admin:
+#         return True
+#
+#     # Дополнительные проверки прав можно добавить здесь
+#     return False
