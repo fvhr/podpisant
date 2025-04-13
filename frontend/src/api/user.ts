@@ -81,7 +81,7 @@ export const addEmployee = async (
   is_dep_admin: boolean,
 ) => {
   try {
-    const response = await axiosInstance.post('/users/user/departament', {
+    const response = await axiosInstance.post('/users/user/department', {
       dep_id,
       fio,
       email,
