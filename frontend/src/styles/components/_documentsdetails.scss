@@ -112,7 +112,7 @@
     transition: background 0.2s;
 
     &:hover {
-      background: rgba(variables.$color-button, 0.05);
+      background: rgba(variables.$color-button-dark, 0.05);
     }
 
     h3 {
@@ -187,16 +187,16 @@
     transition: all 0.2s;
 
     &.download {
-      background: rgba(variables.$color-button, 0.4);
+      background: rgba(variables.$color-button-dark, 0.4);
       color: variables.$color-text;
 
       &:hover {
-        background: rgba(variables.$color-button, 0.8);
+        background: rgba(variables.$color-button-dark, 0.8);
       }
     }
 
     &.edit {
-      background: variables.$color-button;
+      background: variables.$color-button-dark;
       color: variables.$color-text;
 
       &:hover {

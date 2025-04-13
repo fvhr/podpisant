@@ -47,8 +47,7 @@ async def create_department(
 
     await session.flush()
 
-    await session.refresh(department)
-
+    await session.commit()
     return ORJSONResponse({
         "department_id": department.id,
     })

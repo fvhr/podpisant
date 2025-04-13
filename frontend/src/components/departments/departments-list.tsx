@@ -66,7 +66,9 @@ export const DepartmentsList: React.FC = () => {
       setIsLoading(true);
       await createDepartment(orgId, departmentName, 'Описание нового отдела');
 
-      await fetchDepartments();
+
+      const updatedDepartments = await getAllDepartaments(orgId);
+      setDepartments(updatedDepartments || []);
 
       setIsModalOpen(false);
     } catch (error) {
@@ -76,6 +78,7 @@ export const DepartmentsList: React.FC = () => {
       setIsLoading(false);
     }
   };
+
 
   if (isLoading) {
     return <div className="access-control__loading">Загрузка отделов...</div>;
@@ -102,46 +105,49 @@ export const DepartmentsList: React.FC = () => {
         </button>
         {error && <div className="error-message">{error}</div>}
       </div>
+        {departments.length === 0 ? (
+            <div className="access-control__empty">Нет доступных отделов</div>
+        ) : (
+            <div className="access-control__list">
+              {departments.map((department) => (
+                  <div
+                      key={department.id}
+                      className={`access-control__department ${expandedDepartment === department.id ? 'expanded' : ''}`}
+                  >
+                    <div
+                        className="access-control__header"
+                        onClick={() => toggleDepartment(department.id)}
+                    >
+                      <h3>{department.name}</h3>
+                      <span className="access-control__icon">
+                {expandedDepartment === department.id ? <FiChevronUp /> : <FiChevronDown />}
+              </span>
+                    </div>
 
-      {departments.length === 0 ? (
-        <div className="access-control__empty">Нет доступных отделов</div>
-      ) : (
-        <div className="access-control__list">
-          {departments.map((department) => (
-            <div
-              key={department.id}
-              className={`access-control__department ${
-                expandedDepartment === department.id ? 'expanded' : ''
-              }`}>
-              <div
-                className="access-control__header"
-                onClick={() => toggleDepartment(department.id)}>
-                <h3>{department.name}</h3>
-                <span className="access-control__icon">
-                  {expandedDepartment === department.id ? <FiChevronUp /> : <FiChevronDown />}
-                </span>
-              </div>
-
-              {expandedDepartment === department.id && (
-                <div className="access-control__content">
-                  {!department.users || department.users.length === 0 ? (
-                    <div className="access-control__empty">Нет пользователей в отделе</div>
-                  ) : (
-                    department.users.map((user) => (
-                      <div key={user.id} className="access-control__employee">
-                        <span>{user.fio}</span>
-                        <div className="access-control__checkbox-wrapper">
-                          <span className="access-control__label">Групповая рассылка</span>
-                          <label className="access-control__checkbox">
-                            <input
-                              type="checkbox"
-                              checked={user.hasAccess}
-                              onChange={() => toggleUserAccess(department.id, user.id)}
-                            />
-                            <span className="access-control__checkmark">
-                              {user.hasAccess && <FiCheck />}
-                            </span>
-                          </label>
+                    {expandedDepartment === department.id && (
+                        <div className="access-control__content">
+                          {!department.users || department.users.length === 0 ? (
+                              <div className="access-control__empty">Нет пользователей в отделе</div>
+                          ) : (
+                              department.users.map((user) => (
+                                  <div key={user.id} className="access-control__employee">
+                                    <span>{user.fio}</span>
+                                    <div className="access-control__checkbox-wrapper">
+                                      <span className="access-control__label">Групповая рассылка</span>
+                                      <label className="access-control__checkbox">
+                                        <input
+                                            type="checkbox"
+                                            checked={user.hasAccess}
+                                            onChange={() => toggleUserAccess(department.id, user.id)}
+                                        />
+                                        <span className="access-control__checkmark">
+                            {user.hasAccess && <FiCheck />}
+                          </span>
+                                      </label>
+                                    </div>
+                                  </div>
+                              ))
+                          )}
                         </div>
                       </div>
                     ))

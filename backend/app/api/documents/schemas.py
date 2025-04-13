@@ -1,7 +1,7 @@
 from datetime import datetime
 from uuid import UUID
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from database.models import DocSignStage
@@ -51,12 +51,19 @@ class DocSignStageCreateSchema(BaseModel):
             created_at=doc_sign_stage.created_at
         )
 
+class DigitalSignatureSchema(BaseModel):
+    signature_id: str
+    signed_at: datetime
+    is_valid: bool = True
+
 class StageSignerInfoSchema(BaseModel):
     user_id: UUID
     fio: str
     email: str
     signed_at: datetime | None
     signature_type: str | None
+    digital_signature: DigitalSignatureSchema | None
+
 
 class DocumentStageDetailSchema(BaseModel):
     id: int
@@ -65,10 +72,10 @@ class DocumentStageDetailSchema(BaseModel):
     deadline: datetime | None
     is_current: bool
     created_at: datetime
-    signed_users: list[StageSignerInfoSchema]
-    unsigned_users: list[StageSignerInfoSchema]
     is_completed: bool
-
+    signatures: list[StageSignerInfoSchema]  # Все подписи (подписанные и неподписанные)
+    signed_count: int  # Количество подписавших
+    total_signers: int  # Всего подписантов
 
 
 class DocumentSchema(BaseModel):
@@ -95,6 +102,6 @@ class DocumentSchema(BaseModel):
         )
 
 
-# class AddStagesToDocumentSchema(BaseModel):
-#     document_id: int
-#     stages: list[AddStagesSchema]
+class SignDocumentRequest(BaseModel):
+    phone_hash_salt: str
+    fio_hash: str
